@@ -5,3 +5,4 @@ packages/*/public/*.js
 packages/*/public/*.png
 
 packages/*/*.log
+packages/*/.env

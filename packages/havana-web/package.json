@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack -d",
-    "start": "webpack-dev-server --port 8089"
+    "start": "webpack-dev-server --port 8089",
+    "prod": "webpack -p --config webpack.prod.js"
   },
   "dependencies": {
     "ant-design-pro": "^2.3.2",
