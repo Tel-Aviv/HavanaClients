@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack -d",
-    "start": "webpack-dev-server --port 8089",
+    "start": "webpack-dev-server --port 8089 --mode development",
     "prod": "webpack -p --config webpack.prod.js"
   },
   "dependencies": {

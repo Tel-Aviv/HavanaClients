@@ -21,8 +21,8 @@ import { Pie } from 'ant-design-pro/lib/Charts';
 import ReactToPrint from 'react-to-print';
 
 import { DataContext } from './DataContext';
-import TableReport from './components/Reports/TableReport';
-import DocsUploader from './components/DocsUploader';
+import TableReport from '@reports/TableReport';
+import DocsUploader from '@components/DocsUploader';
 
 import { DECREASE_NOTIFICATIONS_COUNT,
          INCREASE_NOTIFICATION_COUNT } from "./redux/actionTypes";

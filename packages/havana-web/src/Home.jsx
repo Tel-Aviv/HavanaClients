@@ -27,9 +27,9 @@ import ReactToPrint from 'react-to-print';
 import { DataContext } from './DataContext';
 import { UPDATE_ITEM, SET_DIRECT_MANAGER } from "./redux/actionTypes";
 
-import TableReport from './components/reports/TableReport';
-import YearReport from './components/Reports/YearReport';
-import DocsUploader from './components/DocsUploader';
+import TableReport from '@reports/TableReport';
+import YearReport from '@reports/YearReport';
+import DocsUploader from '@components/DocsUploader';
 
 const Home = () => {
 
@@ -44,14 +44,15 @@ const Home = () => {
     const [totals, setTotals] = useState(0);
     const [userCompanyCode, setUserCompanyCode] = useState(0);
 
-    const [loadingData, setLoadingData] = useState(false)
+    const [loadingData, setLoadingData] = useState(false);
+    const [reportDataLoaded, setReportDataLoaded] = useState(false);
     const [calendarDate, setCalendarDate] = useState(moment());
     const [printModalVisible, setPrintModalVisible] = useState(false);
     const [signature, setSignature] = useState('');
     // Report Status Alert
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertType, setAlertType] = useState('info');
-    const [alertMessage, setAlertMessage] = useState('');
+    const [alert, setAlert] = useState({
+        type: 'info'
+    })
 
     const [validateModalOpen, setValidateModalOpen] = useState(false)
     const [invalidReportItems, setInvalidReportItems] = useState();
@@ -102,8 +103,12 @@ const Home = () => {
 
                 setEmployeKind(resp.data.kind);
 
-            } catch({response}) {
-                console.log(response)
+            } catch(err) {
+                console.error(err.message)
+                setAlert({
+                    message: err.message,
+                    type: 'error'
+                })
             }
         }
 
@@ -186,21 +191,22 @@ const Home = () => {
                             };
                 })
                 setReportData(data);
+                setReportDataLoaded(true);
 
                 setTotals(`${Math.floor(report.totalHours)}:${Math.round(report.totalHours % 1 * 60)}`);
 
                 setIsReportEditable(report.isEditable);
 
-            } catch({response}) {
-
-                if( response.data ) {
-                    setAlertMessage(response.data);
-                } else {
-                    setAlertMessage('Something went wrong')
-                }
+            } catch(err) {
                 
-                setAlertType('error');
-                setShowAlert(true);
+                const {response} = err;
+                const _message = response ? response.message : err.message;
+  
+                setAlert({
+                    message: _message,
+                    type: 'error'
+                })
+
             } finally {
                 setLoadingData(false)
             }
@@ -229,34 +235,44 @@ const Home = () => {
 
     const defineAlert = (data) => {
         if( data ) {
-            
-            setAlertType('info');
+
             if( !data.submitted ) {
-                setAlertMessage(`דוח שעות לחודש ${month}/${year} טרם נשלח לאישור`);
+                setAlert({
+                    type: 'info',
+                    message: `דוח שעות לחודש ${month}/${year} טרם נשלח לאישור`
+                });
             } else if( !data.approved ) {
 
                 if ( data.rejected ) {
-                    setAlertType('error');
-                    setAlertMessage(t('rejected_note') + data.note)
+                    setAlert({
+                        type: 'error',
+                        message: t('rejected_note') + data.note
+                    })
                 } else {
 
                     let _alertMessage = `דוח שעות לחודש ${month}/${year} טרם אושר`
                     if( data.assignedToName ) {
                         _alertMessage += ` ע"י ${data.assignedToName}`;
                     }
-                    setAlertMessage(_alertMessage);
+                    setAlert({
+                        type: 'info',
+                        message : _alertMessage
+                    });
                 }
             } else {
                 const whenApproved = moment(data.whenApproved).format('DD/MM/YYYY')
-                setAlertMessage(`דוח שעות לחודש ${month}/${year} אושר בתאריך ${whenApproved} ע"י ${data.assignedToName}`);
+                setAlert({
+                    type: 'info',
+                    message: `דוח שעות לחודש ${month}/${year} אושר בתאריך ${whenApproved} ע"י ${data.assignedToName}`
+                });
             }
 
         } else {
-            setAlertMessage(`דוח שעות לחודש ${month}/${year} טרם אושר`);
-            setAlertType('warning');
+            setAlert({
+                message: `דוח שעות לחודש ${month}/${year} טרם אושר`,
+                type: 'warning'
+            });
         }
-
-        setShowAlert(true);
     }
     
     const validateReport = () => {
@@ -341,17 +357,16 @@ const Home = () => {
             
             setReportSubmitted(true);
             setIsReportEditable(false)
-            setAlertType("info");
+
+            message.info(_message)
             
-        } catch( {response} ) {
-            if( response && response.data )
-                message.error(response.data);
-            else
-                message.error("Something went wrong on submission")
+        } catch( err ) {
+
+            const {response} = err;
+            _message = response ? response.message : err.message;
+            message.error(_message);
         }
 
-        setAlertMessage(_message);
-        setShowAlert(true);
     }
 
     const getSubmitTitle = () => {
@@ -615,10 +630,10 @@ const Home = () => {
                         style={{
                             opacity: alertOpacity,
                         }}
-                        message={alertMessage}
+                        message={alert.message}
                         className='hvn-item-rtl' 
                         showIcon 
-                        type={alertType} />
+                        type={alert.type} />
             }
             </Row>
             <Row gutter={[32, 32]}>
@@ -666,7 +681,7 @@ const Home = () => {
                                         reportCodes={reportCodes}
                                         daysOff={daysOff}
                                         manualUpdates={manualUpdates}
-                                        loading={loadingData}
+                                        loading={loadingData && !reportDataLoaded}
                                         scroll={{y: '400px'}}
                                         onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
                                         editable={isReportEditable}>

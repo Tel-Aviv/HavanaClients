@@ -8,7 +8,9 @@
         "web:build": "yarn workspace havana-web build",
         "web:start": "yarn workspace havana-web start",
         "web-m:build": "yarn workspace havana-web-m build",
-        "web-m:start": "yarn workspace havana-web-m start"
+        "web-m:start": "yarn workspace havana-web-m start",
+        "build": "concurrently --kill-others-on-fail \"yarn web:build\" \"yarn web-m:build\"",
+        "start": "concurrently --kill-others-on-fail \"yarn web:start\" \"yarn web-m:start\""
     },
     "dependencies": {
         "axios": "^0.20.0",
