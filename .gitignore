@@ -1,0 +1,7 @@
+node_modules
+
+packages/*/dist/*.js
+packages/*/public/*.js
+packages/*/public/*.png
+
+packages/*/*.log
