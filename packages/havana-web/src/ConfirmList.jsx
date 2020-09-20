@@ -225,9 +225,7 @@ const ConfirmList = () => {
                     className='hvn-item-rtl'
                     message={t('approvals_list')}/>
             </Row>
-            <Row gutter={[32, 32]} style={{
-                    margin: '0% 4%' 
-                }}>
+            <Row>
                 <Col span={24}>
                     <Tabs defaultActiveKey="1" 
                         type="line"

@@ -83,6 +83,9 @@ const Home = () => {
             try {
 
                 const resp = await dataContext.API.get('/me', { withCredentials: true })
+                if( !resp.data.managers )
+                    throw new Error(t('no_managers'));
+                    
                 setManagers(resp.data.managers);
 
                 const signature = resp.data.signature;
@@ -104,11 +107,7 @@ const Home = () => {
                 setEmployeKind(resp.data.kind);
 
             } catch(err) {
-                console.error(err.message)
-                setAlert({
-                    message: err.message,
-                    type: 'error'
-                })
+                handleError(err);
             }
         }
 
@@ -198,15 +197,7 @@ const Home = () => {
                 setIsReportEditable(report.isEditable);
 
             } catch(err) {
-                
-                const {response} = err;
-                const _message = response ? response.message : err.message;
-  
-                setAlert({
-                    message: _message,
-                    type: 'error'
-                })
-
+                handleError(err);
             } finally {
                 setLoadingData(false)
             }
@@ -214,6 +205,19 @@ const Home = () => {
 
         fetchData();
     }, [month, year])
+
+    const handleError = (err) => {
+
+        let _message = err.message;
+        const {response} = err;
+        if( response )
+            _message += `. URL: ${response.config.url}`;
+
+        setAlert({
+            message: _message,
+            type: 'error'
+        })
+    }
 
     const recalculateTotals = () => {
 
@@ -361,12 +365,8 @@ const Home = () => {
             message.info(_message)
             
         } catch( err ) {
-
-            const {response} = err;
-            _message = response ? response.message : err.message;
-            message.error(_message);
+            handleError(err);
         }
-
     }
 
     const getSubmitTitle = () => {

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Route, Switch, useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 
 import moment from 'moment';
 import i18n from 'i18next';
@@ -23,7 +24,9 @@ import { DataContext } from './DataContext';
 import ConfirmList from './ConfirmList';
 import Confirm from './Confirm';
 import Home from './Home';
-import Settings from './Settings'
+import Settings from './Settings';
+
+import { SET_NOTIFICATIONS_COUNT } from './redux/actionTypes';
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -36,10 +39,9 @@ i18n
 const App = () => {
 
     const history = useHistory();
+    const dispatch = useDispatch();
     const { t } = useTranslation();
 
-    const [month, setMonth] = useState(moment().month());
-    const [year, setYear] = useState(moment().year());
     const [displayNotifications, setDisplayNotificatios] = useState(false);
     const [notificationsCount, setNotificationsCount] = useState(0);
 
@@ -49,6 +51,49 @@ const App = () => {
         protocol: getProtocol(),
         API: API
     }
+
+    useEffect( () => {
+
+        const fetchData = async() => {
+            try {
+
+                let res = await context.API.get('/me/is_manager', {
+                    withCredentials: true
+                });
+
+                const isManager = res.data;
+                setDisplayNotificatios( isManager ? 'block' : 'none');
+
+                if( isManager ) {
+                    res = await context.API.get('/me/pendings/count', {
+                        withCredentials: true
+                    })
+                    dispatch( action_setNotificationCount(res.data) )
+                }
+
+            } catch(err) {
+                const {response} = err;
+                console.error(`${response.config.url}: ${err.message}`)
+            }
+        }
+
+        fetchData();
+
+    }, [displayNotifications])
+
+    const action_setNotificationCount = (count) => ({
+        type: SET_NOTIFICATIONS_COUNT,
+        data: count
+    })
+
+    const _notificationsCount = useSelector(
+        store => store.notificationsCountReducer.notificationsCount
+    )
+
+    useEffect( ()=> {
+        if( _notificationsCount )
+            setNotificationsCount(_notificationsCount);
+    }, [_notificationsCount])
 
     const onApprovalClicked = () => {
         history.push(`/confirmlist`);
@@ -70,11 +115,11 @@ const App = () => {
         </Helmet>
         <Layout layout='topmenu' 
                     locale='he-IL'> 
-                <Layout.Header className='ant-layout-header rtl'>
-                    <Menu mode="horizontal" className='ant-menu top-nav-menu ant-menu-blue' 
-                            style={{
-                                padding: '0 3%'
-                            }}>
+                <Layout.Header className='ant-layout-header rtl'
+                                style={{
+                                    padding: '0 1%'
+                                }}>
+                    <Menu mode="horizontal" className='ant-menu top-nav-menu ant-menu-blue'>
                         <Menu.Item key='avatar' style={{
                                 top: '6px',
                                 cursor: 'pointer'
