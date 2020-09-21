@@ -9,7 +9,7 @@ const FileManagerPlugin = require('filemanager-webpack-plugin');
 module.exports = {
     plugins: [
         new webpack.DefinePlugin({
-            "process.env": dotenv.parsed
+            "process.env.mock": process.env.mock
         }),
         new FileManagerPlugin({
           onEnd: {
@@ -79,6 +79,7 @@ module.exports = {
         extensions: ['*', '.js', '.jsx', 'less'],
         alias: {
             "@components": path.resolve(__dirname, "src/components"),
+            "@reports": path.resolve(__dirname, 'src/components/reports')
         }        
     },
     performance: {

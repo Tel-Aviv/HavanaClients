@@ -17,6 +17,7 @@
     },
     "scripts": {
         "web:build": "yarn workspace havana-web build",
+        "web:prod": "yarn workspace havana-web prod",
         "web:start": "yarn workspace havana-web start",
         "web-m:build": "yarn workspace havana-web-m build",
         "web-m:start": "yarn workspace havana-web-m start",
