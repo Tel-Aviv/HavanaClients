@@ -40,6 +40,7 @@ export const API = axios.create({
         //responseType: "json"
 });
 
+// Injected in webpack thru DefinePlugin
 if( process.env.mock ) {
     const mock = new MockAdapter(API);
 

@@ -10,15 +10,23 @@ module.exports = {
 
     plugins: [
         new FileManagerPlugin({
-          onEnd: {
-            copy: [
-                { 
-                    source: './dist/', 
-                    destination: process.env.publish_destination
-                }
-            ]
-          }
-        })
+            onEnd: {
+                copy: [
+                    { 
+                        source: './dist/', 
+                        destination: process.env.publish_destination
+                    }
+                ]
+            }
+            }),
+            new webpack.ProgressPlugin({
+                activeModules: true,
+                entries: true,
+                profile: true,
+            }),
+            new webpack.DefinePlugin({
+                "process.env.mock": process.env.mock
+            })
     ],
     entry: {
         bundle: ["@babel/polyfill", path.resolve(__dirname, './src/index.js')]
