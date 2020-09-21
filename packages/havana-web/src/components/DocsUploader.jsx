@@ -1,24 +1,16 @@
 // @flow
 import React, { useState, useContext, useEffect } from 'react';
-import axios from 'axios';
 import { useTranslation } from "react-i18next";
 import { Upload, Button, Icon, message } from 'antd'
 import { saveAs } from 'file-saver';
 
 import { DataContext } from "../DataContext";
 
-type Props = {
-    year : number, 
-    month: number, 
-    isOperational: boolean, 
-    employeeId: string
-}
-
-const DocsUploader = ({year, month, isOperational, employeeId}: Props) => {
+const DocsUploader = ({year, month, isOperational, employeeId}) => {
 
     const [docs, setDocs] = useState([]);
-    const [_year, _setYear] = useState<number>( year);
-    const [_month, _setMonth] = useState<number>(month);
+    const [_year, _setYear] = useState( year);
+    const [_month, _setMonth] = useState(month);
 
     const dataContext = useContext(DataContext);
 
@@ -32,24 +24,24 @@ const DocsUploader = ({year, month, isOperational, employeeId}: Props) => {
 
             try {
                 const url = (isOperational) ?
-                    //dataContext.API.get
-                    `${dataContext.protocol}://${dataContext.host}/me/reports/${year}/${month}/docs/` :
-                    `${dataContext.protocol}://${dataContext.host}/me/employees/${employeeId}/reports/${year}/${month}/docs`;
-                
-                    const res = await axios(url, {
-                        withCredentials: true
-                    })
+                    `/me/reports/${year}/${month}/docs/` :
+                    `/me/employees/${employeeId}/reports/${year}/${month}/docs`;
+
+                const res = await dataContext.API.get(url, {
+                    withCredentials: true
+                })
                     
-                    if (mounted) {
-                        const _docs = res.data.map( (item, index) => {
-                            return {
-                                uid: index,
-                                status: 'done',
-                                name: item
-                            }
-                        })
-                        setDocs(_docs);
-                    }
+                if (mounted) {
+                    const _docs = res.data.map( (item, index) => {
+                        return {
+                            uid: index,
+                            status: 'done',
+                            name: item
+                        }
+                    })
+                    setDocs(_docs);
+                }
+
             } catch( err ) {
                 console.error(err);
             }
@@ -70,7 +62,7 @@ const DocsUploader = ({year, month, isOperational, employeeId}: Props) => {
 
         try {
             const docName = file.name;
-            await axios.delete(`${dataContext.protocol}://${dataContext.host}/me/reports/${_year}/${_month}/docs?docName=${docName}`, {
+            await dataContext.API.delete(`/me/reports/${_year}/${_month}/docs?docName=${docName}`, {
                 withCredentials: true
             })
         } catch(err) {
@@ -97,9 +89,9 @@ const DocsUploader = ({year, month, isOperational, employeeId}: Props) => {
         console.log(file);
         try {
             let url = (isOperational) ?
-                `${dataContext.protocol}://${dataContext.host}/me/reports/${_year}/${_month}/doc?docName=${file.name}` :
-                `${dataContext.protocol}://${dataContext.host}/me/employees/${employeeId}/reports/${_year}/${_month}/doc?docName=${file.name}`;
-            let res = await axios(url, {
+                `/me/reports/${_year}/${_month}/doc?docName=${file.name}` :
+                `/me/employees/${employeeId}/reports/${_year}/${_month}/doc?docName=${file.name}`;
+            let res = await dataContext.API(url, {
                 withCredentials: true,
             });
             
