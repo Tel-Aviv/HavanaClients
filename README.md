@@ -10,7 +10,11 @@ This is yarn-workspaces monorepo divided into several packages for a different c
 
 ## Root scripts
 You may run each client independently with root scripts
-1. yarn web:start - launches webpack-dev-server with Web client (Chrome, Edge and IE11 browsers are supported). This client uses .env file that is also published in the repository. This file does not contain the sensitive info but used to mock API when Web client is tested outside of the enterprise network. In such a case, ensure .env file contains [code](mock=true) line that activates mocks for axios calls.
+1. yarn web:start - launches webpack-dev-server with Web client (Chrome, Edge and IE11 browsers are supported). This client uses .env file that is also published in the repository. This file does not contain the sensitive info but used to mock API when Web client is tested outside of the enterprise network. In such a case, ensure .env file contains 
+```
+(mock=true) 
+```
+line that activates mocks for axios calls.
 2. yarn web-m:start - launches webpack-dev-server with Responsive Web Client (use Developer Tools for toggle the device in advance)
 3. yarn mobile:start:ios - (only on Mac) launches iOS Simulator for externally published thru [Azure APIM Hanava REST API](https://apiportal.tel-aviv.gov.il/docs/services/presenceserver/operations/daysoff)
 4. yarn mobile:android - starts Android Emulator for the client against Azure APIM published API
