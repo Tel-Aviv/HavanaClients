@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Route, Switch, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
-import moment from 'moment';
 import i18n from 'i18next';
 import { useTranslation, initReactI18next } from "react-i18next";
 
@@ -16,7 +15,8 @@ from 'antd';
 import 'antd-rtl/es/tabs/style/index.css';
 import 'antd/dist/antd.css';
 
-import NotificationBadge, {Effect} from 'react-notification-badge';
+import Badge from '@components/Badge'
+
 import { getUserFromHtml, getHost, getProtocol, API } from './utils';
 import translations from './translations';
 import { DataContext } from './DataContext';
@@ -167,16 +167,25 @@ const App = () => {
                                 float: 'left',
                                 display: displayNotifications
                             }}>
-                                <div>
-                                    <NotificationBadge count={parseInt(notificationsCount)} effect={Effect.SCALE}>
-                                    </NotificationBadge>                                
-                                </div>
+                                <Badge count={parseInt(notificationsCount)} />
+                                {/* <div>
+                                    <div style={{
+                                        position: 'relative',
+                                        width: '100%',
+                                        height: '100%'
+                                    }}>                                
+                                        <span class="hvn-badge hvn-red">
+                                            {parseInt(notificationsCount)}
+                                        </span>
+                                    </div>
+                                </div> */}
                                 <Tooltip title={t('notifications')}>
                                     <Icon type="bell" theme="outlined" onClick={onApprovalClicked} 
                                         style={{
                                             fontSize: '24px'
                                         }}/>
                                 </Tooltip>
+                                
                         </Menu.Item>
                     </Menu>
                 </Layout.Header>

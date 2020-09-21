@@ -7,13 +7,14 @@ const dotenv = require('dotenv').config({
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 
 module.exports = {
+
     plugins: [
         new FileManagerPlugin({
           onEnd: {
             copy: [
                 { 
                     source: './dist/', 
-                    destination: 'C:\\Dev\\Havana\\PS\\PS\\' 
+                    destination: process.env.publish_destination
                 }
             ]
           }

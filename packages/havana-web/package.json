@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "webpack -d --watch",
+    "build": "webpack -d --watch --env.mock=true",
     "start": "webpack-dev-server --port 8089 --mode development",
     "prod": "webpack -p --config webpack.prod.js"
   },
@@ -21,7 +21,6 @@
     "react-helmet": "^6.1.0",
     "react-i18next": "^11.7.2",
     "react-image": "^4.0.3",
-    "react-notification-badge": "^1.5.1",
     "react-redux": "^7.2.1",
     "react-router-dom": "^5.2.0",
     "react-to-print": "^2.10.0",
