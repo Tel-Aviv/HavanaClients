@@ -15,8 +15,11 @@ You may run each client independently with root scripts
 mock=true 
 ```
 line that activates mocks for axios calls.
+
 2. yarn web-m:start - launches webpack-dev-server with Responsive Web Client (use Developer Tools for toggle the device in advance)
+
 3. yarn mobile:start:ios - (only on Mac) launches iOS Simulator for externally published thru [Azure APIM Hanava REST API](https://apiportal.tel-aviv.gov.il/docs/services/presenceserver/operations/daysoff)
+
 4. yarn mobile:android - starts Android Emulator for the client against Azure APIM published API
 
 The root scripts used to create production bundles
