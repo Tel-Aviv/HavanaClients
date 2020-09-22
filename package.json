@@ -1,6 +1,7 @@
 {
     "private": true,
     "name": "havana-clients",
+    "author": "olegkleiman <oleg_kleyman@hotmail.com>",
     "workspaces": {
         "packages": [
             "packages/*"
@@ -16,6 +17,7 @@
         ]
     },
     "scripts": {
+        "web:test": "yarn workspace havana-web test",
         "web:build": "yarn workspace havana-web build",
         "web:prod": "yarn workspace havana-web prod",
         "web:start": "yarn workspace havana-web start",

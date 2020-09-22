@@ -1,6 +1,8 @@
 # HavanaClients
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![dependencies Status](https://david-dm.org/Tel-Aviv/HavanaClients/status.svg)](https://david-dm.org/Tel-Aviv/HavanaClients)
+[![devDependency Status](https://david-dm.org/Tel-Aviv/HavanaClients/dev-status.svg)](https://david-dm.org//Tel-Aviv/HavanaClients#info=devDependencies)
 
 
 This is [yarn-workspaces](https://classic.yarnpkg.com/en/docs/workspaces/) monorepo divided into several packages for a different clients of Havana REST API:
@@ -10,9 +12,10 @@ This is [yarn-workspaces](https://classic.yarnpkg.com/en/docs/workspaces/) monor
 
 ## Root scripts
 You may run each client independently with root scripts:
-1. **yarn web:start** - launches webpack-dev-server with Web client (Chrome, Edge and IE11 browsers are supported). This client uses .env file that is also published in the repository. This file does not contain the sensitive info but used to mock API when Web client is tested outside of the enterprise network. In such a case, ensure .env file contains *mock=true* line that activates mocks for axios calls.
-2. **yarn web-m:start** - launches webpack-dev-server with Responsive Web Client (use Developer Tools for toggle the device in advance)
-3. **yarn mobile:start:ios** - (only on Mac) launches iOS Simulator for externally published thru [Azure APIM Hanava REST API](https://apiportal.tel-aviv.gov.il/docs/services/presenceserver/operations/daysoff)
+1. **yarn web:test** - runs Jest suites for Web-client. May be mocked in *setEnvVars.js* file. When mocked uses the predefined responses in *utils.js*. This invocation may be very time consumable.
+2. **yarn web:start** - launches webpack-dev-server with Web client (Chrome, Edge and IE11 browsers are supported). This client uses .env file that is also published in the repository. This file does not contain the sensitive info but used to mock API when Web client is tested outside of the enterprise network. In such a case, ensure .env file contains *mock=true* line that activates mocks for axios calls.
+3. **yarn web-m:start** - launches webpack-dev-server with Responsive Web Client (use Developer Tools for toggle the device in advance)
+4. **yarn mobile:start:ios** - (only on Mac) launches iOS Simulator for externally published thru [Azure APIM Hanava REST API](https://apiportal.tel-aviv.gov.il/docs/services/presenceserver/operations/daysoff)
 4. **yarn mobile:android** - starts Android Emulator for the client against Azure APIM published API
 
 ## The root scripts used to create production bundles

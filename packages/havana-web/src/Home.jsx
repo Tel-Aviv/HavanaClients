@@ -206,6 +206,56 @@ const Home = () => {
         fetchData();
     }, [month, year])
 
+    useEffect( () => {
+
+        const applyEffect = async () => {
+
+            if( reportData.length > 0 ) { // skip for the first time
+                const _totals = recalculateTotals();
+                setTotals(_totals);
+
+                await onSave();
+            }
+
+        }
+
+        applyEffect();
+
+    }, [reportData])
+
+    const onSave = async() => {
+        try {
+            await dataContext.API.post(`/me/report/save`, 
+                reportData,
+                {
+                    params: {
+                        month: month,
+                        year: year,
+                        employerCode: userCompanyCode
+                    },
+                    withCredentials: true
+                });
+
+            // post to the server the manual update
+            const manualUpdate = {
+                Year: year,
+                Month: month,
+                UserID: dataContext.user.account_name,
+                items: manualUpdates
+            }
+            await dataContext.API.post(`/me/reports/manual_updates`, 
+                manualUpdate,
+                {
+                 withCredentials: true
+                });              
+
+            //message.success(t('saved'))
+        } catch( err ) {
+            handleError(err)
+            //message.error(response.data)
+        }
+    }
+
     const handleError = (err) => {
 
         let _message = err.message;

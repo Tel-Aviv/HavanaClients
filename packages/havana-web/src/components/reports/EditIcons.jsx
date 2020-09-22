@@ -1,6 +1,5 @@
 // @flow
 import React from 'react'
-import 'antd/dist/antd.css';
 import { Popconfirm, Icon, Tooltip } from 'antd';
 import { useTranslation } from "react-i18next";
 

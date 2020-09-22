@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Get notifications count from API and display it on Badge component Test Badge Component 1`] = `
+<div>
+  <div
+    style={
+      Object {
+        "height": "100%",
+        "position": "relative",
+        "width": "100%",
+      }
+    }
+  >
+    <span
+      style={
+        Object {
+          "backgroundColor": "rgba(212,19,13,1)",
+          "borderRadius": "10px",
+          "color": "#fff",
+          "display": "inline-block",
+          "fontSize": "12px",
+          "fontWeight": "700",
+          "lineHeight": "1",
+          "minWidth": "10px",
+          "padding": "3px 7px",
+          "position": "absolute",
+          "right": "-2px",
+          "textAlign": "center",
+          "top": "-2px",
+          "verticalAlign": "baseline",
+          "whiteSpace": "nowrap",
+        }
+      }
+    >
+      3
+    </span>
+  </div>
+</div>
+`;
