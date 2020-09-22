@@ -75,6 +75,96 @@ const Home = () => {
         type: SET_DIRECT_MANAGER,
         data: manager
     })
+    
+    //#region Redux selectors and corresponding Effects
+    const _directManager = useSelector(
+        store => store.directManagerReducer.directManager
+    )
+    useEffect( () => {
+        if( _directManager ) {
+            setAssignee(_directManager);
+        }
+        
+    }, [_directManager])
+
+    const _calendarDate = useSelector(
+        store => store.reportDateReducer.reportDate
+    );
+    useEffect( () => {
+
+        if( _calendarDate ) {
+            setCalendarDate(_calendarDate)
+            setMonth(_calendarDate.month()+1)
+            setYear(_calendarDate.year())
+        }
+    }, [_calendarDate]);
+    
+    const _updatedItem = useSelector(
+        store => store.reportUpdateReducer.lastUpdatedItem
+    )
+    useEffect( () => {
+        
+        if(_updatedItem){
+            const index = reportData.findIndex( item => item.key === _updatedItem.key);
+            if ( index > -1 ) {
+                const updatedReportData =
+                 [...reportData.slice(0, index), _updatedItem, ...reportData.slice(index+1)];
+                const res = isReportDataValid();
+                setReportDataValid( res.isValid );
+                setReportData(updatedReportData);
+                
+            }
+        }
+
+    }, [_updatedItem])
+    const _addedData= useSelector(
+        store => store.reportUpdateReducer.addedData
+    )
+
+    useEffect( () => {
+
+        if( _addedData ) {
+
+            const index = _addedData.index;
+
+            const newData = [
+                ...reportData.slice(0, index),
+                _addedData.item,
+                ...reportData.slice(index)
+            ];
+            setReportData(newData);
+
+            const addedManualUpdates = [{
+                    Day: _addedData.item.day,
+                    Inout: true,
+                }, {
+                    Day: _addedData.item.day,
+                    Inout: false,
+                }
+            ]
+            
+            setManualUpdates([...manualUpdates, ...addedManualUpdates]);
+        }
+
+    }, [_addedData])
+
+    const _deletedData = useSelector(
+        store => store.reportUpdateReducer.deletedData
+    )
+
+    useEffect( () => {
+
+        if( _deletedData ) {
+            const index = _deletedData.index;
+            const newData = [...reportData.slice(0, index), ...reportData.slice(index + 1)];
+            setReportData(newData);
+
+            
+        }
+
+    }, [_deletedData]);
+    
+    //#endregion
 
     useEffect( () => {
 
