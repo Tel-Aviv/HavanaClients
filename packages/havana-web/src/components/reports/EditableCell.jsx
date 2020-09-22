@@ -1,5 +1,5 @@
 // @flow
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Input, Select, Form } from 'antd';
 const { Option } = Select;       
 const moment = require('moment');
@@ -11,7 +11,7 @@ const format = 'H:mm';
 
 const EditableCell = (props) => {
 
-    const [reportCodes, setReportCodes] = useState([]);
+    const reportContext = useContext(ReportContext);
     
     const onReportCodeChanged = (value) => {
         console.log(value)
@@ -28,7 +28,7 @@ const EditableCell = (props) => {
                             style={{width: '120px'}}
                             onChange={onReportCodeChanged}> 
                             {
-                                reportCodes.map( item => 
+                                reportContext.codes.map( item => 
                                     <Option key={uniqid()} 
                                         value={item.Description}>
                                             {item.Description}
@@ -56,8 +56,6 @@ const EditableCell = (props) => {
                 children,
                 ...restProps
             } = props;
-
-            setReportCodes(codes);
 
             return (
                 <td {...restProps}>

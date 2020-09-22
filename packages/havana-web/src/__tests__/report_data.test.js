@@ -59,6 +59,7 @@ describe('Get report data and process it', () => {
 
         // Get all the data in parallel
         let resp = await axios.all([
+            API.get('/me', { withCredentials: true }),
             API.get('/daysoff',  {
                 params: {
                     year: year,
@@ -66,8 +67,7 @@ describe('Get report data and process it', () => {
                 }, 
                 withCredentials: true
             }),
-            API.get('/me', { withCredentials: true }),
-            API.get(`/me/reports/manual_updates`, {
+             API.get(`/me/reports/manual_updates`, {
                 params: {
                     year: year,
                     month: month
@@ -79,12 +79,14 @@ describe('Get report data and process it', () => {
             }),
         ])
 
-        // 1. Let's start with processing days-off
-        daysOff = resp[0].data;
-
-        // 2. Process the results of '/me'
-        employeKind = resp[1].data.kind;
-        const ID = resp[1].data.ID;
+        // 1. 
+        // Let's start with processing the results of '/me' 
+        employeKind = resp[0].data.kind;
+        const ID = resp[0].data.ID;
+ 
+        // 2.
+        // Store obtained days-off
+        daysOff = resp[1].data;
 
         // 3. 
         // Process manual updates
@@ -143,7 +145,7 @@ describe('Get report data and process it', () => {
 
         const totalFormatted = `${Math.floor(lTotal.asHours())}:${lTotal.minutes().toString().padStart(2, '0')}`;
 
-        console.log(totalFormatted);
+        //console.log(totalFormatted);
     });
 
     test('Display report data on TableReport Component', () => {
