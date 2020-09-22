@@ -3,6 +3,7 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 [![dependencies Status](https://david-dm.org/Tel-Aviv/HavanaClients/status.svg)](https://david-dm.org/Tel-Aviv/HavanaClients)
 [![devDependency Status](https://david-dm.org/Tel-Aviv/HavanaClients/dev-status.svg)](https://david-dm.org//Tel-Aviv/HavanaClients#info=devDependencies)
+[![Build Status](https://travis-ci.org/Tel-Aviv/HavanaClients.svg?branch=master)](https://travis-ci.org/Tel-Aviv/HavanaClients)
 
 
 This is [yarn-workspaces](https://classic.yarnpkg.com/en/docs/workspaces/) monorepo divided into several packages for a different clients of Havana REST API:
