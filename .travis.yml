@@ -3,4 +3,4 @@ language: node_js
 node_js:
   - "12.18.3"
 script:
-  - yarn web:build
+  - yarn web:test
