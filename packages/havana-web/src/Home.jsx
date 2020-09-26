@@ -370,7 +370,6 @@ const Home = () => {
     })
 
     const getAlertDescription = () => {
-        console.log(alert);
         if( alert.type === 'error' )
             return <Link to={`/support/${year}/${month}`}>
                 Support

@@ -5,7 +5,7 @@ import { Collapse, Icon, Button,
 const { Panel } = Collapse;
 const { Title } = Typography;
 
-import { API } from '../utils';
+import { API, DEFAULT_BASE_URL } from '../utils';
 
 const reducer = (state, action) => {
     if( action.type == 'UPDATE' ) {
@@ -86,10 +86,11 @@ const SupportPage = () => {
                 _step.status = resp.status;
                 _step.result = resp.data;
 
-            } catch(err) { // if some API call is failed, this catch allows to move on
-                let _message = err._message;
+            } catch(error) { // if some API call is failed, this catch allows to move on
+
+                let _message = `${error.message} when reaching ${DEFAULT_BASE_URL}/${item.url}`;
                 let _status = 0;
-                const { response } = err;
+                const { response } = error;
                 if( response ) {
                     _message = `${response.config.url} => ${response.statusText} (${response.status})`;
                     _status = response.status;

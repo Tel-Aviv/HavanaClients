@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { lazy } from '@loadable/component';
 import { Route, Switch, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -25,8 +25,12 @@ import { DataContext } from './DataContext';
 import ConfirmList from './ConfirmList';
 import Confirm from './Confirm';
 import Home from './Home';
-import Settings from './Settings';
-import SupportPage from '@components/SupportPage'
+// import Settings from './Settings';
+const Settings = lazy( () => import('./Settings') );
+//import SupportPage from '@components/SupportPage'
+const SupportPage = lazy( () => import('@components/SupportPage') )
+
+import Loading from '@components/Loading';
 
 import { SET_NOTIFICATIONS_COUNT } from './redux/actionTypes';
 
@@ -69,9 +73,8 @@ const App = () => {
                     dispatch( action_setNotificationCount(res.data) )
                 }
 
-            } catch(err) {
-                const {response} = err;
-                console.error(`${response.config.url}: ${err.message}`)
+            } catch(e) {
+                console.error(e.message)
             }
         }
 
@@ -199,8 +202,17 @@ const App = () => {
                             <Route path='/confirmlist' component={ConfirmList} />
                             <Route path='/confirm/:userid/:saveReportId' component={Confirm}/>                                
                             <Route path='/settings'
-                                    component={Settings} />
-                            <Route  path='/support/:year/:month' component={SupportPage} />
+                                    render={ (props) =>
+                                        <Suspense fallback={<Loading componentName='Setting' />}>
+                                            <Settings />
+                                        </Suspense>
+                                    } />
+                            <Route  path='/support/:year/:month' 
+                                    render={ (props) => 
+                                        <Suspense fallback={<Loading componentName='SupportPage' />}>
+                                            <SupportPage />
+                                        </Suspense>
+                                    } />
                         </Switch>
                     </DataContext.Provider>
                 </Layout.Content>
