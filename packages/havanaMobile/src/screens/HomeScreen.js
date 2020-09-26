@@ -114,7 +114,7 @@ const HomeScreen = (props) => {
 
         let data = [];
 
-        let respArr = await axios.all([
+        let respArr = await Promise.all([
           axios(
             `https://api.tel-aviv.gov.il/ps/daysoff?year=${year}&month=${month}`,
             {

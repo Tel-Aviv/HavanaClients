@@ -1,6 +1,5 @@
 // @flow
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
 import { useTranslation } from "react-i18next";
 import { Chart, Axis, Geom, Legend, Coord, Tooltip } from 'bizcharts';
 import 'ant-design-pro/dist/ant-design-pro.css';
@@ -8,6 +7,7 @@ import { ChartCard, Bar, WaterWave, Field } from 'ant-design-pro/lib/Charts';
 
 import { Row, Col, Card, Icon } from 'antd';
 
+import {API} from '../../utils';
 import { DataContext } from "../../DataContext";
   
 const scale = {
@@ -37,9 +37,7 @@ const YearReport = (props: Props) => {
     useEffect( () => {
         async function fetchData() {
             try {
-                const resp = await axios(`${context.protocol}://${context.host}/me/reports/yearly?year=${props.year}`, {
-                    withCredentials: true
-                });
+                const resp = await API.get(`/me/reports/yearly?year=${props.year}`);
                 const data = resp.data.items.map( item => {
                     return {
                         month: item.month,

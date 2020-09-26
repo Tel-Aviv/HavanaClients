@@ -1,7 +1,6 @@
 // @flow
 import React, { useState, useContext, useEffect, useReducer  } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
 import { useTranslation } from "react-i18next";
 
 import { Upload, Icon, message } from 'antd';
@@ -28,7 +27,7 @@ import { UPDATE_ITEM, SET_DIRECT_MANAGER } from "./redux/actionTypes"
 const Settings = () => {
 
     const [me, setMe] = useReducer( 
-            (state, newState) => ({...state, ...newState}),
+            (state, newState) => ({...state, ...newState}), // trivial reducer
             {
                 userName: '',
                 userID: '',
@@ -57,8 +56,8 @@ const Settings = () => {
         async function fetchData() {
 
             try {
-
-                const resp = await context.API.get('/me', { withCredentials: true })
+                // API is already wrapped with credentials = true
+                const resp = await context.API.get('/me')
 
                 const signature = resp.data.signature;
                 const stamp = resp.data.stamp;
@@ -149,18 +148,14 @@ const Settings = () => {
     const removeStamp = async (event) => {
         event.stopPropagation()
 
-        await axios.delete(`${context.protocol}://${context.host}/me/stamp`, {
-            withCredentials: true
-        })
+        await context.API.delete(`${context.protocol}://${context.host}/me/stamp`)
         setStamp(null)        
     }    
 
     const removeSignature = async (event) => {
         event.stopPropagation()
 
-        await axios.delete(`${context.protocol}://${context.host}/me/signature`, {
-            withCredentials: true
-        })
+        await context.API.delete(`${context.protocol}://${context.host}/me/signature`)
         setSignature(null)        
     }    
 

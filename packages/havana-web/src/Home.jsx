@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
 import moment from 'moment';
 import uniqid from 'uniqid';
 import Img from 'react-image';
@@ -163,7 +163,7 @@ const Home = () => {
         }
 
     }, [_deletedData]);
-    
+
     //#endregion
 
     useEffect( () => {
@@ -172,7 +172,7 @@ const Home = () => {
 
             try {
 
-                const resp = await dataContext.API.get('/me', { withCredentials: true })
+                const resp = await dataContext.API.get('/me')
                 if( !resp.data.managers )
                     throw new Error(t('no_managers'));
                     
@@ -215,24 +215,21 @@ const Home = () => {
 
                 let data = [];
 
-                let respArr = await axios.all([
+                let respArr = await Promise.all([
+                    // API is already wrapped with credentials = true
                     dataContext.API.get('/daysoff',  {
                         params: {
                             year: year,
                             month: month
-                        }, 
-                        withCredentials: true
+                        }
                     }),
                     dataContext.API.get(`/me/reports/manual_updates`, {
                         params: {
                             year: year,
                             month: month
-                        },
-                        withCredentials: true
+                        }
                     }),
-                    dataContext.API.get(`/me/reports/${year}/${month}`, {
-                        withCredentials: true
-                    })
+                    dataContext.API.get(`/me/reports/${year}/${month}`)
                 ]);
 
                 // 1. Process work off days
@@ -258,8 +255,7 @@ const Home = () => {
                         employerCode: employerCode,
                         year: year,
                         month: month
-                    },
-                    withCredentials: true
+                    }
                 })
                 setReportCodes(resp.data.items);
 
@@ -322,8 +318,7 @@ const Home = () => {
                         month: month,
                         year: year,
                         employerCode: userCompanyCode
-                    },
-                    withCredentials: true
+                    }
                 });
 
             // post to the server the manual update
@@ -334,10 +329,7 @@ const Home = () => {
                 items: manualUpdates
             }
             await dataContext.API.post(`/me/reports/manual_updates`, 
-                manualUpdate,
-                {
-                 withCredentials: true
-                });              
+                                        manualUpdate);              
 
             //message.success(t('saved'))
         } catch( err ) {
@@ -351,7 +343,7 @@ const Home = () => {
         let _message = err.message;
         const {response} = err;
         if( response )
-            _message += `. URL: ${response.config.url}`;
+            _message += `. URL: ${response.config.url} => ${response.statusText}`;
 
         setAlert({
             message: _message,
@@ -376,6 +368,16 @@ const Home = () => {
         type: UPDATE_ITEM,
         item
     })
+
+    const getAlertDescription = () => {
+        console.log(alert);
+        if( alert.type === 'error' )
+            return <Link to={`/support/${year}/${month}`}>
+                Support
+                </Link>
+        else    
+            return null;
+    }
 
     const defineAlert = (data) => {
         if( data ) {
@@ -494,10 +496,7 @@ const Home = () => {
         try {
             
             await dataContext.API.post(`/me/reports?month=${month}&year=${year}&assignee=${assignee.userAccountName}`,
-                reportData,
-                {
-                    withCredentials: true
-                });
+                                        reportData);
             
             setReportSubmitted(true);
             setIsReportEditable(false)
@@ -771,6 +770,7 @@ const Home = () => {
                             opacity: alertOpacity,
                         }}
                         message={alert.message}
+                        description={getAlertDescription()}
                         className='hvn-item-rtl' 
                         showIcon 
                         type={alert.type} />

@@ -152,6 +152,13 @@ body {
   background: rgb(24, 144, 255) !important;
 }
 
+.ant-layout-header-simple {
+  height: 56px !important;
+  padding: 0 50px;
+  line-height: 64px;
+  background: inherit !important;  
+}
+
 .ant-popover-message-title {
   padding-left: 22px;
   direction: rtl;
@@ -186,6 +193,11 @@ body {
 
 .ant-table-row-cell-break-word {
   word-break: keep-all !important;
+}
+
+.ant-collapse-content {
+  padding: 16px;
+  background-color: rgb(252, 246, 219) !important
 }
 
 /* table adaptation for print */

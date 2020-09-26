@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Get report data and process it Display report data on TableReport Component 1`] = `
+exports[`Get report data and display it Display report data on TableReport Component 1`] = `
 <div
   className="ant-table-wrapper"
   style={

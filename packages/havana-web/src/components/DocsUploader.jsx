@@ -27,9 +27,8 @@ const DocsUploader = ({year, month, isOperational, employeeId}) => {
                     `/me/reports/${year}/${month}/docs/` :
                     `/me/employees/${employeeId}/reports/${year}/${month}/docs`;
 
-                const res = await dataContext.API.get(url, {
-                    withCredentials: true
-                })
+                // API is already wrapped with credentials = true
+                const res = await dataContext.API.get(url)
                     
                 if (mounted) {
                     const _docs = res.data.map( (item, index) => {
@@ -62,9 +61,7 @@ const DocsUploader = ({year, month, isOperational, employeeId}) => {
 
         try {
             const docName = file.name;
-            await dataContext.API.delete(`/me/reports/${_year}/${_month}/docs?docName=${docName}`, {
-                withCredentials: true
-            })
+            await dataContext.API.delete(`/me/reports/${_year}/${_month}/docs?docName=${docName}`)
         } catch(err) {
 
             const _doc = docs.find( doc => 
@@ -91,10 +88,7 @@ const DocsUploader = ({year, month, isOperational, employeeId}) => {
             let url = (isOperational) ?
                 `/me/reports/${_year}/${_month}/doc?docName=${file.name}` :
                 `/me/employees/${employeeId}/reports/${_year}/${_month}/doc?docName=${file.name}`;
-            let res = await dataContext.API(url, {
-                withCredentials: true,
-            });
-            
+            let res = await dataContext.API(url);
             url = res.data;
 
             saveAs(url, file.name);

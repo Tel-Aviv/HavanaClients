@@ -37,6 +37,7 @@ export const TextualEmployeKind = {
 
 export const API = axios.create({
         baseURL: `${getProtocol()}://${getHost()}`,
+        withCredentials: true
         //responseType: "json"
 });
 

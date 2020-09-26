@@ -1,7 +1,5 @@
  const regeneratorRuntime = require("regenerator-runtime");
 import React, {useState, useEffect, useContext, useReducer} from 'react';
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 
 import Reports from '../tabs/Reports';
 import Profile from '../tabs/Profile';
@@ -101,7 +99,7 @@ const HomeScreen = (props) => {
         const month = now.getMonth(); // + 1;
 
         let data = [];
-        let respArr = await axios.all([
+        let respArr = await Promise.all([
         //     authContext.API.get(`/daysoff?year=${year}&month=${month}`, { withCredentials: true }),
               authContext.API.get(`/daysoff`, {
                 params: {

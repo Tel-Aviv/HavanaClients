@@ -25,6 +25,7 @@ import ConfirmList from './ConfirmList';
 import Confirm from './Confirm';
 import Home from './Home';
 import Settings from './Settings';
+import SupportPage from '@components/SupportPage'
 
 import { SET_NOTIFICATIONS_COUNT } from './redux/actionTypes';
 
@@ -57,17 +58,13 @@ const App = () => {
         const fetchData = async() => {
             try {
 
-                let res = await context.API.get('/me/is_manager', {
-                    withCredentials: true
-                });
+                let res = await context.API.get('/me/is_manager'); // API is already wrapped with credentials = true
 
                 const isManager = res.data;
                 setDisplayNotificatios( isManager ? 'block' : 'none');
 
                 if( isManager ) {
-                    res = await context.API.get('/me/pendings/count', {
-                        withCredentials: true
-                    })
+                    res = await context.API.get('/me/pendings/count');
                     dispatch( action_setNotificationCount(res.data) )
                 }
 
@@ -194,14 +191,15 @@ const App = () => {
                     }}>
                     <DataContext.Provider value={context}>
                         <Switch>
-                        <Route exact path='/'
-                                render={ (props) => 
-                                    <Home />
-                                }/>
-                        <Route path='/confirmlist' component={ConfirmList} />
-                        <Route path='/confirm/:userid/:saveReportId' component={Confirm}/>                                
-                        <Route path='/settings'
-                                component={Settings} />
+                            <Route exact path='/'
+                                    render={ (props) => 
+                                        <Home />
+                                    }/>
+                            <Route path='/confirmlist' component={ConfirmList} />
+                            <Route path='/confirm/:userid/:saveReportId' component={Confirm}/>                                
+                            <Route path='/settings'
+                                    component={Settings} />
+                            <Route  path='/support/:year/:month' component={SupportPage} />
                         </Switch>
                     </DataContext.Provider>
                 </Layout.Content>

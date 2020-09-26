@@ -1,6 +1,5 @@
 // @flow
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import moment from 'moment'
 
@@ -148,10 +147,11 @@ const ConfirmList = () => {
 
             try {
 
-                const resp = await axios.all([
-                    context.API.get('/me/pendings', { withCredentials: true }),
-                    context.API.get('/me/approved', { withCredentials: true }),
-                    context.API.get('/me/pendings/rejected', { withCredentials: true })
+                const resp = await Promise.all([
+                    // API is already wrapped with credentials = true
+                    context.API.get('/me/pendings'),
+                    context.API.get('/me/approved'),
+                    context.API.get('/me/pendings/rejected')
                 ])
 
                 const pendingReports = resp[0].data.map( (item, index) => {
