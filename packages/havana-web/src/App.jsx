@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { lazy } from '@loadable/component';
 import { Route, Switch, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
