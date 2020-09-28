@@ -31,6 +31,7 @@ const SupportPage = () => {
     const [activePanelKeys, setActivePanelKeys] = useState([]);
     const [expanded, setExpanded] = useState(false);
     const [loading , setLoading] = useState(false);
+    const [incidentData, setIncidentData] = useState();
  
     const steps = [
         {
@@ -139,8 +140,18 @@ const SupportPage = () => {
                 }} />
     }
 
-    const sendOut = () => {
-        // TODO
+    const sendOut = async() => {
+        try {
+            await API.post('./incidents', incidentData,
+            {
+                params: {
+                    year: routeParams.year,
+                    month: routeParams.month
+                }
+            })
+        } catch(err) {
+            throw err; // be catched in AppErrorBoundaries
+        }
     }
 
     return (
