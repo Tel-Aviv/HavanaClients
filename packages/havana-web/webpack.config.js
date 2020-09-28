@@ -53,7 +53,7 @@ module.exports = {
     },
     output: {
         path: __dirname + '/dist',
-        publicPath: '/',
+        publicPath: process.env.public_path,
         chunkFilename: '[name].bundle.js'
         // filename: 'bundle.js'
     },   

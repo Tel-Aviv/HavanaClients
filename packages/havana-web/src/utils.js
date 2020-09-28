@@ -35,8 +35,10 @@ export const TextualEmployeKind = {
     "2": `עובד עיריית ת"א`
 }
 
+export const DEFAULT_BASE_URL = `${getProtocol()}://${getHost()}`;
+
 export const API = axios.create({
-        baseURL: `${getProtocol()}://${getHost()}`,
+        baseURL: DEFAULT_BASE_URL,
         withCredentials: true
         //responseType: "json"
 });

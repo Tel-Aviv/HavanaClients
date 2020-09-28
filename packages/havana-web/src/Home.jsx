@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
@@ -28,7 +28,7 @@ import { DataContext } from './DataContext';
 import { UPDATE_ITEM, SET_DIRECT_MANAGER } from "./redux/actionTypes";
 
 import TableReport from '@reports/TableReport';
-import YearReport from '@reports/YearReport';
+const YearReport = React.lazy( () => import('@reports/YearReport') )
 import DocsUploader from '@components/DocsUploader';
 
 const Home = () => {
@@ -370,7 +370,6 @@ const Home = () => {
     })
 
     const getAlertDescription = () => {
-        console.log(alert);
         if( alert.type === 'error' )
             return <Link to={`/support/${year}/${month}`}>
                 Support
@@ -835,7 +834,9 @@ const Home = () => {
                                     </span>
                                     }
                                     key='2'>
-                            <YearReport year={year}/> 
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <YearReport year={year}/>
+                            </Suspense>
                         </TabPane>
                     </Tabs>
                 </Col>

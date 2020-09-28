@@ -11,6 +11,8 @@
     "prod": "webpack -p --config webpack.prod.js"
   },
   "dependencies": {
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@loadable/component": "^5.13.2",
     "ant-design-pro": "^2.3.2",
     "antd": "3.26.6",
     "antd-rtl": "^3.11.14",

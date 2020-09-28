@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Route, Switch, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -21,11 +21,11 @@ import { getUserFromHtml, getHost, getProtocol, API } from './utils';
 import translations from './translations';
 import { DataContext } from './DataContext';
 
-import ConfirmList from './ConfirmList';
-import Confirm from './Confirm';
+const ConfirmList = React.lazy( () => import('./ConfirmList') )
+const Confirm = React.lazy( () => import('./Confirm') )
 import Home from './Home';
-import Settings from './Settings';
-import SupportPage from '@components/SupportPage'
+const Settings = React.lazy( () => import('./Settings') )
+const SupportPage = React.lazy( () => import('@components/SupportPage') )
 
 import { SET_NOTIFICATIONS_COUNT } from './redux/actionTypes';
 
@@ -34,7 +34,10 @@ i18n
   .init({
     resources: translations,
     lng: "he",
-    debug: false
+    debug: false,
+    react: { 
+        useSuspense: false
+      }
   })
 
 const App = () => {
@@ -68,9 +71,8 @@ const App = () => {
                     dispatch( action_setNotificationCount(res.data) )
                 }
 
-            } catch(err) {
-                const {response} = err;
-                console.error(`${response.config.url}: ${err.message}`)
+            } catch(e) {
+                console.error(e.message)
             }
         }
 
@@ -190,17 +192,18 @@ const App = () => {
                         padding: '17px 24px 24px 24px'
                     }}>
                     <DataContext.Provider value={context}>
-                        <Switch>
-                            <Route exact path='/'
-                                    render={ (props) => 
-                                        <Home />
-                                    }/>
-                            <Route path='/confirmlist' component={ConfirmList} />
-                            <Route path='/confirm/:userid/:saveReportId' component={Confirm}/>                                
-                            <Route path='/settings'
-                                    component={Settings} />
-                            <Route  path='/support/:year/:month' component={SupportPage} />
-                        </Switch>
+                        <Suspense fallback={<div>Loading...</div>}>
+                            <Switch>
+                                <Route exact path='/'
+                                        render={ (props) => 
+                                            <Home />
+                                        }/>
+                                <Route path='/confirmlist' component={ConfirmList} />
+                                <Route path='/confirm/:userid/:saveReportId' component={Confirm} />                                
+                                <Route path='/settings' component={Settings} />
+                                <Route path='/support/:year/:month' component={SupportPage} />
+                            </Switch>
+                        </Suspense> 
                     </DataContext.Provider>
                 </Layout.Content>
             </Layout>
