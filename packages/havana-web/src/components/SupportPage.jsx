@@ -153,6 +153,7 @@ const SupportPage = () => {
 
             const _steps = incidentData.map( step => {
                 let _step = {...step, 
+                    result: JSON.stringify(step.result),
                     callParams: JSON.stringify(step.params)
                 }
                 delete _step.params;
