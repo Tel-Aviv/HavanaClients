@@ -12,11 +12,14 @@ moment.locale('he');
 
 import store from './redux/store';
 
+import AppErrorBoundary from './AppErrorBoundary';
 import App from './App';
 
 ReactDOM.render(<Provider store={store}>
                     <HashRouter>
-                        <App />
+                        <AppErrorBoundary>
+                            <App />
+                        </AppErrorBoundary>
                     </HashRouter>
                 </Provider>,
     document.getElementById('root'));
