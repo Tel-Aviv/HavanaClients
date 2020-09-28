@@ -73,9 +73,13 @@ const SupportPage = () => {
         })
     }
     
-    const fetchData = () => {
+    const fetchData = async() => {
 
-        steps.map( async(item) => {
+        const incident = {
+            items: []
+        }
+
+        const _steps = await Promise.all(steps.map( async(item) => {
 
             let _step = {...item};
 
@@ -101,8 +105,12 @@ const SupportPage = () => {
                 _step.result = _message;
             } finally {
                 action_Update(_step);
+                console.log(_step);
+                return _step;
             }
-        })
+        }))
+
+        setIncidentData(_steps);
     }
 
     useEffect( () => {
@@ -142,7 +150,19 @@ const SupportPage = () => {
 
     const sendOut = async() => {
         try {
-            await API.post('./incidents', incidentData,
+
+            const _steps = incidentData.map( step => {
+                let _step = {...step, 
+                    callParams: JSON.stringify(step.params)
+                }
+                delete _step.params;
+                return _step;
+            })
+
+            const incident = {
+                steps: _steps
+            };
+            await API.post('./incidents', incident,
             {
                 params: {
                     year: routeParams.year,
