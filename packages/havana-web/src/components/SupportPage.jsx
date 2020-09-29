@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { Collapse, Icon, Button, 
     Layout, Row, Col, Typography } from 'antd';
@@ -6,6 +6,7 @@ const { Panel } = Collapse;
 const { Title } = Typography;
 
 import { API, DEFAULT_BASE_URL } from '../utils';
+import { DataContext } from '../DataContext';
 
 const reducer = (state, action) => {
     if( action.type == 'UPDATE' ) {
@@ -22,46 +23,101 @@ const reducer = (state, action) => {
     }
 }
 
+class Step {
+
+    constructor(name, url, params, postProcess) {
+        this.name = name;
+        this.url = url;
+        this.params = params;
+        this.postProcess = postProcess;
+    }
+    
+    get queryString() {
+        let _queryString = '';
+        if( this.params ) {
+            let firstParam = '?'
+            Object.entries(this.params).forEach(
+                ([key, value]) => {
+                    _queryString += `${firstParam}${key}=${value}`;
+                    firstParam = '&';
+                }
+            );
+        }
+
+        return _queryString;
+    }
+
+    async process() {
+        
+        try {
+
+            console.log(this.params);
+            const resp = await API.get(this.url, {
+                params: this.params
+            })
+            this.status = resp.status;
+            this.result = resp.data;
+            if( this.postProcess ) {
+                this.postProcess(resp);
+            }
+            this.query_string = this.queryString;
+
+        } catch(error) {
+
+            let _message = `${error.message} when reaching ${DEFAULT_BASE_URL}/${this.url}`;
+            let _status = 0;
+            const { response } = error;
+            if( response ) {
+                _message = `${response.config.url} => ${response.statusText} (${response.status})`;
+                _status = response.status;
+            }
+
+            this.status = _status || 0;
+            this.result = _message;
+        }   
+    }
+}
+
 const SupportPage = () => {
 
-    // The order of hooks is important here.
-    // Firstly useParams() to populate steps array.
-    // Later this array will be passed to useReducer() as initial state
+    // The order of following hooks is important here.
+    // Firstly useParams() and useContext to populate steps array.
+    // Later this array will be passed to useReducer() as initial state.
     const routeParams = useParams();
+    const context = useContext(DataContext);
     const [activePanelKeys, setActivePanelKeys] = useState([]);
     const [expanded, setExpanded] = useState(false);
     const [loading , setLoading] = useState(false);
     const [incidentData, setIncidentData] = useState();
+
+    // Used as shared data for exchange API results between the steps.
+    // Passed by reference to some step and may be updated in postProcess() of other.
+    let localContext = [{
+        id: context.user.userID,
+        year: routeParams.year,
+        month: routeParams.month,
+        employerCode: 0
+    }];
  
     const steps = [
-        {
-            name: 'me',
-            url: '/me'
-        },
-        {
-            name: 'Days Off',
-            url: `/daysoff`,
-            params: {
+        new Step('me', '/me'),
+        new Step('Days Off', '/daysoff', 
+            {
                 year: routeParams.year,
                 month: routeParams.month
-            }
-        },
-        {
-            name: 'Manual Updates',
-            url: '/me/reports/manual_updates',
-            params: {
+            }),
+        new Step('Manual Updates', '/me/reports/manual_updates',
+            {
                 year: routeParams.year,
                 month: routeParams.month
-            }
-        },
-        {
-            name: 'Report Data',
-            url: `/me/reports/${routeParams.year}/${routeParams.month}`
-        }, 
-        {
-            name: 'Report Codes',
-            url: `/me/report_codes?id=308680768&employerCode=1&year=${routeParams.year}&month=${routeParams.month}`
-        }
+            }),
+        new Step('Report Data', `/me/reports/${routeParams.year}/${routeParams.month}`,
+                null,
+                (res) => {
+                    localContext[0].employerCode = res.data.employerCode;
+                }),
+        new Step('Report Codes', '/me/report_codes',
+                localContext[0])
     ]
 
     const [state, dispatch] = useReducer(reducer, steps);
@@ -75,48 +131,15 @@ const SupportPage = () => {
     
     const fetchData = async() => {
 
-        const incident = {
-            items: []
-        }
-
-        const _steps = await Promise.all(steps.map( async(item) => {
-
-            let _step = {...item};
-
-            try {
-                
-                const resp = await API.get(item.url, {
-                    params: item.params
-                })
-                _step.status = resp.status;
-                _step.result = resp.data;
-
-            } catch(error) { // if some API call is failed, this catch allows to move on
-
-                let _message = `${error.message} when reaching ${DEFAULT_BASE_URL}/${item.url}`;
-                let _status = 0;
-                const { response } = error;
-                if( response ) {
-                    _message = `${response.config.url} => ${response.statusText} (${response.status})`;
-                    _status = response.status;
-                }
-
-                _step.status = _status;
-                _step.result = _message;
-            } finally {
-                action_Update(_step);
-                console.log(_step);
-                return _step;
-            }
-        }))
-
-        setIncidentData(_steps);
+        const results = await Promise.all( steps.map( async(step) => {
+            await step.process();
+            action_Update(step);
+        }));
+        setIncidentData(results);
     }
 
     useEffect( () => {
-        setLoading(true);
-        fetchData();
-        setLoading(false);
+        onRefresh();
     }, [])
 
     const onRefresh = () => {
@@ -203,8 +226,9 @@ const SupportPage = () => {
                             activeKey={activePanelKeys}>
                         {
                             state.map( (item, index) => {
+
                                 return (
-                                    <Panel header={item.name + ' (' + item.url + ')'} 
+                                    <Panel header={item.name + ' (' + item.url + item.query_string + ')'} 
                                             key={index} 
                                             extra={genExtra(item.status)}>
                                         <div style={{
