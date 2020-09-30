@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { Collapse, Icon, Button, 
     Layout, Row, Col, Typography } from 'antd';
@@ -6,64 +6,120 @@ const { Panel } = Collapse;
 const { Title } = Typography;
 
 import { API, DEFAULT_BASE_URL } from '../utils';
+import { DataContext } from '../DataContext';
 
 const reducer = (state, action) => {
     if( action.type == 'UPDATE' ) {
 
         return state.map( step => {
             if( step.url === action.payload.url ) {
-                return {...step,
-                        result: action.payload.result,
-                        status: action.payload.status
-                }
+                return action.payload;
             } else 
                 return {...step}
         }) 
     }
 }
 
+class Step {
+
+    constructor(name, url, params, postProcess) {
+        this.name = name;
+        this.url = url;
+        this.params = params;
+        this.postProcess = postProcess;
+        this.queryString = '';
+    }
+    
+    getQueryString() { // just serialize params
+
+        let _queryString = '';
+        if( this.params ) {
+            let firstParam = '?'
+            Object.entries(this.params).forEach(
+                ([key, value]) => {
+                    _queryString += `${firstParam}${key}=${value}`;
+                    firstParam = '&';
+                }
+            );
+        }
+
+        return _queryString;
+    }
+
+    async process() {
+        
+        try {
+            const resp = await API.get(this.url, {
+                params: this.params
+            })
+            this.status = resp.status;
+            this.result = resp.data;
+            if( this.postProcess ) {
+                this.postProcess(resp);
+            }
+            this.queryString = this.getQueryString();
+
+        } catch(error) {
+
+            let _message = `${error.message} when reaching ${DEFAULT_BASE_URL}/${this.url}`;
+            let _status = 0;
+            const { response } = error;
+            if( response ) {
+                _message = `${response.config.url} => ${response.statusText} (${response.status})`;
+                _status = response.status;
+            }
+
+            this.status = _status || 0;
+            this.result = _message;
+        }   
+    }
+}
+
 const SupportPage = () => {
 
-    // The order of hooks is important here.
-    // Firstly useParams() to populate steps array.
-    // Later this array will be passed to useReducer() as initial state
+    // The order of following hooks is important here.
+    // Firstly useParams() and useContext to populate steps array.
+    // Later this array will be passed to useReducer() as initial state.
     const routeParams = useParams();
+    const context = useContext(DataContext);
     const [activePanelKeys, setActivePanelKeys] = useState([]);
     const [expanded, setExpanded] = useState(false);
     const [loading , setLoading] = useState(false);
+
+    // Used as shared data for exchange API results between the steps.
+    // Passed by reference to some step and may be updated in postProcess() of other.
+    let localContext = [{
+        id: context.user.userID,
+        year: routeParams.year,
+        month: routeParams.month,
+        employerCode: 0
+    }];
  
-    const steps = [
-        {
-            name: 'me',
-            url: '/me'
-        },
-        {
-            name: 'Days Off',
-            url: `/daysoff`,
-            params: {
+    const independent_steps = [
+        new Step('me', '/me'),
+        new Step('Days Off', '/daysoff', 
+            {
                 year: routeParams.year,
                 month: routeParams.month
-            }
-        },
-        {
-            name: 'Manual Updates',
-            url: '/me/reports/manual_updates',
-            params: {
+            }),
+        new Step('Manual Updates', '/me/reports/manual_updates',
+            {
                 year: routeParams.year,
                 month: routeParams.month
-            }
-        },
-        {
-            name: 'Report Data',
-            url: `/me/reports/${routeParams.year}/${routeParams.month}`
-        }, 
-        {
-            name: 'Report Codes',
-            url: `/me/report_codes?id=308680768&employerCode=1&year=${routeParams.year}&month=${routeParams.month}`
-        }
+            }),
+        new Step('Report Data', `/me/reports/${routeParams.year}/${routeParams.month}`,
+                null,
+                (res) => {
+                    localContext[0].employerCode = res.data.employerCode;
+                })
     ]
 
-    const [state, dispatch] = useReducer(reducer, steps);
+    const dependent_steps = [
+        new Step('Report Codes', '/me/report_codes',
+                localContext[0])
+    ]
+
+    const [state, dispatch] = useReducer(reducer, [...independent_steps, ...dependent_steps]);
 
     const action_Update = (item) => {
         dispatch({
@@ -72,42 +128,27 @@ const SupportPage = () => {
         })
     }
     
-    const fetchData = () => {
+    const process_steps = async (steps) => {
+        await Promise.all( steps.map( async(step) => {
+            await step.process();
+            action_Update(step);
+            return step;
+        }));        
+    }
 
-        steps.map( async(item) => {
+    const fetchData = async() => {
 
-            let _step = {...item};
+        // Firstly process independent steps.
+        // At the finish of each step with postProccess() callback, 
+        // the shared parameters are populated in order to be used when dependent steps are processed
+        await process_steps(independent_steps);
 
-            try {
-                
-                const resp = await API.get(item.url, {
-                    params: item.params
-                })
-                _step.status = resp.status;
-                _step.result = resp.data;
-
-            } catch(error) { // if some API call is failed, this catch allows to move on
-
-                let _message = `${error.message} when reaching ${DEFAULT_BASE_URL}/${item.url}`;
-                let _status = 0;
-                const { response } = error;
-                if( response ) {
-                    _message = `${response.config.url} => ${response.statusText} (${response.status})`;
-                    _status = response.status;
-                }
-
-                _step.status = _status;
-                _step.result = _message;
-            } finally {
-                action_Update(_step);
-            }
-        })
+        // At this point, all shared parameters are guaranteed to be ready
+        await process_steps(dependent_steps);
     }
 
     useEffect( () => {
-        setLoading(true);
         fetchData();
-        setLoading(false);
     }, [])
 
     const onRefresh = () => {
@@ -124,7 +165,7 @@ const SupportPage = () => {
         
         expanded ?
             setActivePanelKeys([]) :
-            setActivePanelKeys([...steps.keys()]);  
+            setActivePanelKeys([...state.keys(), ]);  
 
         setExpanded(!expanded)
     }
@@ -139,8 +180,31 @@ const SupportPage = () => {
                 }} />
     }
 
-    const sendOut = () => {
-        // TODO
+    const sendOut = async() => {
+        try {
+
+            const _steps = state.map( step => {
+                let _step = {...step, 
+                    result: JSON.stringify(step.result),
+                    callParams: JSON.stringify(step.params)
+                }
+                delete _step.params;
+                return _step;
+            })
+
+            const incident = {
+                steps: _steps
+            };
+            await API.post('/incidents', incident,
+            {
+                params: {
+                    year: routeParams.year,
+                    month: routeParams.month
+                }
+            })
+        } catch(err) {
+            throw err; // be catched in AppErrorBoundaries
+        }
     }
 
     return (
@@ -171,8 +235,9 @@ const SupportPage = () => {
                             activeKey={activePanelKeys}>
                         {
                             state.map( (item, index) => {
+
                                 return (
-                                    <Panel header={item.name + ' (' + item.url + ')'} 
+                                    <Panel header={item.name + ' (' + item.url + item.queryString + ')'} 
                                             key={index} 
                                             extra={genExtra(item.status)}>
                                         <div style={{
