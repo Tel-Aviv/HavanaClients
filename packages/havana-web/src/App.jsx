@@ -167,17 +167,6 @@ const App = () => {
                                 display: displayNotifications
                             }}>
                                 <Badge count={parseInt(notificationsCount)} />
-                                {/* <div>
-                                    <div style={{
-                                        position: 'relative',
-                                        width: '100%',
-                                        height: '100%'
-                                    }}>                                
-                                        <span class="hvn-badge hvn-red">
-                                            {parseInt(notificationsCount)}
-                                        </span>
-                                    </div>
-                                </div> */}
                                 <Tooltip title={t('notifications')}>
                                     <Icon type="bell" theme="outlined" onClick={onApprovalClicked} 
                                         style={{

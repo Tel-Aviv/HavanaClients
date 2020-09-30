@@ -13,10 +13,7 @@ const reducer = (state, action) => {
 
         return state.map( step => {
             if( step.url === action.payload.url ) {
-                return {...step,
-                        result: action.payload.result,
-                        status: action.payload.status
-                }
+                return action.payload;
             } else 
                 return {...step}
         }) 
@@ -30,9 +27,11 @@ class Step {
         this.url = url;
         this.params = params;
         this.postProcess = postProcess;
+        this.queryString = '';
     }
     
-    get queryString() {
+    getQueryString() { // just serialize params
+
         let _queryString = '';
         if( this.params ) {
             let firstParam = '?'
@@ -50,8 +49,6 @@ class Step {
     async process() {
         
         try {
-
-            console.log(this.params);
             const resp = await API.get(this.url, {
                 params: this.params
             })
@@ -60,7 +57,7 @@ class Step {
             if( this.postProcess ) {
                 this.postProcess(resp);
             }
-            this.query_string = this.queryString;
+            this.queryString = this.getQueryString();
 
         } catch(error) {
 
@@ -88,7 +85,6 @@ const SupportPage = () => {
     const [activePanelKeys, setActivePanelKeys] = useState([]);
     const [expanded, setExpanded] = useState(false);
     const [loading , setLoading] = useState(false);
-    const [incidentData, setIncidentData] = useState();
 
     // Used as shared data for exchange API results between the steps.
     // Passed by reference to some step and may be updated in postProcess() of other.
@@ -131,15 +127,15 @@ const SupportPage = () => {
     
     const fetchData = async() => {
 
-        const results = await Promise.all( steps.map( async(step) => {
+        await Promise.all( steps.map( async(step) => {
             await step.process();
             action_Update(step);
+            return step;
         }));
-        setIncidentData(results);
     }
 
     useEffect( () => {
-        onRefresh();
+        fetchData();
     }, [])
 
     const onRefresh = () => {
@@ -174,7 +170,7 @@ const SupportPage = () => {
     const sendOut = async() => {
         try {
 
-            const _steps = incidentData.map( step => {
+            const _steps = state.map( step => {
                 let _step = {...step, 
                     result: JSON.stringify(step.result),
                     callParams: JSON.stringify(step.params)
@@ -186,7 +182,7 @@ const SupportPage = () => {
             const incident = {
                 steps: _steps
             };
-            await API.post('./incidents', incident,
+            await API.post('/incidents', incident,
             {
                 params: {
                     year: routeParams.year,
@@ -228,7 +224,7 @@ const SupportPage = () => {
                             state.map( (item, index) => {
 
                                 return (
-                                    <Panel header={item.name + ' (' + item.url + item.query_string + ')'} 
+                                    <Panel header={item.name + ' (' + item.url + item.queryString + ')'} 
                                             key={index} 
                                             extra={genExtra(item.status)}>
                                         <div style={{
