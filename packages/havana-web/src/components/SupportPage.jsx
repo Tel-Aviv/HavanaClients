@@ -165,7 +165,7 @@ const SupportPage = () => {
         
         expanded ?
             setActivePanelKeys([]) :
-            setActivePanelKeys([...steps.keys()]);  
+            setActivePanelKeys([...state.keys(), ]);  
 
         setExpanded(!expanded)
     }
