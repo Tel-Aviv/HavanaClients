@@ -95,7 +95,7 @@ const SupportPage = () => {
         employerCode: 0
     }];
  
-    const steps = [
+    const independent_steps = [
         new Step('me', '/me'),
         new Step('Days Off', '/daysoff', 
             {
@@ -111,12 +111,15 @@ const SupportPage = () => {
                 null,
                 (res) => {
                     localContext[0].employerCode = res.data.employerCode;
-                }),
+                })
+    ]
+
+    const dependent_steps = [
         new Step('Report Codes', '/me/report_codes',
                 localContext[0])
     ]
 
-    const [state, dispatch] = useReducer(reducer, steps);
+    const [state, dispatch] = useReducer(reducer, [...independent_steps, ...dependent_steps]);
 
     const action_Update = (item) => {
         dispatch({
@@ -125,13 +128,23 @@ const SupportPage = () => {
         })
     }
     
-    const fetchData = async() => {
-
+    const process_steps = async (steps) => {
         await Promise.all( steps.map( async(step) => {
             await step.process();
             action_Update(step);
             return step;
-        }));
+        }));        
+    }
+
+    const fetchData = async() => {
+
+        // Firstly process independent steps.
+        // At the finish of each step with postProccess() callback, 
+        // the shared parameters are populated in order to be used when dependent steps are processed
+        await process_steps(independent_steps);
+
+        // At this point, all shared parameters are guaranteed to be ready
+        await process_steps(dependent_steps);
     }
 
     useEffect( () => {
