@@ -97,6 +97,7 @@ const SupportPage = () => {
  
     const independent_steps = [
         new Step('me', '/me'),
+        new Step('Docs', `/me/reports/${routeParams.year}/${routeParams.month}/docs`),
         new Step('Days Off', '/daysoff', 
             {
                 year: routeParams.year,
