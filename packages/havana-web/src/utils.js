@@ -61,7 +61,7 @@ if( process.env.mock ) {
             "ID": "313069486"    
     })
 
-    mock.onGet('/me/reports/2020/9/docs/')
+    mock.onGet(/\/me\/reports\/\d+\/\d+\/docs/)
         .reply(200, []);
 
     mock.onGet('/daysoff')
