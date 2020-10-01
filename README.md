@@ -25,7 +25,7 @@ You may run each client independently with root scripts:
 The root API is able to detect the User-Agent and return and HTML with the script linked to 'mobile.bundle.js'
 3. **yarn:build** - creates both Web and Responsive Web clients [concurrently](https://www.npmjs.com/package/concurrently) and copies both to directory specified in .env file by *publish_destination=xxx*
 
-# Build configuration
+## Build configuration
 If your intentions are to use webpack-dev-server from localhost, provide the public path from which the app would be served in .env file. That value will be copied to webpack.config.js before the building. Usually set *public_path = /* there.
 
 If you want the app to be hosted on another http server (likely IIS), provide the desired virtual directory in this entry, say *public_path = /ps/*. Thus, (after deploying) it will be served from *http://<host_name>/ps/*.
