@@ -124,15 +124,21 @@ body {
   margin: 12px;
 }
 
-/* Redefeinition from antd */
+/* Redefeinitions from antd */
 
 .ant-form-item-label {
     display: flex !important;
 }
 
+.ant-menu {
+  line-height: 46px !important;
+  text-align: start !important;
+}
+
 .ant-menu-blue {
   color: white !important;
   background:  rgb(24, 144, 255) !important;
+  
 }
 
 .ant-menu-item-active

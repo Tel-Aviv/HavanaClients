@@ -7,18 +7,24 @@ import Img from 'react-image';
 
 import { useTranslation } from "react-i18next";
 
-import  { Layout, Icon, Popconfirm,
+import { UserOutlined, 
+        BarsOutlined,
+        FundOutlined,
+        PrinterOutlined,
+        CheckCircleOutlined } 
+from '@ant-design/icons'
+import  { Layout, Popconfirm,
             Tooltip, Modal, Button,
             Typography, Table, Tag,
             Alert, Card,
-            Row, Col,
+            Row, Col, Space,
             DatePicker }
 from 'antd';
 const { Content } = Layout;
 const { Title } = Typography;
 const { MonthPicker } = DatePicker;
 
-import { Tabs, Dropdown, Menu, message  } from 'antd-rtl';
+import { Tabs, Dropdown, Menu, message  } from 'antd';
 const { TabPane } = Tabs;
 
 import { Pie } from 'ant-design-pro/lib/Charts';
@@ -527,7 +533,7 @@ const Home = () => {
                 managers ? 
                 managers.map((manager, index) => (
                         <Menu.Item  key={index}>
-                            <Icon type="user" />
+                            <UserOutlined />
                             {manager.userName}
                         </Menu.Item>
                 )) : 
@@ -576,14 +582,14 @@ const Home = () => {
                             </Tooltip>
                             <Tooltip placement='bottom' title={t('validate_report')}>
                                 <Button onClick={validateReport} 
-                                        icon='check-circle'
+                                        icon={<CheckCircleOutlined />}
                                         disabled={loadingData}>
                                     {t('validate')} 
                                 </Button>
                             </Tooltip>
                             <Button onClick={onShowPDF}
                                     disabled={loadingData}
-                                    icon='printer'
+                                    icon={<PrinterOutlined />}
                                     style={{
                                         marginLeft: '4px'
                                     }}>
@@ -767,6 +773,7 @@ const Home = () => {
                 <Alert closable={false}
                         style={{
                             opacity: alertOpacity,
+                            width: '100%'
                         }}
                         message={alert.message}
                         description={getAlertDescription()}
@@ -807,12 +814,14 @@ const Home = () => {
                         type="line"
                         className='hvn-table-rtl'>
                         <TabPane tab={
-                                    <span>
-                                        <Icon type="bars" />
-                                        <span>
+                                    <Space>
+                                        <BarsOutlined />
+                                        <span style={{
+                                            marginRight: '6px'
+                                        }}>
                                             {t('plain')}
                                         </span>
-                                    </span>
+                                    </Space>
                                 }
                                 key="1">
                             <TableReport dataSource={reportData}
@@ -826,12 +835,14 @@ const Home = () => {
                                         editable={isReportEditable}>
                             </TableReport>
                         </TabPane>
-                        <TabPane tab={<span>
-                                        <Icon type="fund" />
-                                        <span>
+                        <TabPane tab={<Space>
+                                        <FundOutlined />
+                                        <span style={{
+                                            marginRight: '6px'
+                                        }}>
                                             {t('yearly')}
                                         </span>
-                                    </span>
+                                    </Space>
                                     }
                                     key='2'>
                             <Suspense fallback={<div>Loading...</div>}>

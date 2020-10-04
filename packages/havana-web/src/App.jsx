@@ -7,12 +7,15 @@ import { useTranslation, initReactI18next } from "react-i18next";
 
 import { Helmet } from 'react-helmet';
 
+import { HomeOutlined, 
+    BellOutlined, 
+    SettingOutlined, 
+    GiftOutlined } 
+from '@ant-design/icons';
 import { Layout, Menu,
-    Avatar, Tooltip,
-    Icon
-   } 
+    Avatar, Tooltip
+} 
 from 'antd';
-import 'antd-rtl/es/tabs/style/index.css';
 import 'antd/dist/antd.css';
 
 import Badge from '@components/Badge'
@@ -26,6 +29,7 @@ const Confirm = React.lazy( () => import('./Confirm') )
 import Home from './Home';
 const Settings = React.lazy( () => import('./Settings') )
 const SupportPage = React.lazy( () => import('@components/SupportPage') )
+const TrainWizard = React.lazy( () => import('./components/train/TrainWizard') )
 
 import { SET_NOTIFICATIONS_COUNT } from './redux/actionTypes';
 
@@ -102,6 +106,10 @@ const App = () => {
         history.push(`/settings`);
     }
 
+    const goTrain = () => {
+        history.push('/train');
+    }
+
     const goHome = () => {
         history.push('/');
     }
@@ -118,7 +126,8 @@ const App = () => {
                                 style={{
                                     padding: '0 1%'
                                 }}>
-                    <Menu mode="horizontal" className='ant-menu top-nav-menu ant-menu-blue'>
+                    <Menu mode="horizontal" theme='light' 
+                        className='top-nav-menu ant-menu-blue'>
                         <Menu.Item key='avatar' style={{
                                 top: '6px',
                                 cursor: 'pointer'
@@ -139,9 +148,7 @@ const App = () => {
                             marginTop: '8px'
                             }}>
                             <Tooltip title={t('home')}>
-                                <Icon type="home" 
-                                    theme="outlined"
-                                    style={{
+                                <HomeOutlined style={{
                                         fontSize: '24px'
                                     }} 
                                     onClick={goHome}
@@ -153,13 +160,21 @@ const App = () => {
                             marginTop: '8px'
                             }}>
                                 <Tooltip title={t('settings')}>
-                                <Icon type="setting" 
-                                        theme="outlined"
+                                <SettingOutlined 
                                         style={{
                                             fontSize: '24px'
                                         }}
                                         onClick={goSettings}/>
                                 </Tooltip>             
+                        </Menu.Item>
+                        <Menu.Item key='train' style={{
+                                float: 'left',
+                                marginTop: '8px'
+                            }}>
+                            <GiftOutlined style={{
+                                        fontSize: '24px'
+                                    }}
+                                    onClick={goTrain}/>
                         </Menu.Item>
                         <Menu.Item key='notifications' style={{
                                 marginTop: '8px',
@@ -168,7 +183,8 @@ const App = () => {
                             }}>
                                 <Badge count={parseInt(notificationsCount)} />
                                 <Tooltip title={t('notifications')}>
-                                    <Icon type="bell" theme="outlined" onClick={onApprovalClicked} 
+                                    <BellOutlined 
+                                        onClick={onApprovalClicked} 
                                         style={{
                                             fontSize: '24px'
                                         }}/>
@@ -190,6 +206,7 @@ const App = () => {
                                 <Route path='/confirmlist' component={ConfirmList} />
                                 <Route path='/confirm/:userid/:saveReportId' component={Confirm} />                                
                                 <Route path='/settings' component={Settings} />
+                                <Route path='/train' component={TrainWizard} />
                                 <Route path='/support/:year/:month' component={SupportPage} />
                             </Switch>
                         </Suspense> 

@@ -7,11 +7,12 @@ import uniqid from 'uniqid';
 
 import { useTranslation } from "react-i18next";
 
+import { PrinterOutlined } from '@ant-design/icons';
 import { Button, Typography, 
         Row, Col, Card, Tooltip, 
-        Icon, Collapse, Alert } from 'antd';
+        Collapse, Alert } from 'antd';
 const { Panel } = Collapse;
-import { Input, Modal } from 'antd-rtl';
+import { Input, Modal } from 'antd';
 
 const { Title } = Typography;    
 
@@ -234,7 +235,7 @@ const Confirm = (props: Props) => {
                         {
                             isReportApproved ? (
                                     <Button
-                                    icon='printer'
+                                    icon={<PrinterOutlined />}
                                     onClick={onPrint}>
                                         {t('print')}
                                     </Button>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useReducer, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { Collapse, Icon, Button, 
+import { Collapse, Button, 
     Layout, Row, Col, Typography } from 'antd';
 const { Panel } = Collapse;
 const { Title } = Typography;
+import { CheckCircleOutlined } from '@ant-design/icons';
 
 import { API, DEFAULT_BASE_URL } from '../utils';
 import { DataContext } from '../DataContext';
@@ -175,10 +176,7 @@ const SupportPage = () => {
 
         const iconColor = status  == 200 ? 'rgb(24, 144, 255)' : 'rgb(255, 0, 0)';
 
-        return <Icon type='check-circle'
-                style={{
-                    color: iconColor
-                }} />
+        return <CheckCircleOutlined twoToneColor={iconColor}/>
     }
 
     const sendOut = async() => {

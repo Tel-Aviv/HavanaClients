@@ -4,6 +4,8 @@ packages/*/dist/*.js
 packages/*/public/*.js
 packages/*/public/*.png
 
+coverage
 packages/*/*.log
+C:/
 
 

@@ -3,14 +3,19 @@ import React, { useState, useContext, useEffect, useReducer  } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from "react-i18next";
 
-import { Upload, Icon, message } from 'antd';
-import { Row, Col, Avatar } from 'antd';
+import { LoadingOutlined, 
+        PlusCircleTwoTone, 
+        UserOutlined,
+        SettingTwoTone,
+        EditTwoTone,
+        DeleteTwoTone } from '@ant-design/icons';
+import { Upload, message, Row, Col, Avatar } from 'antd';
 const { Meta } = Card;
 
 import { Typography } from 'antd';
 const { Title } = Typography;
 
-import { Menu, Dropdown, Select, Card } from 'antd-rtl';
+import { Menu, Dropdown, Select, Card } from 'antd';
 const { Option } = Select;
 
 import { TextualEmployeKind } from './utils';
@@ -185,7 +190,10 @@ const Settings = () => {
 
     const uploadButton = (
         <>
-            <Icon type={loading ? 'loading' : 'plus'} />
+            { loading ?
+                <LoadingOutlined />
+                : <PlusCircleTwoTone />
+            }
             <div className="ant-upload-text">Upload</div>
         </>
     )
@@ -204,7 +212,7 @@ const Settings = () => {
     const managersMenu = <Menu onClick={handleManagersMenuClick}>
         { me.managers.map( (manager, index) => (
                 <Menu.Item  key={index}>
-                    <Icon type="user" />
+                    <UserOutlined />
                     {manager.userName}
                 </Menu.Item>
         ))}
@@ -221,35 +229,7 @@ const Settings = () => {
             <Row gutter={[32, 32]} style={{
                     margin: '0% 2%' 
                 }}>
-                <Col span={8}>
-                    <Card title={t('stamp')}
-                    actions={[
-                        <Icon type="setting" key="setting" />,
-                        <Icon type="edit" key="edit" />,
-                        <Icon type="delete" onClick={ e => removeStamp(e) }/>,
-                    ]}>
-                        <Upload {...uploadStampProps}>
-                            { me.stamp? <img src={me.stamp}  className='avatarUploader' onClick={e => dummyClick(e) }/>
-                                    : uploadButton }
-                        </Upload> 
-                        <Meta title="Uploaded" description="from local store" />
-                    </Card>
-                </Col>
-                <Col span={8}>
-                    <Card title={t('signature')}
-                    actions={[
-                            <Icon type="setting" key="setting" />,
-                            <Icon type="edit" key="edit" />,
-                            <Icon type="delete" onClick={ e => removeSignature(e) }/>,
-                        ]}>
-                        <Upload {...uploadProps}>
-                            { me.signature?  <img src={me.signature} className="avatarUploader" onClick={e => dummyClick(e) }/> 
-                                        : uploadButton }
-                        </Upload>
-                        <Meta title="Uploaded" description="from local store" />
-                    </Card>
-                </Col>
-                <Col span={8}>
+               <Col span={8}>
                     <Card title={context.user.name} loading={loading}>
                         <Meta
                             title={'תעודת זהות: ' + me.userID}
@@ -272,7 +252,36 @@ const Settings = () => {
                             </Col>
                         </Row> 
                     </Card>
+                </Col>                
+                <Col span={8}>
+                    <Card title={t('stamp')}
+                    actions={[
+                        <SettingTwoTone key="setting" />,
+                        <EditTwoTone key="edit" />,
+                        <DeleteTwoTone onClick={ e => removeStamp(e) }/>,   
+                    ]}>
+                        <Upload {...uploadStampProps}>
+                            { me.stamp? <img src={me.stamp}  className='avatarUploader' onClick={e => dummyClick(e) }/>
+                                    : uploadButton }
+                        </Upload> 
+                        <Meta title="Uploaded" description="from local store" />
+                    </Card>
                 </Col>
+                <Col span={8}>
+                    <Card title={t('signature')}
+                    actions={[
+                            <SettingTwoTone key="setting" />,
+                            <EditTwoTone key="edit" />,
+                            <DeleteTwoTone onClick={ e => removeSignature(e) }/>,
+                        ]}>
+                        <Upload {...uploadProps}>
+                            { me.signature?  <img src={me.signature} className="avatarUploader" onClick={e => dummyClick(e) }/> 
+                                        : uploadButton }
+                        </Upload>
+                        <Meta title="Uploaded" description="from local store" />
+                    </Card>
+                </Col>
+ 
             </Row>
         </div>
     )

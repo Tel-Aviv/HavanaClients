@@ -17,9 +17,9 @@ import App from './App';
 
 ReactDOM.render(<Provider store={store}>
                     <HashRouter>
-                        <AppErrorBoundary>
+                        {/* <AppErrorBoundary> */}
                             <App />
-                        </AppErrorBoundary>
+                        {/* </AppErrorBoundary> */}
                     </HashRouter>
                 </Provider>,
     document.getElementById('root'));

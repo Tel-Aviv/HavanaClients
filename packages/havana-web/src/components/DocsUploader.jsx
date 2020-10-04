@@ -1,7 +1,8 @@
 // @flow
 import React, { useState, useContext, useEffect } from 'react';
 import { useTranslation } from "react-i18next";
-import { Upload, Button, Icon, message } from 'antd'
+import { Upload, Button, message } from 'antd'
+import { UploadOutlined } from '@ant-design/icons'
 import { saveAs } from 'file-saver';
 
 import { DataContext } from "../DataContext";
@@ -160,7 +161,7 @@ const DocsUploader = ({year, month, isOperational, employeeId}) => {
             { 
                 isOperational ? 
                     <Button>
-                        <Icon type="upload" /> {t('upload')}
+                        <UploadOutlined />{t('upload')}
                     </Button> :
                     null
             }

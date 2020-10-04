@@ -20,14 +20,17 @@ export default React.forwardRef( (props, ref) => {
             format={format}
             open={open}
             size='small'
+            allowClear={false}
+            showNow={false}
             onOpenChange={(e) => setOpen(e)}
-            addon={() => (
-                <Button size="small"
-                        type="primary"
-                        style={{
-                            width: '100%'
-                        }}    
-                        onClick={(e) => handleOk(e)}> Ok </Button>
-            )} />
+            // renderExtraFooter={() => (
+            //     <Button size="small"
+            //             type="primary"
+            //             style={{
+            //                 width: '100%'
+            //             }}    
+            //             onClick={(e) => handleOk(e)}> Ok </Button>
+            // )} 
+            />
     )
 })

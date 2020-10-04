@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import moment from 'moment';
-import { Popconfirm, Modal, Form, Icon, Button, 
+import { Popconfirm, Modal, Form, Button, 
     Typography , Input, Row, Col } from 'antd';
 const { Title } = Typography;    
 import { useTranslation } from "react-i18next";   
@@ -114,4 +114,4 @@ const AddRecordModal = (props) => {
     )
 }
 
-export default Form.create()(AddRecordModal)
+export default AddRecordModal;
