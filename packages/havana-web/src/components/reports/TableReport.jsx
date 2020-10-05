@@ -144,21 +144,20 @@ const EditableTable = (props) => {
       }
     
       const save = async(key) => {
+
         try {
 
-          //const fieldsValue = form.getFieldsValue();
           const row = await form.validateFields();
 
           const entryTime = row.entry;
           const exitTime = row.exit;
           
           if( exitTime.isBefore(entryTime) ) {
-            form.setFields({
-              entry: {
-                value: fieldsValue.entry,
-                errors: [new Error(t('exit_before_entry'))],
-              },
-            });
+            form.setFields([{
+                name: 'entry',
+                value: entryTime,
+                errors: [t('exit_before_entry')]
+            }]);
             return;
           }
 
@@ -182,37 +181,8 @@ const EditableTable = (props) => {
             setData(newData)            
           }   
         } catch( errorInfo ) {
-          console.log(errorInfo)
+          console.error(errorInfo)
         }
-    
-        // form.validateFields( async(error, row) => {
-        //   if (error) {
-        //     return;
-        //   }
-    
-        //   const inouts = [fieldsValue.hasOwnProperty("entry"), 
-        //                   fieldsValue.hasOwnProperty("exit")];
-    
-        //   const newData = [...data];
-        //   const index = newData.findIndex(item => key === item.key);
-        //   if (index > -1) {
-        //     const item = newData[index];
-        //     let newItem = {
-        //       ...item,
-        //       ...row,
-        //       entry: (row.entry) ? row.entry.format(format) : item.entry, 
-        //       exit:  (row.exit) ? row.exit.format(format) : item.exit, 
-        //       rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format()
-        //     }
-        //     newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
-        //     newItem.valid = true;
-            
-        //     newData.splice(index, 1, newItem);
-        //     setEditingKey('');
-        //     props.onChange && props.onChange(newItem, inouts);        
-        //     setData(newData)
-        //   }
-        // });
       }
     
       const handleAddRow = (record) => {
