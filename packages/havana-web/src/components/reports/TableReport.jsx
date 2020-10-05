@@ -144,27 +144,25 @@ const EditableTable = (props) => {
       }
     
       const save = async(key) => {
-    
-        const fieldsValue = form.getFieldsValue();
-     
-        const entryTime = getEntryTime(fieldsValue, key);
-        const exitTime = getExitTime(fieldsValue, key);
-        
-        if( minutes(entryTime) > minutes(exitTime) ) {  
-          form.setFields({
-            entry: {
-              value: fieldsValue.entry,
-              errors: [new Error(t('exit_before_entry'))],
-            },
-          });
-          return;
-        }
-
         try {
+
+          //const fieldsValue = form.getFieldsValue();
           const row = await form.validateFields();
 
-          const inouts = [fieldsValue.hasOwnProperty("entry"), 
-                          fieldsValue.hasOwnProperty("exit")];
+          const entryTime = row.entry;
+          const exitTime = row.exit;
+          
+          if( exitTime.isBefore(entryTime) ) {
+            form.setFields({
+              entry: {
+                value: fieldsValue.entry,
+                errors: [new Error(t('exit_before_entry'))],
+              },
+            });
+            return;
+          }
+
+          const inouts = [entryTime, exitTime];
           
           const newData = [...data];
           const index = newData.findIndex(item => key === item.key);
@@ -173,8 +171,6 @@ const EditableTable = (props) => {
             let newItem = {
               ...item,
               ...row,
-              entry: (row.entry) ? row.entry.format(format) : item.entry, 
-              exit:  (row.exit) ? row.exit.format(format) : item.exit, 
               rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format()
             }
             newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
@@ -295,7 +291,9 @@ const EditableTable = (props) => {
                         style={{
                           marginRight: '0'
                       }}>
-                        {text}
+                        { moment.isMoment(text) ?
+                          text.format(format) : '-'
+                        }
                       </Tag>
                       {
                         manuallyEditedTag(isEditedManually)
@@ -322,7 +320,9 @@ const EditableTable = (props) => {
                       style={{
                         marginRight: '0'
                     }}>
-                      {text}
+                      { moment.isMoment(text) ?
+                          text.format(format) : '-'
+                      }
                     </Tag>
                     {
                       manuallyEditedTag(isEditedManually)

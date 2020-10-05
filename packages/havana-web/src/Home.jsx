@@ -37,6 +37,8 @@ import TableReport from '@reports/TableReport';
 const YearReport = React.lazy( () => import('@reports/YearReport') )
 import DocsUploader from '@components/DocsUploader';
 
+const TIME_FORMAT = 'HH:mm';
+
 const Home = () => {
 
     const [month, setMonth] = useState(moment().month()+1);
@@ -248,13 +250,14 @@ const Home = () => {
                 data = respArr[1].data.items;
                 setManualUpdates(data)
 
+                // 3. process report data
                 let report = respArr[2].data;
                 defineAlert(report);
                 setIsReportRejected( report.isRejected );
                 const employerCode = report.employerCode || 0;
                 setUserCompanyCode( employerCode );
 
-                // 3. Get report codes
+                // 3a. Get report codes
                 const resp = await dataContext.API.get(`/me/report_codes`, {
                     params: {
                         id : dataContext.user.userID,
@@ -265,7 +268,7 @@ const Home = () => {
                 })
                 setReportCodes(resp.data.items);
 
-                // Now process the report items
+                // Now merge the report items with report codes
                 data = report.items.map( (item, index ) => {
         
                     // Map short description of the report code to the 'normal' description.
@@ -276,7 +279,9 @@ const Home = () => {
                     const reportType = reportCode? reportCode.Description : item.reportType;
 
                     return {
-                                ...item, 
+                                ...item,
+                                entry: moment(item.entry, TIME_FORMAT),
+                                exit: moment(item.exit, TIME_FORMAT),
                                 key: index,
                                 reportType: isWorkingDay(item) ? reportType : ''
                             };

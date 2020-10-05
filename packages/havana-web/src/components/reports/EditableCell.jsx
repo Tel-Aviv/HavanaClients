@@ -31,8 +31,9 @@ const EditableCell = ({
             time: () => {
                 return <TimePicker size='small'
                             className='ltr'
+                            format={format}
                             allowClear={false}
-                            showNow={false} /> // <CustomTimePicker />;
+                            showNow={false} />
             },
             select: () => {
                 return <Select
@@ -56,7 +57,6 @@ const EditableCell = ({
         return (controls[type] || controls['default'])();
     }
 
-    const inputNode = getInput(inputType);
     return (
         <td {...restProps}>
             {
@@ -64,17 +64,13 @@ const EditableCell = ({
                     <Form.Item
                         name={dataIndex}
                         style={{ margin: 0 }}
-                        // initialValue= {
-                        //             (record[dataIndex] && props.inputType === 'time') ?
-                        //                     moment.utc(record[dataIndex], format) : (record[dataIndex])
-                        // }
                         rules={[
                         {
                             required: true,
                             message: `אנא הזן ${title}!`,
                         }
                         ]}>
-                        { inputNode }
+                        { getInput(inputType) }
                     </Form.Item>
                 ) : (
                         children
