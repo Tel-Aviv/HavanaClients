@@ -6,7 +6,6 @@ const moment = require('moment');
 import uniqid from 'uniqid';
 
 import { ReportContext } from "./TableContext";
-import CustomTimePicker from '../CustomTimePicker'
 const format = 'HH:mm';
 
 const EditableCell = ({

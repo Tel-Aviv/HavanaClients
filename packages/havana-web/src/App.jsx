@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import i18n from 'i18next';
 import { useTranslation, initReactI18next } from "react-i18next";
-
+import { useCookies } from 'react-cookie';
 import { Helmet } from 'react-helmet';
 
 import { HomeOutlined, 
@@ -48,10 +48,13 @@ const App = () => {
 
     const history = useHistory();
     const dispatch = useDispatch();
+    
     const { t } = useTranslation();
+    const [cookies, setCookie] = useCookies(['havana']);
 
     const [displayNotifications, setDisplayNotificatios] = useState(false);
     const [notificationsCount, setNotificationsCount] = useState(0);
+    const [showTrain, setShowTrain] = useState(false);
 
     const context = {
         user: getUserFromHtml(),
@@ -107,7 +110,7 @@ const App = () => {
     }
 
     const goTrain = () => {
-        history.push('/train');
+        setShowTrain(true)
     }
 
     const goHome = () => {
@@ -171,10 +174,12 @@ const App = () => {
                                 float: 'left',
                                 marginTop: '8px'
                             }}>
-                            <GiftOutlined style={{
-                                        fontSize: '24px'
-                                    }}
-                                    onClick={goTrain}/>
+                            <Tooltip title={t('train')}>
+                                <GiftOutlined style={{
+                                            fontSize: '24px'
+                                        }}
+                                        onClick={goTrain}/>
+                            </Tooltip>
                         </Menu.Item>
                         <Menu.Item key='notifications' style={{
                                 marginTop: '8px',
@@ -189,13 +194,18 @@ const App = () => {
                                             fontSize: '24px'
                                         }}/>
                                 </Tooltip>
-                                
                         </Menu.Item>
                     </Menu>
                 </Layout.Header>
                 <Layout.Content style={{ 
                         padding: '17px 24px 24px 24px'
                     }}>
+                    {
+                        (!cookies.showTrain || showTrain) ? (
+                        <Suspense fallback={<div>Loading Train..</div>}>
+                            <TrainWizard showOnStart={cookies.showTrain }/>
+                        </Suspense> ) : null
+                    }
                     <DataContext.Provider value={context}>
                         <Suspense fallback={<div>Loading...</div>}>
                             <Switch>
@@ -206,7 +216,6 @@ const App = () => {
                                 <Route path='/confirmlist' component={ConfirmList} />
                                 <Route path='/confirm/:userid/:saveReportId' component={Confirm} />                                
                                 <Route path='/settings' component={Settings} />
-                                <Route path='/train' component={TrainWizard} />
                                 <Route path='/support/:year/:month' component={SupportPage} />
                             </Switch>
                         </Suspense> 

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import moment from 'moment';
 
-import { Steps, TimePicker, Button, message,
-    Row, Col } from 'antd';
+import { Modal, Steps, TimePicker, Button, message,
+    Row, Col, Checkbox} from 'antd';
 const { Step } = Steps;
+
+import { useTranslation } from "react-i18next";
+import { useCookies } from 'react-cookie';
 
 const TimesStepLayout = (callback) => {
 
@@ -33,10 +36,26 @@ const TimesStepLayout = (callback) => {
     </>)
 }
 
-const TrainWizard = () => {
+const TrainWizard = (props) => {
 
     const [currentStep, setCurrentStep] = useState(0)
     const [currentStepSucceeded, SetCurrentStepSucceeded] = useState(undefined);
+    const [modalVisible, setModalVisible] = useState(true);
+    const [showOnStart, setShowOnStart] = useState(props.showOnStart)
+
+    const { t } = useTranslation();
+    const [cookies, setCookie] = useCookies(['showTrain']);
+
+    //#region Modal appearance
+    const handleOk = () => {
+        setModalVisible(false);
+    }
+    
+    const handleShowOnStart = () => {
+        setCookie('showTrain', !showOnStart, { path: '/'})
+        setShowOnStart(!showOnStart);
+    }
+    //#endregion
 
     const steps = [{
         title: 'Enterance',
@@ -48,8 +67,6 @@ const TrainWizard = () => {
         content: 'Pickup'
     }];
 
-
-
     const next = () => {
         setCurrentStep( currentStep + 1)
     }
@@ -59,43 +76,56 @@ const TrainWizard = () => {
     }
 
     return (
-    <>
-        <Steps>
-        {
-            steps.map( item => (
-                <Step key={item.title} title={item.title}
-                    description={item.description} />
-            ))
-        }
-        </Steps>
-        <div className='steps-content'>{steps[currentStep].content}</div>
-        <Row>
-            <Col>
-                {
-                    currentStepSucceeded ? 'Good Job. Keep going!.. Press Next.' :
-                        'Try again'
-                }
-                
-            </Col>
-        </Row>        
-        <div className='steps-action'>
-            { currentStep < steps.length - 1 && (
-                <Button type='primary' onClick={next}>
-                    Next
+        <Modal title={t('train')}
+            className='rtl'
+            visible={modalVisible}
+            closable={true}
+            footer={[
+                <Button key='close' type='primary' onClick={handleOk}>{t('got_it')}</Button>,
+                <Row key='gotit'>
+                    <Col span={24}>
+                        <Checkbox onChange={handleShowOnStart}
+                                    checked={showOnStart}>
+                                    {t('show_on_start')}
+                        </Checkbox>
+                    </Col>
+                </Row>
+            ]}>
+            <Steps>
+            {
+                steps.map( item => (
+                    <Step key={item.title} title={item.title}
+                        description={item.description} />
+                ))
+            }
+            </Steps>
+            <div className='steps-content'>{steps[currentStep].content}</div>
+            <Row>
+                <Col>
+                    {
+                        currentStepSucceeded ? 'Good Job. Keep going!.. Press Next.' :
+                            'Try again'
+                    }
+                </Col>
+            </Row>        
+            <div className='steps-action'>
+                { currentStep < steps.length - 1 && (
+                    <Button type='primary' onClick={next}>
+                        Next
+                    </Button>
+                )}
+                { currentStep === steps.length - 1 && (
+                <Button type='primary' onClick={() => message.success('Complete')}>
+                    Done
                 </Button>
-            )}
-            { currentStep === steps.length - 1 && (
-            <Button type='primary' onClick={() => message.success('Complete')}>
-                Done
-            </Button>
-            )}
-            { currentStep > 0 && (
-                <Button style={{ margin: '0 8 px'}}  onClick={prev}>
-                    Previous
-                </Button>
-            )}
-        </div>
-    </>)
+                )}
+                { currentStep > 0 && (
+                    <Button style={{ margin: '0 8 px'}} onClick={prev}>
+                        Previous
+                    </Button>
+                )}
+            </div>
+        </Modal>)
 }
 
 export default TrainWizard;

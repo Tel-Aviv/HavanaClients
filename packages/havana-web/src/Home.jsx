@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useRef, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { useCookies } from 'react-cookie';
 import moment from 'moment';
 import uniqid from 'uniqid';
 import Img from 'react-image';
@@ -78,6 +79,8 @@ const Home = () => {
 
     const dispatch = useDispatch();
     const { t } = useTranslation();
+
+    const [cookies, setCookie] = useCookies(['havana']);
 
     const action_setDirectManager = (manager) => ({
         type: SET_DIRECT_MANAGER,
