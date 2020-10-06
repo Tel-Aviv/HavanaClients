@@ -14,7 +14,7 @@ const iconStyle = {
     fontSize: '100%'
 }
 
-export default ({record, display, editing, disable, edit, save, cancel}) => {
+export default ({record, editing, disable, edit, save, cancel}) => {
 
     const {t} = useTranslation();
 

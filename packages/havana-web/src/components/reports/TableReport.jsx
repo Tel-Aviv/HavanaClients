@@ -18,7 +18,7 @@ import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
 const format = 'H:mm';
 
-const EditableTable = (props) => {
+const TableReport = (props) => {
 
     const [form] = Form.useForm();
 
@@ -361,7 +361,7 @@ const EditableTable = (props) => {
                     edit={edit} 
                     save={save} 
                     cancel={cancel}
-                />): null
+                />): <div>here</div>
     
             }
           },
@@ -542,4 +542,4 @@ const EditableTable = (props) => {
   
 }
 
-export default EditableTable;
+export default TableReport;

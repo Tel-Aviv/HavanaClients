@@ -80,34 +80,35 @@ const AddRecordModal = (props) => {
             <Form layout="vertical"
                     size='small'
                     onSubmit={_onSubmit}>
-                <Form.Item label={t('in')}>
-                    {getFieldDecorator('entryTime', {
-                        rules: [{ 
+                <Form.Item label={t('in')}
+                        name={dataIndex}
+                        rules={[{ 
                                 type: 'object', 
                                 required: true, 
                                 message: t('add_entry_error') 
-                                }],
-                    })(
-                        <CustomTimePicker />
-                    )}
+                        }]
+                }>
+                    <CustomTimePicker />
                 </Form.Item>
-                <Form.Item label={t('out')}>
-                    {getFieldDecorator('exitTime', {
-                        rules: [{ 
-                                type: 'object', 
-                                required: true, 
-                                message: t('add_exit_error') 
-                                }],                
-                    })(
-                        <CustomTimePicker />
-                    )}
+                <Form.Item label={t('out')}
+                        name='dataIndex'
+                        rules={[{ 
+                            type: 'object', 
+                            required: true, 
+                            message: t('add_exit_error') 
+                        }]
+                }>
+                    <CustomTimePicker />
                 </Form.Item>
-                <Form.Item label={t('notes')}>
-                    {getFieldDecorator('notes', {
-                        rules: [{ required: true, message: t('add_notes_error') }],
-                    })(
-                        <Input />,
-                    )}
+                <Form.Item label={t('notes')}
+                    name='notes'
+                    rules={[
+                        { 
+                            required: true, 
+                            message: t('add_notes_error') 
+                        }]
+                }>
+                    <Input />
                 </Form.Item>                
             </Form>
         </Modal>        
