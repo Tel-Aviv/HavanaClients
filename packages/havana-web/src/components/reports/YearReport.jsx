@@ -1,4 +1,3 @@
-// @flow
 import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from "react-i18next";
 import { Chart, Axis, Geom, Legend, Coord, Tooltip } from 'bizcharts';
@@ -20,15 +19,11 @@ const scale = {
     }
   };
 
-type Props = {
-    year: number
-}
-
-const YearReport = (props: Props) => {
+const YearReport = (props) => {
 
     const [reportData, setReportData] = useState([]);
-    const [annualLeft, setAnnualLett] = useState<string>();
-    const [annualLeftPecentage, setAnnualLeftPercentage] = useState<number>();
+    const [annualLeft, setAnnualLett] = useState();
+    const [annualLeftPecentage, setAnnualLeftPercentage] = useState();
 
     const { t } = useTranslation();
 

@@ -3,6 +3,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { ADD_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
 import { Table, Popconfirm, Modal, Form, Icon,
         Tag, Row, Col, Tooltip, Menu } from 'antd';
+import { PlusCircleTwoTone, 
+  MinusCircleTwoTone,
+  TagOutlined } 
+from '@ant-design/icons';
 import moment from 'moment';
 import { useTranslation } from "react-i18next";
 
@@ -14,7 +18,9 @@ import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
 const format = 'H:mm';
 
-const EditableTable = (props) => {
+const TableReport = (props) => {
+
+    const [form] = Form.useForm()
 
     const [data, setData] = useState([])
     const [daysOff, setDaysOff] = useState([]);
@@ -113,8 +119,11 @@ const EditableTable = (props) => {
                               || hasSytemNotes(record));
       }
     
-      const edit = (key) => {
-        setEditingKey(key);
+      const edit = (record) => {
+        form.setFieldsValue({
+          ...record
+        })
+        setEditingKey(record.key);
       }
     
       const cancel = () => {
@@ -134,31 +143,25 @@ const EditableTable = (props) => {
         return parseInt(tokens[0]) * 60 + parseInt(tokens[1]);
       }
     
-      const save = (form, key) => {
+      const save = async (key) => {
     
-        const fieldsValue = form.getFieldsValue();
-     
-        const entryTime = getEntryTime(fieldsValue, key);
-        const exitTime = getExitTime(fieldsValue, key);
-        
-        if( minutes(entryTime) > minutes(exitTime) ) {  
-          form.setFields({
-            entry: {
-              value: fieldsValue.entry,
-              errors: [new Error(t('exit_before_entry'))],
-            },
-          });
-          return;
-        }
-    
-        form.validateFields( async(error, row) => {
-          if (error) {
+        try {
+
+          const row = await form.validateFields();
+          const entryTime = row.entry;
+          const exitTime = row.exit;
+
+          if( exitTime.isBefore(entryTime) ) {
+            form.setFields([{
+              name: 'entry',
+              value: entryTime,
+              errors: [t('exit_before_entry')]
+            }]);
             return;
           }
-    
-          const inouts = [fieldsValue.hasOwnProperty("entry"), 
-                          fieldsValue.hasOwnProperty("exit")];
-    
+
+          const inouts = [entryTime, exitTime]; 
+
           const newData = [...data];
           const index = newData.findIndex(item => key === item.key);
           if (index > -1) {
@@ -166,8 +169,6 @@ const EditableTable = (props) => {
             let newItem = {
               ...item,
               ...row,
-              entry: (row.entry) ? row.entry.format(format) : item.entry, 
-              exit:  (row.exit) ? row.exit.format(format) : item.exit, 
               rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format()
             }
             newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
@@ -178,7 +179,11 @@ const EditableTable = (props) => {
             props.onChange && props.onChange(newItem, inouts);        
             setData(newData)
           }
-        });
+
+        } catch( errorInfo ) {
+          console.error(errorInfo)
+        }
+
       }
     
       const handleAddRow = (record) => {
@@ -205,7 +210,7 @@ const EditableTable = (props) => {
               <Row>
                 <Col span={12}>
                   <Tooltip title={t('add_record')}>
-                    <Icon type="plus-circle" theme="twoTone" 
+                    <PlusCircleTwoTone
                           onClick={() => handleAddRow(record)}/>
                   </Tooltip>      
                 </Col>
@@ -215,7 +220,7 @@ const EditableTable = (props) => {
                       <Popconfirm
                         title={t('sure')}
                         onConfirm={() => handleRemoveRecord(record)}>
-                          <Icon type='minus-circle' theme='twoTone' />  
+                          <MinusCircleTwoTone />  
                       </Popconfirm>    
                     : null
                 }
@@ -257,7 +262,10 @@ const EditableTable = (props) => {
                         style={{
                           marginRight: '0'
                       }}>
-                        {text}
+                        { 
+                          moment.isMoment(text) ?
+                            text.format(format) : '-'
+                        }
                       </Tag>
                       {
                         manuallyEditedTag(isEditedManually)
@@ -284,7 +292,10 @@ const EditableTable = (props) => {
                       style={{
                         marginRight: '0'
                     }}>
-                      {text}
+                      {
+                        moment.isMoment(text) ?
+                        text.format(format) : '-'
+                      }
                     </Tag>
                     {
                       manuallyEditedTag(isEditedManually)
@@ -347,7 +358,7 @@ const EditableTable = (props) => {
               return ( moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) // no edits for future
                         && record.requireChange)? 
                 (<EditIcons 
-                    recordId={record.key}
+                    record={record}
                     editing={isRowEditing(record)} 
                     disable={editingKey !== ''} 
                     edit={edit} 
@@ -413,7 +424,7 @@ const EditableTable = (props) => {
         return isEditedManually ?
                 <Tooltip title={t('manual_tag')}>
                 <Tag color='magenta'>
-                        <Icon type="tag" />
+                        <TagOutlined />
                 </Tag> 
                 </Tooltip>: null
       }
@@ -512,27 +523,27 @@ const EditableTable = (props) => {
                                          codes: reportCodes
                                         }
                                       }>
-          <Table
-              {...props}
-              style={{ 
-                      direction: 'rtl', 
-                      heigth: '600px',
-                      margin: '12px'
-                      }}
-              tableLayout='auto'
-              bordered={false}
-              components={components}
-              dataSource={data}
-              columns={columns}
-              rowClassName="editable-row"
-              pagination={false}
-              size="small"
-            />
+          <Form form={form} component={false}>
+            <Table
+                {...props}
+                style={{ 
+                        direction: 'rtl', 
+                        heigth: '600px',
+                        margin: '12px'
+                        }}
+                tableLayout='auto'
+                bordered={false}
+                components={components}
+                dataSource={data}
+                columns={columns}
+                rowClassName="editable-row"
+                pagination={false}
+                size="small"
+              />
+            </Form>
         </ReportContext.Provider>
     </>)
   
 }
 
-export default Form.create({
-    name: "report_table"
-  })(EditableTable)
+export default TableReport;

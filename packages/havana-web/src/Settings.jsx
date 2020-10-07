@@ -10,7 +10,15 @@ const { Meta } = Card;
 import { Typography } from 'antd';
 const { Title } = Typography;
 
-import { Menu, Dropdown, Select, Card } from 'antd-rtl';
+import { LoadingOutlined,
+    PlusCircleTwoTone,
+    UserOutlined,
+    SettingTwoTone,
+    EditTwoTone,
+    DeleteTwoTone } 
+from '@ant-design/icons';
+
+import { Menu, Dropdown, Select, Card } from 'antd';
 const { Option } = Select;
 
 import { TextualEmployeKind } from './utils';
@@ -185,7 +193,7 @@ const Settings = () => {
 
     const uploadButton = (
         <>
-            <Icon type={loading ? 'loading' : 'plus'} />
+             {loading ? <LoadingOutlined /> : <PlusCircleTwoTone />}
             <div className="ant-upload-text">Upload</div>
         </>
     )
@@ -204,7 +212,7 @@ const Settings = () => {
     const managersMenu = <Menu onClick={handleManagersMenuClick}>
         { me.managers.map( (manager, index) => (
                 <Menu.Item  key={index}>
-                    <Icon type="user" />
+                    <UserOutlined />
                     {manager.userName}
                 </Menu.Item>
         ))}
@@ -224,9 +232,9 @@ const Settings = () => {
                 <Col span={8}>
                     <Card title={t('stamp')}
                     actions={[
-                        <Icon type="setting" key="setting" />,
-                        <Icon type="edit" key="edit" />,
-                        <Icon type="delete" onClick={ e => removeStamp(e) }/>,
+                        <SettingTwoTone key="setting" />,
+                        <EditTwoTone key="edit" />,
+                        <DeleteTwoTone key="delete" onClick={ e => removeStamp(e) }/>,
                     ]}>
                         <Upload {...uploadStampProps}>
                             { me.stamp? <img src={me.stamp}  className='avatarUploader' onClick={e => dummyClick(e) }/>
@@ -238,9 +246,9 @@ const Settings = () => {
                 <Col span={8}>
                     <Card title={t('signature')}
                     actions={[
-                            <Icon type="setting" key="setting" />,
-                            <Icon type="edit" key="edit" />,
-                            <Icon type="delete" onClick={ e => removeSignature(e) }/>,
+                            <SettingTwoTone key="setting" />,
+                            <EditTwoTone key="edit" />,
+                            <DeleteTwoTone key="delete" onClick={ e => removeSignature(e) }/>,
                         ]}>
                         <Upload {...uploadProps}>
                             { me.signature?  <img src={me.signature} className="avatarUploader" onClick={e => dummyClick(e) }/> 

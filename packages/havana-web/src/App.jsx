@@ -12,8 +12,12 @@ import { Layout, Menu,
     Icon
    } 
 from 'antd';
-import 'antd-rtl/es/tabs/style/index.css';
+import { HomeOutlined,
+    SettingOutlined,
+    BellOutlined } 
+from '@ant-design/icons';
 import 'antd/dist/antd.css';
+import 'ant-design-pro/dist/ant-design-pro.css'
 
 import Badge from '@components/Badge'
 
@@ -118,10 +122,12 @@ const App = () => {
                                 style={{
                                     padding: '0 1%'
                                 }}>
-                    <Menu mode="horizontal" className='ant-menu top-nav-menu ant-menu-blue'>
+                    <Menu mode="horizontal" theme='light'
+                        className='ant-menu top-nav-menu ant-menu-blue'>
                         <Menu.Item key='avatar' style={{
                                 top: '6px',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                float: 'right'
                             }}>
                                 <div>
                                     <Avatar size="large" src={`data:image/jpeg;base64,${context.user.imageData}`}
@@ -139,8 +145,7 @@ const App = () => {
                             marginTop: '8px'
                             }}>
                             <Tooltip title={t('home')}>
-                                <Icon type="home" 
-                                    theme="outlined"
+                                <HomeOutlined
                                     style={{
                                         fontSize: '24px'
                                     }} 
@@ -153,8 +158,7 @@ const App = () => {
                             marginTop: '8px'
                             }}>
                                 <Tooltip title={t('settings')}>
-                                <Icon type="setting" 
-                                        theme="outlined"
+                                <SettingOutlined
                                         style={{
                                             fontSize: '24px'
                                         }}
@@ -168,7 +172,7 @@ const App = () => {
                             }}>
                                 <Badge count={parseInt(notificationsCount)} />
                                 <Tooltip title={t('notifications')}>
-                                    <Icon type="bell" theme="outlined" onClick={onApprovalClicked} 
+                                    <BellOutlined onClick={onApprovalClicked} 
                                         style={{
                                             fontSize: '24px'
                                         }}/>

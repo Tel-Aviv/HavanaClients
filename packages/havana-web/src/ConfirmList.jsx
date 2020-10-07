@@ -5,8 +5,12 @@ import moment from 'moment'
 
 import { Table, Alert, 
         Row, Col, Icon, Tag, Checkbox } from 'antd';
+import { ScheduleTwoTone,
+    CarryOutTwoTone,
+    AlertTwoTone 
+} from '@ant-design/icons';
 import { useTranslation } from "react-i18next";
-import { Tabs } from 'antd-rtl';
+import { Tabs } from 'antd';
 const { TabPane } = Tabs;
 import { Layout } from 'antd';
 const { Content } = Layout;
@@ -232,7 +236,7 @@ const ConfirmList = () => {
                         className='hvn-table-rtl'>
                         <TabPane tab={
                             <span>
-                                <Icon type="schedule" theme="twoTone"/>
+                                <ScheduleTwoTone />
                                 <span>
                                     {t('pending_reports')} ({pendingCount})
                                 </span>
@@ -252,7 +256,7 @@ const ConfirmList = () => {
                         </TabPane>
                         <TabPane tab={
                             <span>
-                                <Icon type="carry-out" theme="twoTone"/>
+                                <CarryOutTwoTone />
                                 <span>
                                     {t('approved_reports')} ({approvedCount})
                                 </span>
@@ -273,7 +277,7 @@ const ConfirmList = () => {
                         </TabPane>
                         <TabPane tab={
                             <span>
-                                <Icon type="alert" theme="twoTone" />
+                                <AlertTwoTone />
                                 <span>
                                     {t('rejected_reports')} ({rejectedCount})
                                 </span>

@@ -1,15 +1,23 @@
 // @flow
 import React, { useState, useContext } from 'react'
-import { Input, Select, Form } from 'antd';
+import { Input, Select, Form, TimePicker } from 'antd';
 const { Option } = Select;       
 const moment = require('moment');
 import uniqid from 'uniqid';
 
 import { ReportContext } from "./TableContext";
-import CustomTimePicker from '../CustomTimePicker'
-const format = 'H:mm';
+const format = 'HH:mm';
 
-const EditableCell = (props) => {
+const EditableCell = ({
+    rowEditing,
+    dataIndex,
+    title,
+    inputType,
+    record,
+    index,
+    children,
+    ...restProps
+}) => {
 
     const reportContext = useContext(ReportContext);
     
@@ -20,7 +28,11 @@ const EditableCell = (props) => {
     const getInput = (type) => {
         const controls = {
             time: () => {
-                return  <CustomTimePicker />;
+                return  <TimePicker size='small'
+                            className='ltr'
+                            format={format}
+                            allowClear={false}
+                            showNow={false} />
             },
             select: () => {
                 return <Select
@@ -44,43 +56,26 @@ const EditableCell = (props) => {
         return (controls[type] || controls['default'])();
     }
 
-    return <ReportContext.Consumer>
-        {( {form, codes} ) => {
-            const {
-                rowEditing,
-                dataIndex,
-                title,
-                inputType,
-                record,
-                index,
-                children,
-                ...restProps
-            } = props;
+    const inputNode = getInput(inputType);
+    return (
+        <td {...restProps}>
+            {rowEditing /*&& cellEditable*/ ?  (
+                <Form.Item style={{ margin: 0 }}
+                        name={dataIndex}
+                            rules={[
+                            {
+                                required: true,
+                                message: `אנא הזן ${title}!`,
+                            },
+                        ]}>
+                    { inputNode }
+                </Form.Item>
+            ) : (
+                    children
+                )}
+        </td>
+     );
 
-            return (
-                <td {...restProps}>
-                    {rowEditing /*&& cellEditable*/ ?  (
-                        <Form.Item style={{ margin: 0 }}>
-                            {form.getFieldDecorator(dataIndex, {
-                                rules: [
-                                    {
-                                        required: true,
-                                        message: `אנא הזן ${title}!`,
-                                    },
-                                ],
-                                initialValue: (record[dataIndex] && props.inputType === 'time') ?
-                                            moment.utc(record[dataIndex], format) : (record[dataIndex])
-                            })
-                                (getInput(inputType))
-                            }
-                        </Form.Item>
-                    ) : (
-                            children
-                        )}
-                </td>
-            );
-        }}
-    </ReportContext.Consumer>;
 }
 
 export default EditableCell

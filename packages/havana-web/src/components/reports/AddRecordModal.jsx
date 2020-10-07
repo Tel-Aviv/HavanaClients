@@ -12,8 +12,6 @@ const AddRecordModal = (props) => {
 
     const { t } = useTranslation();
 
-    const { getFieldDecorator } = props.form;
-
     const visible = props.visible;
     const onCancel = props.onCancel;
     const _addRecord = props.onAddRecord;
@@ -80,38 +78,37 @@ const AddRecordModal = (props) => {
             <Form layout="vertical"
                     size='small'
                     onSubmit={_onSubmit}>
-                <Form.Item label={t('in')}>
-                    {getFieldDecorator('entryTime', {
-                        rules: [{ 
+                <Form.Item name={t('in')}
+                        rules={ [{ 
                                 type: 'object', 
                                 required: true, 
                                 message: t('add_entry_error') 
-                                }],
-                    })(
-                        <CustomTimePicker />
-                    )}
+                                }]
+                            }
+                    >
+                    <CustomTimePicker />
                 </Form.Item>
-                <Form.Item label={t('out')}>
-                    {getFieldDecorator('exitTime', {
-                        rules: [{ 
+                <Form.Item name={t('out')}
+                        rules={ [{ 
                                 type: 'object', 
                                 required: true, 
                                 message: t('add_exit_error') 
-                                }],                
-                    })(
-                        <CustomTimePicker />
-                    )}
+                                }]
+                            }                
+                >
+                    <CustomTimePicker />
                 </Form.Item>
-                <Form.Item label={t('notes')}>
-                    {getFieldDecorator('notes', {
-                        rules: [{ required: true, message: t('add_notes_error') }],
-                    })(
-                        <Input />,
-                    )}
+                <Form.Item name={t('notes')}
+                        rules={ [{ 
+                            required: true, 
+                            message: t('add_notes_error') }]
+                    }
+                >    
+                        <Input />                
                 </Form.Item>                
             </Form>
         </Modal>        
     )
 }
 
-export default Form.create()(AddRecordModal)
+export default AddRecordModal;

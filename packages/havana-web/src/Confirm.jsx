@@ -1,4 +1,3 @@
-// @flow
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
@@ -9,9 +8,9 @@ import { useTranslation } from "react-i18next";
 
 import { Button, Typography, 
         Row, Col, Card, Tooltip, 
-        Icon, Collapse, Alert } from 'antd';
+        Collapse, Alert } from 'antd';
 const { Panel } = Collapse;
-import { Input, Modal } from 'antd-rtl';
+import { Input, Modal } from 'antd';
 
 const { Title } = Typography;    
 
@@ -27,32 +26,27 @@ import DocsUploader from '@components/DocsUploader';
 import { DECREASE_NOTIFICATIONS_COUNT,
          INCREASE_NOTIFICATION_COUNT } from "./redux/actionTypes";
 
-type Props = {
-    month: number,
-    year: number
-}
-
 const ref = React.createRef();
 
-const Confirm = (props: Props) => {
+const Confirm = (props) => {
     
-    const [month, setMonth] = useState<number>(0);
-    const [year, setYear] = useState<number>(0);
-    const [savedReportId, setSavedReportId] = useState<number>(0);
-    const [reportOwnerName, setReportOwnerName] = useState<string>('');
-    const [totals, setTotals] = useState<number>(0);
+    const [month, setMonth] = useState(0);
+    const [year, setYear] = useState(0);
+    const [savedReportId, setSavedReportId] = useState(0);
+    const [reportOwnerName, setReportOwnerName] = useState('');
+    const [totals, setTotals] = useState(0);
     const [tableData, setTableData] = useState([])
-    const [title, setTitle] = useState<string>('');
-    const [isReportApproved, setIsReportApproved] = useState<bool>(false);
-    const [isReportRejected, setReportRejected] = useState<bool>(false);
-    const [isReportResubmitted, setReportResubmitted] = useState<bool>(false);
-    const [reportNote, setReportNote] = useState<string>('')
+    const [title, setTitle] = useState('');
+    const [isReportApproved, setIsReportApproved] = useState(false);
+    const [isReportRejected, setReportRejected] = useState(false);
+    const [isReportResubmitted, setReportResubmitted] = useState(false);
+    const [reportNote, setReportNote] = useState('')
     const [whenApproved, setWhenApproved] = useState();
-    const [loadingData, setLoadingData] = useState<boolean>(false);
-    const [notesModalVisible, setNotesModalVisible] = useState<boolean>(false);
-    const [printModalVisible, setPrintModalVisible] = useState<boolean>(false);
-    const [note, setNote] = useState<string>('');
-    const [approvalSending, setApprovalSending] = useState<boolean>(false);
+    const [loadingData, setLoadingData] = useState(false);
+    const [notesModalVisible, setNotesModalVisible] = useState(false);
+    const [printModalVisible, setPrintModalVisible] = useState(false);
+    const [note, setNote] = useState('');
+    const [approvalSending, setApprovalSending] = useState(false);
     const [manualUpdates, setManualUpdates] = useState();
 
     const history = useHistory();

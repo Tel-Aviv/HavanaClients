@@ -86,7 +86,12 @@ const translations = {
             "resubmitted_status": "Re-submitted",
             "resubmitted_header": "This report was resubmitted",
             "report_type": "Work Kind",
-            "no_managers": "No managers were defined for this user"
+            "no_managers": "No managers were defined for this user",
+            "support_page": "Support Page for Report",
+            "expand": "Expand",
+            "collapse": "Collapse",
+            "refresh": "Refresh",
+            "cancel_edit": "Sure to discard changes?",
         }
     },
     he: {
@@ -176,7 +181,12 @@ const translations = {
             "resubmitted_status": "נשלח מחדש",
             "resubmitted_header": "דוח זה נשלח לאישור מחדש לאחר טיפול בהערת מנהל",
             "report_type": "קוד דיווח",
-            "no_managers": "לא הוגדרו מנהלים עבור משתמש זה"
+            "no_managers": "לא הוגדרו מנהלים עבור משתמש זה",
+            "support_page": "דף תמיכה לדוח",
+            "expand": "הרחב",
+            "collapse": "צמצם",
+            "refresh": "רענן",
+            "cancel_edit": "האם ברצונך לבטל את השינויים ?"
         }
     }
 }    

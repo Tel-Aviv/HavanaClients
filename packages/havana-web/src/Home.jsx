@@ -7,18 +7,24 @@ import Img from 'react-image';
 
 import { useTranslation } from "react-i18next";
 
-import  { Layout, Icon, Popconfirm,
+import  { Layout, Popconfirm,
             Tooltip, Modal, Button,
             Typography, Table, Tag,
             Alert, Card,
             Row, Col,
             DatePicker }
 from 'antd';
-const { Content } = Layout;
+import { UserOutlined,
+    BarsOutlined,
+    FundOutlined,
+    PrinterOutlined,
+    CheckCircleOutlined } 
+from '@ant-design/icons'
+;const { Content } = Layout;
 const { Title } = Typography;
 const { MonthPicker } = DatePicker;
 
-import { Tabs, Dropdown, Menu, message  } from 'antd-rtl';
+import { Tabs, Dropdown, Menu, message  } from 'antd';
 const { TabPane } = Tabs;
 
 import { Pie } from 'ant-design-pro/lib/Charts';
@@ -30,6 +36,8 @@ import { UPDATE_ITEM, SET_DIRECT_MANAGER } from "./redux/actionTypes";
 import TableReport from '@reports/TableReport';
 const YearReport = React.lazy( () => import('@reports/YearReport') )
 import DocsUploader from '@components/DocsUploader';
+
+const TIME_FORMAT = 'HH:mm';
 
 const Home = () => {
 
@@ -242,13 +250,14 @@ const Home = () => {
                 data = respArr[1].data.items;
                 setManualUpdates(data)
 
+                // 3. process report data
                 let report = respArr[2].data;
                 defineAlert(report);
                 setIsReportRejected( report.isRejected );
                 const employerCode = report.employerCode || 0;
                 setUserCompanyCode( employerCode );
 
-                // 3. Get report codes
+                // 3a. Get report codes
                 const resp = await dataContext.API.get(`/me/report_codes`, {
                     params: {
                         id : dataContext.user.userID,
@@ -270,7 +279,9 @@ const Home = () => {
                     const reportType = reportCode? reportCode.Description : item.reportType;
 
                     return {
-                                ...item, 
+                                ...item,
+                                entry: moment(item.entry, TIME_FORMAT),
+                                exit: moment(item.exit, TIME_FORMAT),
                                 key: index,
                                 reportType: isWorkingDay(item) ? reportType : ''
                             };
@@ -310,9 +321,19 @@ const Home = () => {
     }, [reportData])
 
     const onSave = async() => {
+
+        // convert back entry/exit times from moment to 'HH:mm'
+        const _reportData = reportData.map( item => {
+            return {
+                ...item,
+                entry: moment(item.entry).format('HH:mm'),
+                exit: moment(item.exit).format('HH:mm')
+            }
+        })
+
         try {
             await dataContext.API.post(`/me/report/save`, 
-                reportData,
+                _reportData,
                 {
                     params: {
                         month: month,
@@ -527,7 +548,7 @@ const Home = () => {
                 managers ? 
                 managers.map((manager, index) => (
                         <Menu.Item  key={index}>
-                            <Icon type="user" />
+                            <UserOutlined />
                             {manager.userName}
                         </Menu.Item>
                 )) : 
@@ -576,14 +597,14 @@ const Home = () => {
                             </Tooltip>
                             <Tooltip placement='bottom' title={t('validate_report')}>
                                 <Button onClick={validateReport} 
-                                        icon='check-circle'
+                                        icon={<CheckCircleOutlined />}
                                         disabled={loadingData}>
                                     {t('validate')} 
                                 </Button>
                             </Tooltip>
                             <Button onClick={onShowPDF}
                                     disabled={loadingData}
-                                    icon='printer'
+                                    icon={<PrinterOutlined />}
                                     style={{
                                         marginLeft: '4px'
                                     }}>
@@ -767,6 +788,7 @@ const Home = () => {
                 <Alert closable={false}
                         style={{
                             opacity: alertOpacity,
+                            width: '100%'
                         }}
                         message={alert.message}
                         description={getAlertDescription()}
@@ -777,21 +799,26 @@ const Home = () => {
             </Row>
             <Row gutter={[32, 32]}>
                 <Col span={5}>
-                    <Row gutter={[40, 32]}>
+                    <Row gutter={[32, 32]}>
                         <Col>
-                            <Card title={ `סיכום חודשי: ${getMonthName(month)} ${year} ` } bordered={false}
+                            <Card title={ `סיכום חודשי: ${getMonthName(month)} ${year} ` } 
+                                style={{ width: 270}}
+                                bordered={false}
                                 className='rtl' loading={loadingData}>
-                                <Pie percent={getTotalHoursPercentage()} 
-                                     total={getTotalHoursPercentage() + '%'} 
-                                     animate={false}
-                                     subTitle={ `${totals} שעות`}
-                                     height={180} />
+                                        <Pie percent={getTotalHoursPercentage()} 
+                                            total={getTotalHoursPercentage() + '%'} 
+                                            title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
+                                            animate={false}
+                                            subTitle={ `${totals} שעות`}
+                                            height={140} />                               
                             </Card>
                         </Col>
                     </Row>
                     <Row gutter={[32, 32]}>
                         <Col>
-                            <Card title={t('abs_docs')} bordered={true}
+                            <Card title={t('abs_docs')} 
+                                style={{ width: 270}}
+                                bordered={true}
                                 className='rtl' loading={loadingData}>
                                 <div style={{
                                     marginBottom: '12px'
@@ -808,8 +835,10 @@ const Home = () => {
                         className='hvn-table-rtl'>
                         <TabPane tab={
                                     <span>
-                                        <Icon type="bars" />
-                                        <span>
+                                        <BarsOutlined />
+                                        <span style={{
+                                            marginRight: '6px'
+                                        }}>
                                             {t('plain')}
                                         </span>
                                     </span>
@@ -827,8 +856,10 @@ const Home = () => {
                             </TableReport>
                         </TabPane>
                         <TabPane tab={<span>
-                                        <Icon type="fund" />
-                                        <span>
+                                        <FundOutlined />
+                                        <span style={{
+                                            marginRight: '6px'
+                                        }}>
                                             {t('yearly')}
                                         </span>
                                     </span>
