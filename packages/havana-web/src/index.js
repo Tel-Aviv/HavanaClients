@@ -4,11 +4,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter } from 'react-router-dom';
 
-import { Provider } from 'react-redux'
+import { Provider } from 'react-redux';
+import { ConfigProvider } from 'antd';
+import heIL from 'antd/es/locale/he_IL'
 
-import moment from 'moment';
-import 'moment/locale/he';
-moment.locale('he');
+// import moment from 'moment';
+// import 'moment/locale/he';
+// moment.locale('he');
 
 import store from './redux/store';
 
@@ -18,7 +20,9 @@ import App from './App';
 ReactDOM.render(<Provider store={store}>
                     <HashRouter>
                         {/* <AppErrorBoundary> */}
-                            <App />
+                            <ConfigProvider locale={heIL}>
+                                <App />
+                            </ConfigProvider>
                         {/* </AppErrorBoundary> */}
                     </HashRouter>
                 </Provider>,

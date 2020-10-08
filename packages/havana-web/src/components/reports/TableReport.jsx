@@ -203,8 +203,8 @@ const TableReport = (props) => {
           align: 'center',
           width: '6%',
           editable: false,
-          render: (text, record) => 
-            props.editable? (
+          render: (_, record) => 
+            props.editable ? (
               <Row>
                 <Col span={12}>
                   <Tooltip title={t('add_record')}>
@@ -223,8 +223,8 @@ const TableReport = (props) => {
                     : null
                 }
                 </Col>
-              </Row>
-            ) : null
+              </Row> 
+              ) : null
         },
           {
             title: 'יום',
@@ -510,16 +510,17 @@ const TableReport = (props) => {
       }
 
       return (<>
-        <AddRecordModal 
-                visible={addModalVisible}
-                record = {recordToAdd}
-                onCancel={onCancelAdd}
-                onAddRecord={addRecord}
-                />
         <ReportContext.Provider value={ {
                                          codes: reportCodes
                                         }
                                       }>
+          <AddRecordModal 
+                  visible={addModalVisible}
+                  record = {recordToAdd}
+                  onCancel={onCancelAdd}
+                  onAddRecord={addRecord}
+                  />
+
           <Form form={form} component={false}>
             <Table
                 {...props}

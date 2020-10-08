@@ -1,8 +1,6 @@
-// @flow
 import React, { useState, useContext } from 'react'
 import { Input, Select, Form, TimePicker } from 'antd';
 const { Option } = Select;       
-const moment = require('moment');
 import uniqid from 'uniqid';
 
 import { ReportContext } from "./TableContext";
@@ -28,7 +26,7 @@ const EditableCell = ({
     const getInput = (type) => {
         const controls = {
             time: () => {
-                return  <TimePicker size='small'
+                return  <TimePicker
                             className='ltr'
                             format={format}
                             allowClear={false}

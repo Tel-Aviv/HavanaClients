@@ -158,7 +158,7 @@ if( process.env.mock ) {
             "year":2020,
             "month":7,
             "totalHours":191.10,
-            "isEditable":false,
+            "isEditable":true,
             "isApproved":false,
             "isRejected":false,
             "whenRejected":null,

@@ -1,15 +1,19 @@
-// @flow
-import React from 'react';
+import React, {useContext} from 'react';
 import moment from 'moment';
-import { Popconfirm, Modal, Form, Icon, Button, 
-    Typography , Input, Row, Col } from 'antd';
+import { Modal, Form, Icon, Button, TimePicker,
+    Typography , Input, Select, Row, Col } from 'antd';
+const { Option } = Select;
 const { Title } = Typography;    
 import { useTranslation } from "react-i18next";   
+import uniqid from 'uniqid';
 
-import CustomTimePicker from '../CustomTimePicker'
+const format = 'HH:mm';
+
+import { ReportContext } from "./TableContext";
 
 const AddRecordModal = (props) => {
 
+    const reportContext = useContext(ReportContext);
     const { t } = useTranslation();
 
     const visible = props.visible;
@@ -86,7 +90,11 @@ const AddRecordModal = (props) => {
                                 }]
                             }
                     >
-                    <CustomTimePicker />
+                    <TimePicker
+                            className='ltr'
+                            format={format}
+                            allowClear={false}
+                            showNow={false} />
                 </Form.Item>
                 <Form.Item name={t('out')}
                         rules={ [{ 
@@ -96,7 +104,24 @@ const AddRecordModal = (props) => {
                                 }]
                             }                
                 >
-                    <CustomTimePicker />
+                    <TimePicker
+                            className='ltr'
+                            format={format}
+                            allowClear={false}
+                            showNow={false} />
+                </Form.Item>
+                <Form.Item>
+                    <Select
+                        size="small" style={{margin: '2px'}} 
+                        style={{width: '120px'}}>
+                        {
+                            reportContext.codes.map( item => 
+                                <Option key={uniqid()} 
+                                    value={item.Description}>
+                                        {item.Description}
+                                </Option>)
+                            }
+                    </Select>
                 </Form.Item>
                 <Form.Item name={t('notes')}
                         rules={ [{ 

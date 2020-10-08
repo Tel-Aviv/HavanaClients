@@ -776,11 +776,11 @@ const Home = () => {
                 </Col>
                 <Col span={3} offset={11}>
                     <MonthPicker onChange={onMonthChange}
-                                            disabledDate={disabledDate}
-                                            className='ltr'
-                                            value={calendarDate}
-                                            allowClear={false}
-                                            defaultValue={moment()} />
+                                disabledDate={disabledDate}
+                                className='ltr'
+                                value={calendarDate}
+                                allowClear={false}
+                                defaultValue={moment()} />
                 </Col>
             </Row>
             <Row>
