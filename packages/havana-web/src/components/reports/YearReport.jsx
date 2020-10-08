@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from "react-i18next";
-import { Chart, Axis, Geom, Legend, Coord, Tooltip } from 'bizcharts';
-import 'ant-design-pro/dist/ant-design-pro.css';
-import { ChartCard, Bar, WaterWave, Field } from 'ant-design-pro/lib/Charts';
+import { Chart, Axis, Geom, Tooltip } from 'bizcharts';
+import { ChartCard, WaterWave } from 'ant-design-pro/lib/Charts';
 
-import { Row, Col, Card, Icon } from 'antd';
+import { Row, Col } from 'antd';
 
 import {API} from '../../utils';
 import { DataContext } from "../../DataContext";

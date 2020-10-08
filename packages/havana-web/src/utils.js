@@ -77,7 +77,7 @@ if( process.env.mock ) {
         .reply(200, {
         "items":[{
                 "Code": 1,
-                "Description": "רגיל",
+                "Description": "עבודה רגילה",
                 "ShortDescription": "",
                 "goodFor": 1
             },

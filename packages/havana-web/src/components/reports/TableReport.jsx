@@ -24,7 +24,6 @@ const TableReport = (props) => {
 
     const [data, setData] = useState([])
     const [daysOff, setDaysOff] = useState([]);
-    const [originalData, setOriginalData] = useState([])
     const [editingKey, setEditingKey] = useState('')
     const [manualUpdates, setManualUpdates] = useState([]);
     const [reportCodes, setReportCodes] = useState([]);
@@ -50,7 +49,6 @@ const TableReport = (props) => {
     const { t } = useTranslation();
 
     useEffect(() => {
-        setOriginalData(props.dataSource)
         setData(props.dataSource.map( record =>  {
     
             const _isRowEditable = isRowEditable(record);
@@ -169,7 +167,7 @@ const TableReport = (props) => {
             let newItem = {
               ...item,
               ...row,
-              rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format()
+              rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('DD/MM/YYYY')
             }
             newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
             newItem.valid = true;
@@ -354,7 +352,7 @@ const TableReport = (props) => {
             dataIndex: 'operation',
             width: '10%',
             render: (_, record) => {
-    
+
               return ( moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) // no edits for future
                         && record.requireChange)? 
                 (<EditIcons 
@@ -364,7 +362,7 @@ const TableReport = (props) => {
                     edit={edit} 
                     save={save} 
                     cancel={cancel}
-                />): null
+                />) : null
     
             }
           },
@@ -519,7 +517,6 @@ const TableReport = (props) => {
                 onAddRecord={addRecord}
                 />
         <ReportContext.Provider value={ {
-                                         form: props.form,
                                          codes: reportCodes
                                         }
                                       }>
