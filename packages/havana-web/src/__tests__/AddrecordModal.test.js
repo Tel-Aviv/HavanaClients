@@ -8,7 +8,7 @@ import { useTranslation, initReactI18next } from "react-i18next";
 import translations from '../translations';
 
 import { ReportContext } from "../components/reports//TableContext";
-import AddRecordModal from '../components/reports/AddrecordModal';
+import AddRecordModal from '../components/reports/AddRecordModal';
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
