@@ -92,6 +92,7 @@ const translations = {
             "collapse": "Collapse",
             "refresh": "Refresh",
             "cancel_edit": "Sure to discard changes?",
+            "why_add_record": "Free text - the essence of the activity"
         }
     },
     he: {
@@ -186,7 +187,8 @@ const translations = {
             "expand": "הרחב",
             "collapse": "צמצם",
             "refresh": "רענן",
-            "cancel_edit": "האם ברצונך לבטל את השינויים ?"
+            "cancel_edit": "האם ברצונך לבטל את השינויים ?",
+            "why_add_record": "טקסט חופשי - מהות הפעילות"        
         }
     }
 }    

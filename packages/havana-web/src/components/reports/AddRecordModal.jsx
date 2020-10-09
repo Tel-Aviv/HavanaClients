@@ -31,19 +31,25 @@ const AddRecordModal = (props) => {
     const { t } = useTranslation();
 
     const visible = props.visible;
-    const onCancel = props.onCancel;
 
     const [form] = Form.useForm();
 
-    const onFinish = values => {
-       props.onAddRecord && props.onAddRecord(values)
-    }    
+    const onOk = async () => {
+        try {
+            const values = await form.validateFields();
+            form.resetFields();
+            props.onAddRecord && props.onAddRecord(values);
+        } catch( err ) {
+            console.error(err);
+        } 
+    }
 
     return (
         <Modal visible={visible}
               closable={true}   
               onCancel={props.onCancel}
-              className='rtl'>
+              className='rtl'
+              onOk={onOk}>
             <Title level={3} className='rtl'
                 style={{
                     marginTop: '12px'
@@ -56,8 +62,7 @@ const AddRecordModal = (props) => {
             </Title> 
 
             <Form {...layout} form={form}
-                    size='small'
-                    onFinish={onFinish}>
+                    size='small'>
                 <Form.Item name='inTime'
                         label={t('in')}
                         rules={ [{ 
@@ -107,7 +112,7 @@ const AddRecordModal = (props) => {
                 </Form.Item>
                 <Form.Item name='notes' required
                         label={<span>{t('notes')}
-                                    <Tooltip title="Why you're adding this record?">
+                                    <Tooltip title={t('why_add_record')}>
                                         <QuestionCircleOutlined />
                                     </Tooltip>
                                </span>}
@@ -117,11 +122,11 @@ const AddRecordModal = (props) => {
                     }>    
                      <Input />                
                 </Form.Item>
-                <Form.Item  {...tailLayout}>
+                {/* <Form.Item  {...tailLayout}>
                     <Button type="primary" htmlType="submit">
                         {t('add_record')}
                     </Button>
-                </Form.Item>               
+                </Form.Item>                */}
             </Form>
         </Modal>        
     )
