@@ -904,7 +904,11 @@ const Home = () => {
                             display: 'flex',
                             justifyContent: 'flex-end'
                         }}>
-                            <img className='footer-signature' src={signature} />
+                            {
+                                signature ? 
+                                <img className='footer-signature' src={signature} /> :
+                                null
+                            }
                         </Col>
                         <Col span={3}>
                             <div className='footer-print'>{t('signature')}</div>        
