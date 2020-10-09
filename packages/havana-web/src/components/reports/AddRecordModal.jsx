@@ -1,13 +1,27 @@
 import React, {useContext} from 'react';
-import moment from 'moment';
-import { Modal, Form, Icon, Button, TimePicker,
-    Typography , Input, Select, Row, Col } from 'antd';
+import { Modal, Form, Button, TimePicker,
+    Typography , Input, Select, Tooltip } from 'antd';
 const { Option } = Select;
-const { Title } = Typography;    
+const { Title } = Typography;
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from "react-i18next";   
 import uniqid from 'uniqid';
 
 const format = 'HH:mm';
+const layout = {
+    labelCol: {
+      span: 8,
+    },
+    wrapperCol: {
+      span: 16,
+    },
+  };
+const tailLayout = {
+    wrapperCol: {
+      offset: 8,
+      span: 16,
+    },
+};
 
 import { ReportContext } from "./TableContext";
 
@@ -18,56 +32,18 @@ const AddRecordModal = (props) => {
 
     const visible = props.visible;
     const onCancel = props.onCancel;
-    const _addRecord = props.onAddRecord;
 
-    const _onSubmit = e => {
+    const [form] = Form.useForm();
 
-        e.preventDefault();
-
-        const fieldsValue = props.form.getFieldsValue();
-        console.log(fieldsValue);
-        if( moment(fieldsValue.entryTime).format("HH:mm") >= moment(fieldsValue.exitTime).format("HH:mm") ) {
-            props.form.setFields({
-                entryTime: {
-                value: fieldsValue.entryTime,
-                errors: [new Error(t('exit_before_entry'))],
-              },
-            });
-            return;
-        }
-
-        props.form.validateFields( (err, values) => {
-
-            if (err) {
-                return;
-            }
-
-            console.log(values);    
-            
-            const _values = {
-                inTime: values["entryTime"],
-                outTime: values["exitTime"],
-                note: values["notes"]
-            }   
-            
-            if( _addRecord )
-                _addRecord(_values);
-        })
+    const onFinish = values => {
+       props.onAddRecord && props.onAddRecord(values)
     }    
 
     return (
         <Modal visible={visible}
-              closable={false}
-              className='rtl'
-              footer={[
-                <Button key='cancel' onClick={onCancel}>
-                    {t('cancel')}
-                </Button>,
-                <Button key='submit' onClick={_onSubmit} 
-                        type="primary" htmlType="submit">
-                    {t('add_record')}
-                </Button>
-              ]}>
+              closable={true}   
+              onCancel={props.onCancel}
+              className='rtl'>
             <Title level={3} className='rtl'
                 style={{
                     marginTop: '12px'
@@ -79,38 +55,44 @@ const AddRecordModal = (props) => {
                 }
             </Title> 
 
-            <Form layout="vertical"
+            <Form {...layout} form={form}
                     size='small'
-                    onSubmit={_onSubmit}>
-                <Form.Item name={t('in')}
+                    onFinish={onFinish}>
+                <Form.Item name='inTime'
+                        label={t('in')}
                         rules={ [{ 
                                 type: 'object', 
                                 required: true, 
                                 message: t('add_entry_error') 
                                 }]
-                            }
-                    >
+                            }>
                     <TimePicker
                             className='ltr'
                             format={format}
                             allowClear={false}
                             showNow={false} />
                 </Form.Item>
-                <Form.Item name={t('out')}
+                <Form.Item name='outTime'
+                        label={t('out')}
                         rules={ [{ 
                                 type: 'object', 
                                 required: true, 
                                 message: t('add_exit_error') 
                                 }]
-                            }                
-                >
+                            }>
                     <TimePicker
                             className='ltr'
                             format={format}
                             allowClear={false}
                             showNow={false} />
                 </Form.Item>
-                <Form.Item>
+                <Form.Item label={t('report_code')}
+                            name="reportCode"
+                            rules={[
+                                {
+                                    required: true,
+                                },
+                            ]}>
                     <Select
                         size="small" style={{margin: '2px'}} 
                         style={{width: '120px'}}>
@@ -123,14 +105,23 @@ const AddRecordModal = (props) => {
                             }
                     </Select>
                 </Form.Item>
-                <Form.Item name={t('notes')}
+                <Form.Item name='notes' required
+                        label={<span>{t('notes')}
+                                    <Tooltip title="Why you're adding this record?">
+                                        <QuestionCircleOutlined />
+                                    </Tooltip>
+                               </span>}
                         rules={ [{ 
                             required: true, 
                             message: t('add_notes_error') }]
-                    }
-                >    
-                        <Input />                
-                </Form.Item>                
+                    }>    
+                     <Input />                
+                </Form.Item>
+                <Form.Item  {...tailLayout}>
+                    <Button type="primary" htmlType="submit">
+                        {t('add_record')}
+                    </Button>
+                </Form.Item>               
             </Form>
         </Modal>        
     )

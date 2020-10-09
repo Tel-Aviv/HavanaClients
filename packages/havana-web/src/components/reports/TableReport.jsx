@@ -16,7 +16,7 @@ import EditIcons from './EditIcons';
 import AddRecordModal from './AddRecordModal';
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
-const format = 'H:mm';
+const format = 'HH:mm';
 
 const TableReport = (props) => {
 
@@ -316,7 +316,7 @@ const TableReport = (props) => {
             editable: false,
           },
           {
-            title: t('report_type'),
+            title: t('report_code'),
             width: '10%',
             dataIndex: 'reportType',
             align: 'right',
@@ -451,7 +451,7 @@ const TableReport = (props) => {
         props.onValidated && props.onValidated(data)
       }
 
-      const addRecord = ({inTime, outTime, note}) => {
+      const addRecord = ({inTime, outTime, reportCode, notes}) => {
     
         setAddModalVisible(false);
     
@@ -471,12 +471,13 @@ const TableReport = (props) => {
             ...recordToAdd,
             key: addedPositions.key + 1,
             isAdded: true,
-            notes: note,
-            entry: inTime.format(format),
-            exit: outTime.format(format)
+            notes: notes,
+            entry: inTime,
+            exit: outTime,
+            reportType: reportCode
         }      
     
-        newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)    
+        newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format) 
     
         dispatch(
           action_ItemAdded(newItem, index)
