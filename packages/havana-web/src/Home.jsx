@@ -187,15 +187,17 @@ const Home = () => {
                 setManagers(resp.data.managers);
 
                 const signature = resp.data.signature;
-                if( signature.startsWith('data:') ) {
-                    setSignature(signature);
-                }
-                else {    
-                    setSignature(`data:/image/*;base64,${signature}`);
+                if( signature ) {
+                    if( signature.startsWith('data:') ) {
+                        setSignature(signature);
+                    }
+                    else {    
+                        setSignature(`data:/image/*;base64,${signature}`);
+                    }
                 }
 
                 if( assignee.userId === 'direct' ) {
-                    const directManager = resp.data;
+                    const directManager = resp.data.direct_manager;
                     if( directManager ) {
                         setAssignee(directManager);
                         dispatch(action_setDirectManager(directManager));

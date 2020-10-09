@@ -126,84 +126,88 @@ margin: 12px;
 
 /* Redefeinitions from antd */
 
+.ant-upload-select-picture-card {
+  height: 100% !important;
+}
+
+
 .ant-form-item-label {
   display: flex !important;
 }
 
 .ant-menu {
-line-height: 46px !important;
-text-align: start !important;
+  line-height: 46px !important;
+  text-align: start !important;
 }
 
 .ant-menu-blue {
-color: white !important;
-background:  rgb(24, 144, 255) !important;
-
+  color: white !important;
+  background:  rgb(24, 144, 255) !important;
 }
 
 .ant-menu-item-active
 {
-color: white !important;
+  color: white !important;
 }
 
 .ant-menu-item-selected {
-color: white !important;
-border-bottom: 2px solid transparent !important;
+  color: white !important;
+  border-bottom: 2px solid transparent !important;
 }
 
 .ant-layout-header {
-height: 56px !important;
-padding: 0 50px;
-line-height: 64px;
-background: rgb(24, 144, 255) !important;
+  height: 56px !important;
+  padding: 0 50px;
+  line-height: 64px;
+  background: rgb(24, 144, 255) !important;
 }
 
 .ant-layout-header-simple {
-height: 56px !important;
-padding: 0 50px;
-line-height: 64px;
-background: inherit !important;  
+  height: 56px !important;
+  padding: 0 50px;
+  line-height: 64px;
+  background: inherit !important;  
 }
 
 .ant-popover-message-title {
-padding-left: 22px;
-direction: rtl;
+  padding-left: 22px;
+  direction: rtl;
 }
 
 .ant-modal-header {
-padding: 16px 24px;
-color: rgba(0, 0, 0, 0.65);
-background: #fff;
-border-bottom: 1px solid #e8e8e8;
-border-radius: 4px 4px 0 0;
-direction: rtl;
+  padding: 16px 24px;
+  color: rgba(0, 0, 0, 0.65);
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  border-radius: 4px 4px 0 0;
+  direction: rtl;
 }
 
 .ant-modal-close {
-position: absolute;
-top: 0;
-right: 92% !important;
-z-index: 10;
-padding: 0;
-color: rgba(0, 0, 0, 0.45);
-font-weight: 700;
-line-height: 1;
-text-decoration: none;
-background: transparent;
-border: 0;
-outline: 0;
-cursor: pointer;
--webkit-transition: color 0.3s;
-transition: color 0.3s;
+  position: absolute;
+  top: 0;
+  right: 92% !important;
+  z-index: 10;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.45);
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+  -webkit-transition: color 0.3s;
+  transition: color 0.3s;
 }
 
 .ant-table-row-cell-break-word {
-word-break: keep-all !important;
+  word-break: keep-all !important;
 }
 
 .ant-collapse-content {
-padding: 16px;
-background-color: rgb(252, 246, 219) !important
+  padding: 16px;
+  background-color: rgb(252, 246, 219) !important
 }
 
 /* table adaptation for print */
@@ -240,46 +244,46 @@ background-color: rgb(252, 246, 219) !important
 }
 
 .footer-signature {
-width: 100px
+  width: 100px
 }
 
 .totals {
-width: 200px;
-margin: 0 auto;
+  width: 200px;
+  margin: 0 auto;
 }
 
 /* Splash animation */
 
 .bar {
-position: relative;
-height: 2px;
-width: 500px;
-margin: 0 auto;
-background: #fff;
-margin-top: 150px;
+  position: relative;
+  height: 2px;
+  width: 500px;
+  margin: 0 auto;
+  background: #fff;
+  margin-top: 150px;
 }
 
 .circle {
-position: absolute;
-top: -30px;
-margin-left: -30px;
-height: 60px;
-width: 60px;
-left: 0;
-background: #fff;
-border-radius: 30%;
-animation: move 5s infinite;
--webkit-animation: move 5s infinite;
-}
+  position: absolute;
+  top: -30px;
+  margin-left: -30px;
+  height: 60px;
+  width: 60px;
+  left: 0;
+  background: #fff;
+  border-radius: 30%;
+  animation: move 5s infinite;
+  -webkit-animation: move 5s infinite;
+  }
 
 p {
-position: absolute;
-top: -35px;
-right: -85px;
-text-transform: uppercase;
-color: #347fc3;
-font-family: helvetica, sans-serif;
-font-weight: bold;
+  position: absolute;
+  top: -35px;
+  right: -85px;
+  text-transform: uppercase;
+  color: #347fc3;
+  font-family: helvetica, sans-serif;
+  font-weight: bold;
 }
 
 @keyframes move {

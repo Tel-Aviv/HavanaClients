@@ -122,11 +122,6 @@ const AddRecordModal = (props) => {
                     }>    
                      <Input />                
                 </Form.Item>
-                {/* <Form.Item  {...tailLayout}>
-                    <Button type="primary" htmlType="submit">
-                        {t('add_record')}
-                    </Button>
-                </Form.Item>                */}
             </Form>
         </Modal>        
     )

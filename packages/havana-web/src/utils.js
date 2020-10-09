@@ -58,7 +58,21 @@ if( process.env.mock ) {
             "userAccountName": "c1306948",
             "userName": "אולג קליימן - טכנולוג אינטגרצייה",
             "isManager": false,
-            "ID": "313069486"    
+            "ID": "313069486",
+            "kind": 2,
+            "direct_manager": {
+                "userAccountName": "x2783703",
+                "userName": "הילי זילבנסקי",
+                "isManager": true,
+                "ID": null,
+                "kind": 0,
+                "direct_manager": null,
+                "managers": null,
+                "signature": null,
+                "stamp": null
+
+            },
+            "managers": []   
     })
 
     mock.onGet(/\/me\/reports\/\d+\/\d+\/docs/)
