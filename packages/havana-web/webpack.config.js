@@ -45,7 +45,7 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: ['*', '.js', '.jsx', 'less'],
+        extensions: ['*', '.js', '.jsx', '.less'],
         alias: {
             "@components": path.resolve(__dirname, "src/components"),
             "@reports": path.resolve(__dirname, 'src/components/reports')

@@ -13,6 +13,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@testing-library/jest-dom": "^5.11.4",
     "ant-design-pro": "^2.3.2",
     "antd": "^4.6.6",
     "axios": "^0.20.0",
@@ -33,10 +34,13 @@
   "devDependencies": {
     "@babel/preset-env": "^7.11.5",
     "@babel/preset-react": "^7.10.4",
+    "@testing-library/react": "^11.0.4",
     "babel-jest": "^26.3.0",
     "babel-loader": "^8.1.0",
     "babel-polyfill": "^6.26.0",
     "css-loader": "^4.3.0",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.5",
     "filemanager-webpack-plugin": "^2.0.5",
     "jest": "^26.4.2",
     "react-test-renderer": "^16.13.1",

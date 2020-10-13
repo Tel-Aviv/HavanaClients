@@ -60,6 +60,8 @@ if( process.env.mock ) {
             "isManager": false,
             "ID": "313069486",
             "kind": 2,
+            "signature": "",
+            "stamp": "",
             "direct_manager": {
                 "userAccountName": "x2783703",
                 "userName": "הילי זילבנסקי",

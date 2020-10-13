@@ -2,6 +2,7 @@ import 'babel-polyfill'
 
 import React from 'react';
 import renderer from 'react-test-renderer';
+//import {cleanup, fireEvent, render} from '@testing-library/react';
 
 import i18n from 'i18next';
 import { useTranslation, initReactI18next } from "react-i18next";
@@ -75,5 +76,7 @@ describe('Enables adding new entry to the report', () => {
 
         let tree = component.toJSON();
         expect(tree).toMatchSnapshot();
+
+        //console.log(tree.props)
     })
 })

@@ -4,12 +4,12 @@ html {
 }
 
 body {
-margin: 0;
-padding: 0;
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-/* background-color: rgb(240, 242, 245) !important   */
-background-color: black !important
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* background-color: rgb(240, 242, 245) !important   */
+  background-color: black !important
 } 
 
 .cbox {
@@ -143,6 +143,8 @@ margin: 12px;
 .ant-menu-blue {
   color: white !important;
   background:  rgb(24, 144, 255) !important;
+  border-right: 0px !important;
+  -webkit-box-shadow: none !important;
 }
 
 .ant-menu-item-active

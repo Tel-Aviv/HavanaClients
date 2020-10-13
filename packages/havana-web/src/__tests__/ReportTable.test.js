@@ -14,7 +14,7 @@ import { Provider } from 'react-redux'
 import moment from 'moment';
 
 import i18n from 'i18next';
-import { useTranslation, initReactI18next } from "react-i18next";
+import { initReactI18next } from "react-i18next";
 import translations from '../translations';
 
 import renderer from 'react-test-renderer';
