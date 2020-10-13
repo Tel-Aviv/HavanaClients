@@ -58,7 +58,23 @@ if( process.env.mock ) {
             "userAccountName": "c1306948",
             "userName": "אולג קליימן - טכנולוג אינטגרצייה",
             "isManager": false,
-            "ID": "313069486"    
+            "ID": "313069486",
+            "kind": 2,
+            "signature": "",
+            "stamp": "",
+            "direct_manager": {
+                "userAccountName": "x2783703",
+                "userName": "הילי זילבנסקי",
+                "isManager": true,
+                "ID": null,
+                "kind": 0,
+                "direct_manager": null,
+                "managers": null,
+                "signature": null,
+                "stamp": null
+
+            },
+            "managers": []   
     })
 
     mock.onGet(/\/me\/reports\/\d+\/\d+\/docs/)
@@ -77,7 +93,7 @@ if( process.env.mock ) {
         .reply(200, {
         "items":[{
                 "Code": 1,
-                "Description": "רגיל",
+                "Description": "עבודה רגילה",
                 "ShortDescription": "",
                 "goodFor": 1
             },
@@ -158,7 +174,7 @@ if( process.env.mock ) {
             "year":2020,
             "month":7,
             "totalHours":191.10,
-            "isEditable":false,
+            "isEditable":true,
             "isApproved":false,
             "isRejected":false,
             "whenRejected":null,

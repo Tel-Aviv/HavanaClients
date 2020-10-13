@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useReducer, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { Collapse, Icon, Button, 
+import { Collapse, Button, 
     Layout, Row, Col, Typography } from 'antd';
+import { CheckCircleOutlined } from '@ant-design/icons';
 const { Panel } = Collapse;
 const { Title } = Typography;
+
+import { useTranslation } from "react-i18next";
 
 import { API, DEFAULT_BASE_URL } from '../utils';
 import { DataContext } from '../DataContext';
@@ -22,8 +25,9 @@ const reducer = (state, action) => {
 
 class Step {
 
-    constructor(name, url, params, postProcess) {
+    constructor(name, method, url, params, postProcess) {
         this.name = name;
+        this.method = method;
         this.url = url;
         this.params = params;
         this.postProcess = postProcess;
@@ -49,7 +53,12 @@ class Step {
     async process() {
         
         try {
-            const resp = await API.get(this.url, {
+            // const resp = await API.get(this.url, {
+            //     params: this.params
+            // })
+            const resp = await API({
+                method: this.method,
+                url: this.url,
                 params: this.params
             })
             this.status = resp.status;
@@ -86,6 +95,8 @@ const SupportPage = () => {
     const [expanded, setExpanded] = useState(false);
     const [loading , setLoading] = useState(false);
 
+    const { t } = useTranslation();
+
     // Used as shared data for exchange API results between the steps.
     // Passed by reference to some step and may be updated in postProcess() of other.
     let localContext = [{
@@ -96,19 +107,19 @@ const SupportPage = () => {
     }];
  
     const independent_steps = [
-        new Step('me', '/me'),
-        new Step('Docs', `/me/reports/${routeParams.year}/${routeParams.month}/docs`),
-        new Step('Days Off', '/daysoff', 
+        new Step('me', 'get', '/me'),
+        new Step('Docs', 'get', `/me/reports/${routeParams.year}/${routeParams.month}/docs`),
+        new Step('Days Off', 'get', '/daysoff', 
             {
                 year: routeParams.year,
                 month: routeParams.month
             }),
-        new Step('Manual Updates', '/me/reports/manual_updates',
+        new Step('Manual Updates', 'get', '/me/reports/manual_updates',
             {
                 year: routeParams.year,
                 month: routeParams.month
             }),
-        new Step('Report Data', `/me/reports/${routeParams.year}/${routeParams.month}`,
+        new Step('Report Data', 'get', `/me/reports/${routeParams.year}/${routeParams.month}`,
                 null,
                 (res) => {
                     localContext[0].employerCode = res.data.employerCode;
@@ -116,8 +127,10 @@ const SupportPage = () => {
     ]
 
     const dependent_steps = [
-        new Step('Report Codes', '/me/report_codes',
-                localContext[0])
+        new Step('Report Codes', 'get', '/me/report_codes',
+                localContext[0]),
+        new Step('Save Report', 'post', '/me/report/save',
+            localContext[0])
     ]
 
     const [state, dispatch] = useReducer(reducer, [...independent_steps, ...dependent_steps]);
@@ -175,7 +188,7 @@ const SupportPage = () => {
 
         const iconColor = status  == 200 ? 'rgb(24, 144, 255)' : 'rgb(255, 0, 0)';
 
-        return <Icon type='check-circle'
+        return <CheckCircleOutlined
                 style={{
                     color: iconColor
                 }} />
@@ -213,24 +226,24 @@ const SupportPage = () => {
             <Layout.Header className='ant-layout-header-simple'>
                 <Row>
                     <Col offset={9}>
-                        <Title level={3}>Support Page for Report {routeParams.year}/{routeParams.month}</Title>
+                        <Title level={3}>{t('support_page')} {routeParams.year}/{routeParams.month}</Title>
                     </Col>
                 </Row>
             </Layout.Header>
             <Layout.Content>
                 <Row gutter={[0, 16]} type='flex'>
                     <Col span={22}>
-                        <Button disabled={loading} onClick={onRefresh}>Refresh</Button>
+                        <Button disabled={loading} onClick={onRefresh}>{t('refresh')}</Button>
                     </Col>
                     <Col span={2}>
                         <Button onClick={expandAllPanels}
                                 style={{ float: 'right' }}>{
-                           expanded? 'Collapse All': 'Expand All'
+                           expanded? t('collapse') : t('expand')
                         }</Button>
                     </Col>
                 </Row>
                 <Row gutter={[0, 16]}>
-                    <Col>
+                    <Col span={24}>
                         <Collapse 
                             onChange={activePanelChanged}
                             activeKey={activePanelKeys}>

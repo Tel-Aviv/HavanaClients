@@ -3,6 +3,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { ADD_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
 import { Table, Popconfirm, Modal, Form, Icon,
         Tag, Row, Col, Tooltip, Menu } from 'antd';
+import { PlusCircleTwoTone, 
+  MinusCircleTwoTone,
+  TagOutlined } 
+from '@ant-design/icons';
 import moment from 'moment';
 import { useTranslation } from "react-i18next";
 
@@ -12,13 +16,14 @@ import EditIcons from './EditIcons';
 import AddRecordModal from './AddRecordModal';
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
-const format = 'H:mm';
+const format = 'HH:mm';
 
-const EditableTable = (props) => {
+const TableReport = (props) => {
+
+    const [form] = Form.useForm()
 
     const [data, setData] = useState([])
     const [daysOff, setDaysOff] = useState([]);
-    const [originalData, setOriginalData] = useState([])
     const [editingKey, setEditingKey] = useState('')
     const [manualUpdates, setManualUpdates] = useState([]);
     const [reportCodes, setReportCodes] = useState([]);
@@ -44,7 +49,6 @@ const EditableTable = (props) => {
     const { t } = useTranslation();
 
     useEffect(() => {
-        setOriginalData(props.dataSource)
         setData(props.dataSource.map( record =>  {
     
             const _isRowEditable = isRowEditable(record);
@@ -113,8 +117,11 @@ const EditableTable = (props) => {
                               || hasSytemNotes(record));
       }
     
-      const edit = (key) => {
-        setEditingKey(key);
+      const edit = (record) => {
+        form.setFieldsValue({
+          ...record
+        })
+        setEditingKey(record.key);
       }
     
       const cancel = () => {
@@ -134,31 +141,25 @@ const EditableTable = (props) => {
         return parseInt(tokens[0]) * 60 + parseInt(tokens[1]);
       }
     
-      const save = (form, key) => {
+      const save = async (key) => {
     
-        const fieldsValue = form.getFieldsValue();
-     
-        const entryTime = getEntryTime(fieldsValue, key);
-        const exitTime = getExitTime(fieldsValue, key);
-        
-        if( minutes(entryTime) > minutes(exitTime) ) {  
-          form.setFields({
-            entry: {
-              value: fieldsValue.entry,
-              errors: [new Error(t('exit_before_entry'))],
-            },
-          });
-          return;
-        }
-    
-        form.validateFields( async(error, row) => {
-          if (error) {
+        try {
+
+          const row = await form.validateFields();
+          const entryTime = row.entry;
+          const exitTime = row.exit;
+
+          if( exitTime.isBefore(entryTime) ) {
+            form.setFields([{
+              name: 'entry',
+              value: entryTime,
+              errors: [t('exit_before_entry')]
+            }]);
             return;
           }
-    
-          const inouts = [fieldsValue.hasOwnProperty("entry"), 
-                          fieldsValue.hasOwnProperty("exit")];
-    
+
+          const inouts = [entryTime, exitTime]; 
+
           const newData = [...data];
           const index = newData.findIndex(item => key === item.key);
           if (index > -1) {
@@ -166,9 +167,7 @@ const EditableTable = (props) => {
             let newItem = {
               ...item,
               ...row,
-              entry: (row.entry) ? row.entry.format(format) : item.entry, 
-              exit:  (row.exit) ? row.exit.format(format) : item.exit, 
-              rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format()
+              rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('DD/MM/YYYY')
             }
             newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
             newItem.valid = true;
@@ -178,7 +177,11 @@ const EditableTable = (props) => {
             props.onChange && props.onChange(newItem, inouts);        
             setData(newData)
           }
-        });
+
+        } catch( errorInfo ) {
+          console.error(errorInfo)
+        }
+
       }
     
       const handleAddRow = (record) => {
@@ -200,12 +203,12 @@ const EditableTable = (props) => {
           align: 'center',
           width: '6%',
           editable: false,
-          render: (text, record) => 
-            props.editable? (
+          render: (_, record) => 
+            props.editable ? (
               <Row>
                 <Col span={12}>
                   <Tooltip title={t('add_record')}>
-                    <Icon type="plus-circle" theme="twoTone" 
+                    <PlusCircleTwoTone
                           onClick={() => handleAddRow(record)}/>
                   </Tooltip>      
                 </Col>
@@ -215,13 +218,13 @@ const EditableTable = (props) => {
                       <Popconfirm
                         title={t('sure')}
                         onConfirm={() => handleRemoveRecord(record)}>
-                          <Icon type='minus-circle' theme='twoTone' />  
+                          <MinusCircleTwoTone />  
                       </Popconfirm>    
                     : null
                 }
                 </Col>
-              </Row>
-            ) : null
+              </Row> 
+              ) : null
         },
           {
             title: 'יום',
@@ -257,7 +260,10 @@ const EditableTable = (props) => {
                         style={{
                           marginRight: '0'
                       }}>
-                        {text}
+                        { 
+                          moment.isMoment(text) ?
+                            text.format(format) : '-'
+                        }
                       </Tag>
                       {
                         manuallyEditedTag(isEditedManually)
@@ -284,7 +290,10 @@ const EditableTable = (props) => {
                       style={{
                         marginRight: '0'
                     }}>
-                      {text}
+                      {
+                        moment.isMoment(text) ?
+                        text.format(format) : '-'
+                      }
                     </Tag>
                     {
                       manuallyEditedTag(isEditedManually)
@@ -307,7 +316,7 @@ const EditableTable = (props) => {
             editable: false,
           },
           {
-            title: t('report_type'),
+            title: t('report_code'),
             width: '10%',
             dataIndex: 'reportType',
             align: 'right',
@@ -343,17 +352,17 @@ const EditableTable = (props) => {
             dataIndex: 'operation',
             width: '10%',
             render: (_, record) => {
-    
+
               return ( moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) // no edits for future
                         && record.requireChange)? 
                 (<EditIcons 
-                    recordId={record.key}
+                    record={record}
                     editing={isRowEditing(record)} 
                     disable={editingKey !== ''} 
                     edit={edit} 
                     save={save} 
                     cancel={cancel}
-                />): null
+                />) : null
     
             }
           },
@@ -413,7 +422,7 @@ const EditableTable = (props) => {
         return isEditedManually ?
                 <Tooltip title={t('manual_tag')}>
                 <Tag color='magenta'>
-                        <Icon type="tag" />
+                        <TagOutlined />
                 </Tag> 
                 </Tooltip>: null
       }
@@ -442,7 +451,7 @@ const EditableTable = (props) => {
         props.onValidated && props.onValidated(data)
       }
 
-      const addRecord = ({inTime, outTime, note}) => {
+      const addRecord = ({inTime, outTime, reportCode, notes}) => {
     
         setAddModalVisible(false);
     
@@ -462,12 +471,13 @@ const EditableTable = (props) => {
             ...recordToAdd,
             key: addedPositions.key + 1,
             isAdded: true,
-            notes: note,
-            entry: inTime.format(format),
-            exit: outTime.format(format)
+            notes: notes,
+            entry: inTime,
+            exit: outTime,
+            reportType: reportCode
         }      
     
-        newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)    
+        newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format) 
     
         dispatch(
           action_ItemAdded(newItem, index)
@@ -501,38 +511,38 @@ const EditableTable = (props) => {
       }
 
       return (<>
-        <AddRecordModal 
-                visible={addModalVisible}
-                record = {recordToAdd}
-                onCancel={onCancelAdd}
-                onAddRecord={addRecord}
-                />
         <ReportContext.Provider value={ {
-                                         form: props.form,
                                          codes: reportCodes
                                         }
                                       }>
-          <Table
-              {...props}
-              style={{ 
-                      direction: 'rtl', 
-                      heigth: '600px',
-                      margin: '12px'
-                      }}
-              tableLayout='auto'
-              bordered={false}
-              components={components}
-              dataSource={data}
-              columns={columns}
-              rowClassName="editable-row"
-              pagination={false}
-              size="small"
-            />
+          <AddRecordModal 
+                  visible={addModalVisible}
+                  record = {recordToAdd}
+                  onCancel={onCancelAdd}
+                  onAddRecord={addRecord}
+                  />
+
+          <Form form={form} component={false}>
+            <Table
+                {...props}
+                style={{ 
+                        direction: 'rtl', 
+                        heigth: '600px',
+                        margin: '12px'
+                        }}
+                tableLayout='auto'
+                bordered={false}
+                components={components}
+                dataSource={data}
+                columns={columns}
+                rowClassName="editable-row"
+                pagination={false}
+                size="small"
+              />
+            </Form>
         </ReportContext.Provider>
     </>)
   
 }
 
-export default Form.create({
-    name: "report_table"
-  })(EditableTable)
+export default TableReport;

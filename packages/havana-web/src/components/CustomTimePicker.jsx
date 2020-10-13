@@ -21,13 +21,14 @@ export default React.forwardRef( (props, ref) => {
             open={open}
             size='small'
             onOpenChange={(e) => setOpen(e)}
-            addon={() => (
-                <Button size="small"
-                        type="primary"
-                        style={{
-                            width: '100%'
-                        }}    
-                        onClick={(e) => handleOk(e)}> Ok </Button>
-            )} />
+            // addon={() => (
+            //     <Button size="small"
+            //             type="primary"
+            //             style={{
+            //                 width: '100%'
+            //             }}    
+            //             onClick={(e) => handleOk(e)}> Ok </Button>
+            // )} 
+            />
     )
 })

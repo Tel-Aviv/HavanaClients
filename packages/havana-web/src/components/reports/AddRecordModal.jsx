@@ -1,71 +1,55 @@
-// @flow
-import React from 'react';
-import moment from 'moment';
-import { Popconfirm, Modal, Form, Icon, Button, 
-    Typography , Input, Row, Col } from 'antd';
-const { Title } = Typography;    
+import React, {useContext} from 'react';
+import { Modal, Form, Button, TimePicker,
+    Typography , Input, Select, Tooltip } from 'antd';
+const { Option } = Select;
+const { Title } = Typography;
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from "react-i18next";   
+import uniqid from 'uniqid';
 
-import CustomTimePicker from '../CustomTimePicker'
+const format = 'HH:mm';
+const layout = {
+    labelCol: {
+      span: 8,
+    },
+    wrapperCol: {
+      span: 16,
+    },
+  };
+const tailLayout = {
+    wrapperCol: {
+      offset: 8,
+      span: 16,
+    },
+};
+
+import { ReportContext } from "./TableContext";
 
 const AddRecordModal = (props) => {
 
+    const reportContext = useContext(ReportContext);
     const { t } = useTranslation();
 
-    const { getFieldDecorator } = props.form;
-
     const visible = props.visible;
-    const onCancel = props.onCancel;
-    const _addRecord = props.onAddRecord;
 
-    const _onSubmit = e => {
+    const [form] = Form.useForm();
 
-        e.preventDefault();
-
-        const fieldsValue = props.form.getFieldsValue();
-        console.log(fieldsValue);
-        if( moment(fieldsValue.entryTime).format("HH:mm") >= moment(fieldsValue.exitTime).format("HH:mm") ) {
-            props.form.setFields({
-                entryTime: {
-                value: fieldsValue.entryTime,
-                errors: [new Error(t('exit_before_entry'))],
-              },
-            });
-            return;
-        }
-
-        props.form.validateFields( (err, values) => {
-
-            if (err) {
-                return;
-            }
-
-            console.log(values);    
-            
-            const _values = {
-                inTime: values["entryTime"],
-                outTime: values["exitTime"],
-                note: values["notes"]
-            }   
-            
-            if( _addRecord )
-                _addRecord(_values);
-        })
-    }    
+    const onOk = async () => {
+        try {
+            const values = await form.validateFields();
+            form.resetFields();
+            props.onAddRecord && props.onAddRecord(values);
+        } catch( err ) {
+            console.error(err);
+        } 
+    }
 
     return (
         <Modal visible={visible}
-              closable={false}
+              closable={true}   
+              onCancel={props.onCancel}
               className='rtl'
-              footer={[
-                <Button key='cancel' onClick={onCancel}>
-                    {t('cancel')}
-                </Button>,
-                <Button key='submit' onClick={_onSubmit} 
-                        type="primary" htmlType="submit">
-                    {t('add_record')}
-                </Button>
-              ]}>
+              onOk={onOk}>
             <Title level={3} className='rtl'
                 style={{
                     marginTop: '12px'
@@ -77,41 +61,70 @@ const AddRecordModal = (props) => {
                 }
             </Title> 
 
-            <Form layout="vertical"
-                    size='small'
-                    onSubmit={_onSubmit}>
-                <Form.Item label={t('in')}>
-                    {getFieldDecorator('entryTime', {
-                        rules: [{ 
+            <Form {...layout} form={form}
+                    size='small'>
+                <Form.Item name='inTime'
+                        label={t('in')}
+                        rules={ [{ 
                                 type: 'object', 
                                 required: true, 
                                 message: t('add_entry_error') 
-                                }],
-                    })(
-                        <CustomTimePicker />
-                    )}
+                                }]
+                            }>
+                    <TimePicker
+                            className='ltr'
+                            format={format}
+                            allowClear={false}
+                            showNow={false} />
                 </Form.Item>
-                <Form.Item label={t('out')}>
-                    {getFieldDecorator('exitTime', {
-                        rules: [{ 
+                <Form.Item name='outTime'
+                        label={t('out')}
+                        rules={ [{ 
                                 type: 'object', 
                                 required: true, 
                                 message: t('add_exit_error') 
-                                }],                
-                    })(
-                        <CustomTimePicker />
-                    )}
+                                }]
+                            }>
+                    <TimePicker
+                            className='ltr'
+                            format={format}
+                            allowClear={false}
+                            showNow={false} />
                 </Form.Item>
-                <Form.Item label={t('notes')}>
-                    {getFieldDecorator('notes', {
-                        rules: [{ required: true, message: t('add_notes_error') }],
-                    })(
-                        <Input />,
-                    )}
-                </Form.Item>                
+                <Form.Item label={t('report_code')}
+                            name="reportCode"
+                            rules={[
+                                {
+                                    required: true,
+                                },
+                            ]}>
+                    <Select
+                        size="small" style={{margin: '2px'}} 
+                        style={{width: '120px'}}>
+                        {
+                            reportContext.codes.map( item => 
+                                <Option key={uniqid()} 
+                                    value={item.Description}>
+                                        {item.Description}
+                                </Option>)
+                            }
+                    </Select>
+                </Form.Item>
+                <Form.Item name='notes' required
+                        label={<span>{t('notes')}
+                                    <Tooltip title={t('why_add_record')}>
+                                        <QuestionCircleOutlined />
+                                    </Tooltip>
+                               </span>}
+                        rules={ [{ 
+                            required: true, 
+                            message: t('add_notes_error') }]
+                    }>    
+                     <Input />                
+                </Form.Item>
             </Form>
         </Modal>        
     )
 }
 
-export default Form.create()(AddRecordModal)
+export default AddRecordModal;

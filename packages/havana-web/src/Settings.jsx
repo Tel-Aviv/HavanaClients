@@ -1,17 +1,23 @@
-// @flow
-import React, { useState, useContext, useEffect, useReducer  } from 'react';
+import React, { useState, useContext, useEffect, useReducer } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from "react-i18next";
 
-import { Upload, Icon, message } from 'antd';
-import { Row, Col, Avatar } from 'antd';
-const { Meta } = Card;
+import { Upload, Button, message } from 'antd';
+import { Row, Col } from 'antd';
 
 import { Typography } from 'antd';
 const { Title } = Typography;
 
-import { Menu, Dropdown, Select, Card } from 'antd-rtl';
+import { UserOutlined,
+    UploadOutlined,
+    SettingTwoTone,
+    EditTwoTone,
+    DeleteTwoTone } 
+from '@ant-design/icons';
+
+import { Menu, Dropdown, Select, Card } from 'antd';
 const { Option } = Select;
+const { Meta } = Card;
 
 import { TextualEmployeKind } from './utils';
 
@@ -22,7 +28,6 @@ import { UPDATE_ITEM, SET_DIRECT_MANAGER } from "./redux/actionTypes"
 // but you neither can access its rules or its styles.
 // So we refer to CSS-class names like compiled CSS-rule
 //import style from './less/components/settings.less';
-
 
 const Settings = () => {
 
@@ -57,7 +62,7 @@ const Settings = () => {
 
             try {
                 // API is already wrapped with credentials = true
-                const resp = await context.API.get('/me')
+                const resp = await context.API.get('/me');
 
                 const signature = resp.data.signature;
                 const stamp = resp.data.stamp;
@@ -65,8 +70,10 @@ const Settings = () => {
                 setMe({
                     userName: resp.data.userName,
                     userID: resp.data.ID,
-                    signature: signature.startsWith('data:') ? signature : `data:/image/*;base64,${signature}`,  
-                    stamp: stamp.startsWith('data:') ? stamp : `data:/image/*;base64,${stamp}`, 
+                    signature: signature ?  signature.startsWith('data:') ? signature : `data:/image/*;base64,${signature}` 
+                            : null,
+                    stamp: stamp ? stamp.startsWith('data:') ? stamp : `data:/image/*;base64,${stamp}`
+                            : null,
                     managers: resp.data.managers,
                     employeKind: resp.data.kind
                 })
@@ -184,16 +191,15 @@ const Settings = () => {
     }
 
     const uploadButton = (
-        <>
-            <Icon type={loading ? 'loading' : 'plus'} />
-            <div className="ant-upload-text">Upload</div>
-        </>
+        <Button>
+            <UploadOutlined /> {t('upload')}
+        </Button>
     )
 
     const handleManagersMenuClick = (e) => {
-        // setAssignee(managers[e.key].userId);
         console.log( me.managers[e.key].userId )
-        // message.info(`הדוח יועבר לאישור ${managers[e.key].userName}`);
+        setAssignee(managers[e.key].userId);
+        message.info(`הדוח יועבר לאישור ${managers[e.key].userName}`);
     }
 
     const onDirectManagerChanged = (val) => {
@@ -204,53 +210,27 @@ const Settings = () => {
     const managersMenu = <Menu onClick={handleManagersMenuClick}>
         { me.managers.map( (manager, index) => (
                 <Menu.Item  key={index}>
-                    <Icon type="user" />
+                    <UserOutlined />
                     {manager.userName}
                 </Menu.Item>
         ))}
     </Menu>
 
     return (
-        <div className='hvn-item-rtl'>
-            
+        <div className='rtl' >
             <Row style={{
                     margin: '0% 4%' 
-                }}>
-                <Title level={2}>{t('setting_title')}</Title>
+                }}
+                >
+                <Col>
+                    <Title level={2}>{t('setting_title')}</Title>
+                </Col>
             </Row>
             <Row gutter={[32, 32]} style={{
                     margin: '0% 2%' 
                 }}>
                 <Col span={8}>
-                    <Card title={t('stamp')}
-                    actions={[
-                        <Icon type="setting" key="setting" />,
-                        <Icon type="edit" key="edit" />,
-                        <Icon type="delete" onClick={ e => removeStamp(e) }/>,
-                    ]}>
-                        <Upload {...uploadStampProps}>
-                            { me.stamp? <img src={me.stamp}  className='avatarUploader' onClick={e => dummyClick(e) }/>
-                                    : uploadButton }
-                        </Upload> 
-                        <Meta title="Uploaded" description="from local store" />
-                    </Card>
-                </Col>
-                <Col span={8}>
-                    <Card title={t('signature')}
-                    actions={[
-                            <Icon type="setting" key="setting" />,
-                            <Icon type="edit" key="edit" />,
-                            <Icon type="delete" onClick={ e => removeSignature(e) }/>,
-                        ]}>
-                        <Upload {...uploadProps}>
-                            { me.signature?  <img src={me.signature} className="avatarUploader" onClick={e => dummyClick(e) }/> 
-                                        : uploadButton }
-                        </Upload>
-                        <Meta title="Uploaded" description="from local store" />
-                    </Card>
-                </Col>
-                <Col span={8}>
-                    <Card title={context.user.name} loading={loading}>
+                <Card title={context.user.name} loading={loading} >
                         <Meta
                             title={'תעודת זהות: ' + me.userID}
                             description={TextualEmployeKind[me.employeKind]}
@@ -271,6 +251,32 @@ const Settings = () => {
                                 </Select>
                             </Col>
                         </Row> 
+                    </Card>
+                </Col>
+                <Col span={8}>
+                    <Card title={t('signature')}
+                        actions={[
+                            <SettingTwoTone key="setting" />,
+                            <EditTwoTone key="edit" />,
+                            <DeleteTwoTone key="delete" onClick={ e => removeSignature(e) }/>,
+                        ]}>
+                        <Upload {...uploadProps}>
+                            { me.signature?  <img src={me.signature} className="avatarUploader" onClick={e => dummyClick(e) }/> 
+                                        : uploadButton }
+                        </Upload>
+                    </Card>
+                </Col>
+                <Col span={8}>
+                    <Card title={t('stamp')}
+                    actions={[
+                        <SettingTwoTone key="setting" />,
+                        <EditTwoTone key="edit" />,
+                        <DeleteTwoTone key="delete" onClick={ e => removeStamp(e) }/>,
+                    ]}>
+                        <Upload {...uploadStampProps}>
+                            { me.stamp? <img src={me.stamp}  className='avatarUploader' onClick={e => dummyClick(e) }/>
+                                    : uploadButton }
+                        </Upload> 
                     </Card>
                 </Col>
             </Row>
