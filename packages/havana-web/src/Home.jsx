@@ -28,11 +28,11 @@ import { Tabs, Dropdown, Menu, message  } from 'antd';
 const { TabPane } = Tabs;
 
 import { Pie } from 'ant-design-pro/lib/Charts';
-import ReactToPrint from 'react-to-print';  
 
 import { DataContext } from './DataContext';
 import { UPDATE_ITEM, SET_DIRECT_MANAGER } from "./redux/actionTypes";
 
+const PrintModal = React.lazy( () => import('./PrintModal') );
 import TableReport from '@reports/TableReport';
 const YearReport = React.lazy( () => import('@reports/YearReport') )
 import DocsUploader from '@components/DocsUploader';
@@ -72,7 +72,7 @@ const Home = () => {
                                         });
     const [reportCodes, setReportCodes] = useState([]);
     const [employeKind, setEmployeKind] = useState()
-
+   
     const dataContext = useContext(DataContext);
     const componentRef = useRef();
 
@@ -125,6 +125,7 @@ const Home = () => {
         }
 
     }, [_updatedItem])
+
     const _addedData= useSelector(
         store => store.reportUpdateReducer.addedData
     )
@@ -507,10 +508,6 @@ const Home = () => {
         } 
     }
 
-    const onShowPDF = () => {
-        setPrintModalVisible(!printModalVisible);
-    }
-
     const onSubmit = async () => {
         
         let _message = `דוח שעות לחודש ${month}/${year} נשלח לאישור`;
@@ -604,7 +601,7 @@ const Home = () => {
                                     {t('validate')} 
                                 </Button>
                             </Tooltip>
-                            <Button onClick={onShowPDF}
+                            <Button onClick={ () => setPrintModalVisible(true)}
                                     disabled={loadingData}
                                     icon={<PrinterOutlined />}
                                     style={{
@@ -731,7 +728,7 @@ const Home = () => {
         </div>
     )
 
-    const handlePrintCancel = () => {
+    const onPrintModalClosed = () => {
         setPrintModalVisible(false);
     }
 
@@ -874,56 +871,26 @@ const Home = () => {
                     </Tabs>
                 </Col>
             </Row>
-            <Modal title={printReportTitle()}
-                    width='64%'
-                    visible={printModalVisible}
-                    closable={true}
-                    forceRender={true}
-                    onCancel={handlePrintCancel}
-                    footer={[
-                            <ReactToPrint key={uniqid()}
-                                copyStyles={true}
-                                removeAfterPrint={true}
-                                trigger={() => <Button type="primary">{t('print')}</Button>}
-                                documentTitle={`attendance report ${month}/${year}`}
-                                content={() => componentRef.current}
-                            />,
-                            <Button key={uniqid()} onClick={handlePrintCancel}>{t('cancel')}</Button>
-                        ]}>
-
-                <div ref={componentRef} style={{textAlign: 'center'}} className='pdf-container'>
-                    <div className='pdf-title'>{dataContext.user.name}</div>
-                    <div className='pdf-title'>{t('summary')} {month}/{year}</div>
-                    <TableReport dataSource={reportData}
-                                employeKind={employeKind}
-                                reportCodes={reportCodes}
-                                daysOff={daysOff}
-                                loading={loadingData} 
-                                manualUpdates={manualUpdates}
-                                editable={false} />
-                    <Row>
-                         <Col span={9} style={{
-                            display: 'flex',
-                            justifyContent: 'flex-end'
-                        }}>
-                            {
-                                signature ? 
-                                <img className='footer-signature' src={signature} /> :
-                                null
-                            }
-                        </Col>
-                        <Col span={3}>
-                            <div className='footer-print'>{t('signature')}</div>        
-                        </Col>
-                        <Col span={6}>
-                            <div className='footer-print'>סה"כ { totals } שעות</div>
-                        </Col>
-                        <Col span={6}>
-                            <div className='footer-print'>{t('printed_when')} {moment().format('DD/MM/YYYY')}</div>
-                        </Col> 
-                    </Row>
-                </div>
-            </Modal>
+            {
+                printModalVisible ?
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <PrintModal visible={printModalVisible}
+                            closed={onPrintModalClosed}
+                            month={month}
+                            year={year}
+                            signature={signature}
+                            totals={totals}>
+                                <TableReport dataSource={reportData}
+                                            employeKind={employeKind}
+                                            reportCodes={reportCodes}
+                                            daysOff={daysOff}
+                                            loading={loadingData} 
+                                            manualUpdates={manualUpdates}
+                                            editable={false} />                                    
+                            </PrintModal>
+                    </Suspense> 
+                    : null
+            }
         </Content>
     )
 }

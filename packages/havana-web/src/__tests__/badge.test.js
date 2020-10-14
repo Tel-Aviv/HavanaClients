@@ -7,6 +7,7 @@
 // in 'jest.config.js'
 //
 import 'babel-polyfill'
+import './matchMedia.mock';
 
 import React from 'react';
 import renderer from 'react-test-renderer';

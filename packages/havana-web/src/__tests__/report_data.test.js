@@ -4,7 +4,7 @@
 // Test the network calls for PS server. Enforces un-mock by setting environment variable
 // for MockAdapter before 'API' module (utils.js) is actually loaded.
 // 
-
+import './matchMedia.mock';
 import 'babel-polyfill'
 
 import axios from 'axios';

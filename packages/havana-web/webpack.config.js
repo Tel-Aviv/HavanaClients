@@ -5,6 +5,7 @@ const dotenv = require('dotenv').config({
 });
 
 const FileManagerPlugin = require('filemanager-webpack-plugin');
+// const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
 
 module.exports = {
 
@@ -19,14 +20,15 @@ module.exports = {
                 ]
             }
             }),
-            new webpack.ProgressPlugin({
+        new webpack.ProgressPlugin({
                 activeModules: true,
                 entries: true,
                 profile: true,
             }),
-            new webpack.DefinePlugin({
+        new webpack.DefinePlugin({
                 "process.env.mock": process.env.mock
-            })
+            }),
+        // new AntdDayjsWebpackPlugin()    
     ],
     entry: {
         bundle: ["@babel/polyfill", path.resolve(__dirname, './src/index.js')]
@@ -36,6 +38,7 @@ module.exports = {
             {
                 test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
+                include: path.resolve(__dirname, 'src'),
                 use: ['babel-loader']
             },
             {
@@ -54,12 +57,15 @@ module.exports = {
     output: {
         path: __dirname + '/dist',
         publicPath: process.env.public_path,
-        chunkFilename: '[name].bundle.js'
-        // filename: 'bundle.js'
+        chunkFilename: '[name].bundle.js',
+        pathinfo: false
     },   
     devServer: {
         contentBase: path.join(__dirname, 'dist'),
         disableHostCheck: true
     },
-    devtool: 'source-map'
+    devtool: 'source-map',
+    // optimization: {
+    //     runtimeChunk: true
+    // }
 }

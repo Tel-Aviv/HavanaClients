@@ -8,6 +8,7 @@
 // This is experiment used in contast with configuation approach (setEnvVars.js) taken for other suites 
 //
 import 'babel-polyfill'
+import './matchMedia.mock';
 
 import React from 'react';
 import { Provider } from 'react-redux'

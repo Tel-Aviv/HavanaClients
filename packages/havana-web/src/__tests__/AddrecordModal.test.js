@@ -1,4 +1,5 @@
 import 'babel-polyfill'
+import './matchMedia.mock';
 
 import React from 'react';
 import renderer from 'react-test-renderer';
@@ -8,7 +9,7 @@ import i18n from 'i18next';
 import { useTranslation, initReactI18next } from "react-i18next";
 import translations from '../translations';
 
-import { ReportContext } from "../components/reports//TableContext";
+import { ReportContext } from "../components/reports/TableContext";
 import AddRecordModal from '../components/reports/AddRecordModal';
 
 i18n
@@ -28,6 +29,7 @@ describe('Enables adding new entry to the report', () => {
     const OLD_ENV = process.env;
 
     beforeAll( async() => {
+
         //
         // Set 'mock' environment variable 
         // and load API dynamically that should be mocked

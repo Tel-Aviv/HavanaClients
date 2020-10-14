@@ -4,6 +4,7 @@
 // Test the apperiance on SupportPage Component based on varios API calls.
 //
 import 'babel-polyfill'
+import './matchMedia.mock';
 
 import React from 'react';
 import { Route, Switch, HashRouter} from 'react-router-dom';
