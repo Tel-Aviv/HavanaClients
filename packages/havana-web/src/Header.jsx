@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Menu, Avatar, Image, Tooltip } from 'antd';
@@ -12,6 +13,10 @@ import Badge from './components/Badge'
 import { DataContext } from './DataContext';
 
 import { SET_NOTIFICATIONS_COUNT } from './redux/actionTypes';
+
+// Header.propTypes = {
+//     showBadge: PropTypes.boolean
+// }
 
 const Header = ({showBadge, badgeCount, ...restProps}) => {
 

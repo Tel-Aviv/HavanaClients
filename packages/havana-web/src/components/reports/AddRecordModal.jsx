@@ -49,7 +49,10 @@ const AddRecordModal = (props) => {
               closable={true}   
               onCancel={props.onCancel}
               className='rtl'
-              onOk={onOk}>
+              onOk={onOk}
+              okButtonProps={{
+                  "data-testid": "armOk"
+              }}>
             <Title level={3} className='rtl'
                 style={{
                     marginTop: '12px'

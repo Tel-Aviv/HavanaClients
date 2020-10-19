@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useContext, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
@@ -19,8 +19,8 @@ import { UserOutlined,
     FundOutlined,
     PrinterOutlined,
     CheckCircleOutlined } 
-from '@ant-design/icons'
-;const { Content } = Layout;
+from '@ant-design/icons';
+const { Content } = Layout;
 const { Title } = Typography;
 const { MonthPicker } = DatePicker;
 
@@ -41,6 +41,8 @@ const TIME_FORMAT = 'HH:mm';
 
 const Home = () => {
 
+    const { t } = useTranslation();
+
     const [month, setMonth] = useState(moment().month()+1);
     const [year, setYear] = useState(moment().year());
     const [reportData, setReportData] = useState([])
@@ -59,7 +61,8 @@ const Home = () => {
     const [signature, setSignature] = useState('');
     // Report Status Alert
     const [alert, setAlert] = useState({
-        type: 'info'
+        type: 'info',
+        message: t('loading')
     })
 
     const [validateModalOpen, setValidateModalOpen] = useState(false)
@@ -74,11 +77,9 @@ const Home = () => {
     const [employeKind, setEmployeKind] = useState()
    
     const dataContext = useContext(DataContext);
-    const componentRef = useRef();
-
+ 
     const dispatch = useDispatch();
-    const { t } = useTranslation();
-
+    
     const action_setDirectManager = (manager) => ({
         type: SET_DIRECT_MANAGER,
         data: manager
@@ -184,7 +185,6 @@ const Home = () => {
                 const resp = await dataContext.API.get('/me')
                 if( !resp.data.managers )
                     throw new Error(t('no_managers'));
-                    
                 setManagers(resp.data.managers);
 
                 const signature = resp.data.signature;
@@ -536,13 +536,13 @@ const Home = () => {
       
     }  
 
-    const handleMenuClick = (e) => {
+    const onAssigneeChanged = (e) => {
         setAssignee(managers[e.key].userId);
         message.info(`הדוח יועבר לאישור ${managers[e.key].userName}`);
     }
 
     const menu = 
-        <Menu onClick={handleMenuClick}>
+        <Menu onClick={onAssigneeChanged}>
             {
                 managers ? 
                 managers.map((manager, index) => (
@@ -581,35 +581,35 @@ const Home = () => {
         return Math.floor( parseFloat(totals) / 160. * 100 );
     }
 
-    const operations = <div>
-                            <Tooltip placement='bottom' title={getSubmitTitle}>
-                                <Popconfirm title={t('send_to_approval')} 
-                                    onConfirm={onSubmit}>
-                                    <Dropdown.Button type="primary" overlay={menu}
-                                                        disabled={ isReportSubmitted || !reportDataValid }
-                                        style={{
-                                            marginRight: '6px'
-                                        }}>
-                                        {t('submit')}
-                                    </Dropdown.Button>
-                                </Popconfirm>
-                            </Tooltip>
-                            <Tooltip placement='bottom' title={t('validate_report')}>
-                                <Button onClick={validateReport} 
-                                        icon={<CheckCircleOutlined />}
-                                        disabled={loadingData}>
-                                    {t('validate')} 
-                                </Button>
-                            </Tooltip>
-                            <Button onClick={ () => setPrintModalVisible(true)}
-                                    disabled={loadingData}
-                                    icon={<PrinterOutlined />}
-                                    style={{
-                                        marginLeft: '4px'
-                                    }}>
-                                    {t('print')}
-                            </Button>
-                        </div>;
+    const operations = <>
+        <Tooltip placement='bottom' title={getSubmitTitle}>
+            <Popconfirm title={t('send_to_approval')} 
+                onConfirm={onSubmit}>
+                <Dropdown.Button type="primary" overlay={menu}
+                                    disabled={ isReportSubmitted || !reportDataValid }
+                    style={{
+                        marginRight: '6px'
+                    }}>
+                    {t('submit')}
+                </Dropdown.Button>
+            </Popconfirm>
+        </Tooltip>
+        <Tooltip placement='bottom' title={t('validate_report')}>
+            <Button onClick={validateReport} 
+                    icon={<CheckCircleOutlined />}
+                    disabled={loadingData}>
+                {t('validate')} 
+            </Button>
+        </Tooltip>
+        <Button onClick={ () => setPrintModalVisible(true)}
+                disabled={loadingData}
+                icon={<PrinterOutlined />}
+                style={{
+                    marginLeft: '4px'
+                }}>
+                {t('print')}
+        </Button>
+    </>;
 
         let columns = [
             {
@@ -769,7 +769,7 @@ const Home = () => {
                     </Col>
                 </Row>
             </Modal>
-            <Row className='hvn-item-ltr' align={'middle'} type='flex'>
+            <Row gutter={[32, 0]}>
                 <Col span={10} >
                     {operations}
                 </Col>
@@ -783,7 +783,6 @@ const Home = () => {
                 </Col>
             </Row>
             <Row>
-            { 
                 <Alert closable={false}
                         style={{
                             opacity: alertOpacity,
@@ -794,19 +793,19 @@ const Home = () => {
                         className='hvn-item-rtl' 
                         showIcon 
                         type={alert.type} />
-            }
             </Row>
             <Row gutter={[32, 32]}>
                 <Col span={5}>
                     <Row gutter={[32, 32]}>
                         <Col>
+                            {/* Card width and Pie's height are set for IE10 support */}
                             <Card title={ `סיכום חודשי: ${getMonthName(month)} ${year} ` } 
                                 style={{ width: 270}}
-                                bordered={false}
-                                className='rtl' loading={loadingData}>
+                                bordered={true}
+                                className='rtl' 
+                                loading={loadingData}>
                                         <Pie percent={getTotalHoursPercentage()} 
                                             total={getTotalHoursPercentage() + '%'} 
-                                            title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
                                             animate={false}
                                             subTitle={ `${totals} שעות`}
                                             height={140} />                               
@@ -895,4 +894,4 @@ const Home = () => {
     )
 }
 
-export default Home;
+export default React.memo(Home);

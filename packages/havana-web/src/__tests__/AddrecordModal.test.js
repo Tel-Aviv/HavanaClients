@@ -1,12 +1,12 @@
-import 'babel-polyfill'
 import './matchMedia.mock';
 
 import React from 'react';
 import renderer from 'react-test-renderer';
-//import {cleanup, fireEvent, render} from '@testing-library/react';
+import {cleanup, fireEvent, render, screen} from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
 
 import i18n from 'i18next';
-import { useTranslation, initReactI18next } from "react-i18next";
+import { initReactI18next } from "react-i18next";
 import translations from '../translations';
 
 import { ReportContext } from "../components/reports/TableContext";
@@ -66,19 +66,31 @@ describe('Enables adding new entry to the report', () => {
         process.env = OLD_ENV; // restore old env
     });
 
-    test('Fit Layout', () => {
-        const component = renderer.create(
-            <ReportContext.Provider value={ {
-                                                codes: reportCodes
-                                            }
-                                           }>
-                <AddRecordModal />
-            </ReportContext.Provider>
-        );
+    const modalComponent = 
+        <ReportContext.Provider value={ {
+                                            codes: reportCodes
+                                        }
+                                       }>
+            <AddRecordModal />
+        </ReportContext.Provider>
+
+    test('Fit Snap Layout', () => {
+
+        const component = renderer.create(modalComponent);
 
         let tree = component.toJSON();
         expect(tree).toMatchSnapshot();
 
         //console.log(tree.props)
     })
+
+    // test('Test Add button', () => {
+    //     render(modalComponent);
+
+    //     // <button /> has the button role without explicitly setting the role attribute.
+    //     //const addButton = screen.getByText('אישור');
+    //     screen.debug()
+    //     const okButton = screen.getByTestId('armOk');
+    //     expect(okButton).toBeInTheDocument();
+    // })
 })

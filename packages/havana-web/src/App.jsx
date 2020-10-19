@@ -18,6 +18,7 @@ import Header from './Header';
 
 const ConfirmList = React.lazy( () => import('./ConfirmList') )
 const Confirm = React.lazy( () => import('./Confirm') )
+import Stub from './Stub';
 import Home from './Home';
 const Settings = React.lazy( () => import('./Settings') )
 const SupportPage = React.lazy( () => import('@components/SupportPage') )
@@ -92,7 +93,7 @@ const App = () => {
                             <Switch>
                                 <Route exact path='/'
                                         render={ (props) => 
-                                            <Home />
+                                            <Stub />
                                         }/>
                                 <Route path='/confirmlist' component={ConfirmList} />
                                 <Route path='/confirm/:userid/:saveReportId' component={Confirm} />                                

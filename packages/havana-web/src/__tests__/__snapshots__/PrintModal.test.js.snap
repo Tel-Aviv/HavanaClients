@@ -1,13 +1,3 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Test Header Layout  1`] = `
-<div>
-  Print
-</div>
-`;
-
-exports[`Test Header Layout Check Print Modal Layout 1`] = `
-<div>
-  here
-</div>
-`;
+exports[`PrintModal Layout PrintModal Snap 1`] = `null`;

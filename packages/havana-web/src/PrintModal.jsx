@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext, useRef, Children } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import PropTypes from 'prop-types';
 import { Modal, Button, Row, Col } from 'antd';
 import ReactToPrint from 'react-to-print';
 import moment from 'moment';
@@ -40,7 +41,7 @@ const PrintModal = (props) => {
                 <ReactToPrint key={uniqid()} 
                             copyStyles={true}
                             removeAfterPrint={true}
-                            trigger={() => <Button type="primary">{t('print')}</Button>}
+                            trigger={() => <Button aria-label= 'print' type="primary">{t('print')}</Button>}
                             content={() => componentRef.current}
                 />,
                 <Button key={uniqid()} onClick={onCancel}>{t('cancel')}</Button>
@@ -75,6 +76,10 @@ const PrintModal = (props) => {
                 </div>
         </Modal>
     )
+}
+
+PrintModal.PropTypes = {
+    children: PropTypes.element.isRequired
 }
 
 export default PrintModal;

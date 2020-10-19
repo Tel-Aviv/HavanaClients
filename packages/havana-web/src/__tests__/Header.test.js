@@ -108,7 +108,7 @@ describe('Test Header Layout', () => {
         //     .simulate('click');
     })
 
-    test('Test functionality (@testting-library)', () => {
+    test('Test functionality (@testing-library)', () => {
         render(headerComponent)
 
         expect(screen.getByLabelText('home')).toBeInTheDocument();

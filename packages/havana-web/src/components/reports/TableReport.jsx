@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import { ADD_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
 import { Table, Popconfirm, Modal, Form, Icon,
@@ -524,7 +525,7 @@ const TableReport = (props) => {
 
           <Form form={form} component={false}>
             <Table
-                {...props}
+                loading={props.loading}
                 style={{ 
                         direction: 'rtl', 
                         heigth: '600px',
@@ -545,4 +546,8 @@ const TableReport = (props) => {
   
 }
 
-export default TableReport;
+TableReport.propTypes = {
+  dataSource: PropTypes.array.isRequired
+}
+
+export default React.memo(TableReport);
