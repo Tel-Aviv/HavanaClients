@@ -20,6 +20,7 @@ import moment from 'moment';
 import { useTranslation } from "react-i18next";
 
 import { DataContext } from './DataContext';
+import { UPDATE_ITEM, SET_DIRECT_MANAGER } from "./redux/actionTypes";
 const PrintModal = React.lazy( () => import('./PrintModal') );
 import DocsUploader from '@components/DocsUploader';
 import TableReport from '@reports/TableReport';
@@ -140,9 +141,9 @@ const Stub = () => {
                 // 3. process report data
                 let report = respArr[2].data;
                 defineAlert(report);
-                setIsReportRejected( report.isRejected );
+                // setIsReportRejected( report.isRejected );
                 const employerCode = report.employerCode || 0;
-                setUserCompanyCode( employerCode );
+                // setUserCompanyCode( employerCode );
 
                 // 3a. Get report codes
                 const resp = await dataContext.API.get(`/me/report_codes`, {
@@ -153,7 +154,7 @@ const Stub = () => {
                         month: month
                     }
                 })
-                setReportCodes(resp.data.items); 
+                // setReportCodes(resp.data.items); 
                 
                 // Now process the report items
                 data = report.items.map( (item, index ) => {
@@ -173,9 +174,9 @@ const Stub = () => {
                                 reportType: isWorkingDay(item) ? reportType : ''
                             };
                 })
-                setReportData(data);
+                // setReportData(data);
 
-                setTotals(`${Math.floor(report.totalHours)}:${Math.round(report.totalHours % 1 * 60)}`);
+                // setTotals(`${Math.floor(report.totalHours)}:${Math.round(report.totalHours % 1 * 60)}`);
 
                 setIsReportEditable(report.isEditable);                              
 
