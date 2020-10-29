@@ -1,17 +1,21 @@
   
 language: node_js
+
 node_js:
   - node
-script:
-  - yarn web:build
-  - yarn web:test
 
-services:
+  services:
   - docker
 
 before_install:
-  - docker build -t havana-web ./packages/havana-web/dist/ 
+  - docker build -t havana:web -f Dockerfile.dev .
+
+script:
+    - yarn web:build
+    - yarn web:test
+    - docker run -e CI=true havana:web yarn test
 
 after_success:
+  - docker build -t havana-web ./packages/havana-web/dist/ 
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  - docker push 
+  - docker push havana:web

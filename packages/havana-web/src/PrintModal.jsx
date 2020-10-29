@@ -78,7 +78,7 @@ const PrintModal = (props) => {
     )
 }
 
-PrintModal.PropTypes = {
+PrintModal.propTypes = {
     children: PropTypes.element.isRequired
 }
 
