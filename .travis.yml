@@ -15,7 +15,7 @@ script:
     - yarn web:test
     - docker run -e CI=true havana:web yarn test
 
-after_success:
-  - docker build -t havana-web ./packages/havana-web/dist/ 
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  - docker push havana:web
+# after_success:
+#   - docker build -t havana-web ./packages/havana-web/dist/ 
+#   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+#   - docker push havana:web
