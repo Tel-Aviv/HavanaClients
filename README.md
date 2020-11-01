@@ -25,4 +25,31 @@ You may run each client independently with root scripts:
 The root API is able to detect the User-Agent and return and HTML with the script linked to 'mobile.bundle.js'
 3. **yarn:build** - creates both Web and Responsive Web clients [concurrently](https://www.npmjs.com/package/concurrently) and copies both to directory specified in .env file by *publish_destination=xxx*
 
+## Run in Container (only for Web client)
+As a prerequisite for this step install [Docker Desktop](http://docker.com/products/docker-desktop).
+1. Build an image for Web:
 
+    cd ./packages/havana-web
+    docker build -t havan:web .
+
+    or
+
+    docker build -f Dockerfile.dev -t havana:web .
+
+    Inspect the "Images" tab in Docker Destop to see havana image taggeg as 'web'
+    
+2. Run the image as a container
+
+    docker run -it -p 8080:80 havana:web
+
+3. (Optioanlly) Push the image to Docker Hub
+
+    3.1. Login to your docker hub account on terminal: docker login --username=olegkleiman
+
+    3.2. run docker images and note the IMAGE ID for 'havana'
+
+    3.3. tag the image: docker tag <IMAGEID> olegkleiman/havana:web
+
+    3.4. docker push olegkleiman/havana:web
+
+4. Then browse to http://localhost:8080

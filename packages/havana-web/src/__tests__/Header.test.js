@@ -89,22 +89,22 @@ describe('Test Header Layout', () => {
     //     headerWrapper.unmount();
     // })
 
-    test('Header functionality (Enzyme)', () => {
-        headerWrapper = mount(headerComponent)
+    // test('Header functionality (Enzyme)', () => {
+    //     headerWrapper = mount(headerComponent)
 
-        // Should be 4 menu items: 'home', 'settings', 'notifications' and user's avatar.
-        expect(headerWrapper.find("li")).toHaveLength(4);    
+    //     // Should be 4 menu items: 'home', 'settings', 'notifications' and user's avatar.
+    //     expect(headerWrapper.find("li")).toHaveLength(4);    
 
-        // const state = headerWrapper.state('notificationsCount');
-        // const instance = headerWrapper.instance();
-        // const result = instance.goSettings();
+    //     // const state = headerWrapper.state('notificationsCount');
+    //     // const instance = headerWrapper.instance();
+    //     // const result = instance.goSettings();
 
 
-        //expect(myComp).toHaveLength(1) 
-        // component
-        //     .find('button#submit_form')
-        //     .simulate('click');
-    })
+    //     //expect(myComp).toHaveLength(1) 
+    //     // component
+    //     //     .find('button#submit_form')
+    //     //     .simulate('click');
+    // })
 
     test('Test functionality (@testting-library)', () => {
         render(headerComponent)

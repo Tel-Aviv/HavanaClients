@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest --collectCoverage",
     "build": "webpack -d --watch",
-    "start": "webpack-dev-server --port 8089 --mode development",
+    "start": "webpack serve --port 8089 --mode development",
     "prod": "webpack -p --config webpack.prod.js"
   },
   "dependencies": {
@@ -16,12 +16,12 @@
     "@testing-library/jest-dom": "^5.11.4",
     "ant-design-pro": "^2.3.2",
     "antd": "^4.6.6",
-    "axios": "^0.20.0",
+    "axios": "^0.21.0",
     "dotenv": "^8.2.0",
     "file-saver": "^2.0.2",
     "i18next": "^19.7.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
     "react-i18next": "^11.7.2",
     "react-image": "^4.0.3",
@@ -29,7 +29,7 @@
     "react-router-dom": "^5.2.0",
     "react-to-print": "^2.10.0",
     "redux": "^4.0.5",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^4.1.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.11.5",
