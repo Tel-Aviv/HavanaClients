@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { ADD_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
 import { Table, Popconfirm, Modal, Form, Icon,
@@ -15,7 +15,8 @@ import { ReportContext } from "./TableContext";
 import EditableCell from './EditableCell';
 import EditIcons from './EditIcons';
 import AddRecordModal from './AddRecordModal';
-const FullDayReport = React.lazy( () => import('./FullDayReport') );
+//const FullDayReport = React.lazy( () => import('./FullDayReport') );
+import FullDayReport from './FullDayReport';
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
 const format = 'HH:mm';
@@ -552,11 +553,14 @@ const TableReport = (props) => {
                   onAddRecord={addRecord}
                   />
 
-          <FullDayReport visible={fullDayReportVisible}
-                        onCancel={onCancelFullDayReport}
-                        onOk={onFullDayReportAdded}
-                        record={recordToAdd}
-                  />
+          {/* <Suspense fallback={<div>Loading...</div>}> */}
+            <FullDayReport visible={fullDayReportVisible}
+                          onCancel={onCancelFullDayReport}
+                          onOk={onFullDayReportAdded}
+                          record={recordToAdd}
+                    />
+          {/* </Suspense> */}
+
 
           <Form form={form} component={false}>
             <Table
