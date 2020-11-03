@@ -336,6 +336,13 @@ const TableReport = (props) => {
             editable: false,
           },
           {
+            title: 'נחשב',
+            width: '6%',
+            dataIndex: 'accepted',
+            align: 'right',
+            editable: false
+          },
+          {
             title: t('report_code'),
             width: '10%',
             dataIndex: 'reportType',
@@ -414,9 +421,12 @@ const TableReport = (props) => {
       });
 
       if( props.employeKind === 1) { // Contractor 
-        const index = columns.findIndex( item => item.dataIndex === 'required');
+        let index = columns.findIndex( item => item.dataIndex === 'required');
         columns = [...columns.slice(0, index),
-                  ...columns.slice(index+1)]
+                  ...columns.slice(index+1)];
+        index = columns.findIndex( item => item.dataIndex === 'accepted');
+        columns = [...columns.slice(0, index),
+          ...columns.slice(index+1)];
       }
     
       const getInputType = (type) => {

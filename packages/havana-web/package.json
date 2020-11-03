@@ -6,8 +6,8 @@
   "author": "olegkleiman <oleg_kleyman@hotmail.com>",
   "scripts": {
     "test": "jest --collectCoverage",
-    "build": "webpack -d --watch",
-    "start": "webpack serve --port 8089 --mode production",
+    "build": "webpack --mode=development --watch",
+    "start": "webpack serve --port 8089 --mode=development",
     "prod": "webpack -p --config webpack.prod.js"
   },
   "dependencies": {

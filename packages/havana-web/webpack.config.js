@@ -61,5 +61,5 @@ module.exports = {
         contentBase: path.join(__dirname, 'dist'),
         disableHostCheck: true
     },
-    devtool: 'source-map'
+    devtool: 'inline-source-map'
 }
