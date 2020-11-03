@@ -39,6 +39,14 @@ exports[`Get report data and display it Display report data on TableReport Compo
                 <col
                   style={
                     Object {
+                      "minWidth": undefined,
+                      "width": undefined,
+                    }
+                  }
+                />
+                <col
+                  style={
+                    Object {
                       "minWidth": "6%",
                       "width": "6%",
                     }
@@ -121,6 +129,16 @@ exports[`Get report data and display it Display report data on TableReport Compo
                 className="ant-table-thead"
               >
                 <tr>
+                  <th
+                    className="ant-table-cell"
+                    colSpan={null}
+                    rowSpan={null}
+                    style={
+                      Object {
+                        "textAlign": "center",
+                      }
+                    }
+                  />
                   <th
                     className="ant-table-cell"
                     colSpan={null}
@@ -250,7 +268,7 @@ exports[`Get report data and display it Display report data on TableReport Compo
                 >
                   <td
                     className="ant-table-cell"
-                    colSpan={10}
+                    colSpan={11}
                     rowSpan={null}
                     style={Object {}}
                   >

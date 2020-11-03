@@ -103,11 +103,11 @@ const AddRecordModal = (props) => {
                         style={{width: '120px'}}>
                         {
                             reportContext.codes.map( item => 
-                                <Option key={uniqid()} 
+                                <Select.Option key={uniqid()} 
                                     value={item.Description}>
                                         {item.Description}
-                                </Option>)
-                            }
+                                </Select.Option>)
+                        }
                     </Select>
                 </Form.Item>
                 <Form.Item name='notes' required

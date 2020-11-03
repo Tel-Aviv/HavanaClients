@@ -9,7 +9,7 @@
 //
 import 'babel-polyfill'
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Provider } from 'react-redux'
 import moment from 'moment';
 
@@ -153,10 +153,13 @@ describe('Get report data and display it', () => {
 
         const component = renderer.create(
             <Provider store={store}>
-                <TableReport dataSource={report_items}
-                            daysOff={daysOff}
-                            employeKind={employeKind}
-                            manualUpdates={manualUpdates}/>
+
+                <Suspense fallback={<div>Loading...</div>}>
+                    <TableReport dataSource={report_items}
+                                daysOff={daysOff}
+                                employeKind={employeKind}
+                                manualUpdates={manualUpdates}/>
+                </Suspense>
             </Provider>
         );
 

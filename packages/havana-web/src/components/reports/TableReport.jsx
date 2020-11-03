@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { ADD_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
 import { Table, Popconfirm, Modal, Form, Icon,
         Tag, Row, Col, Tooltip, Menu } from 'antd';
 import { PlusCircleTwoTone, 
   MinusCircleTwoTone,
-  TagOutlined } 
+  TagOutlined,
+  ClockCircleTwoTone } 
 from '@ant-design/icons';
 import moment from 'moment';
 import { useTranslation } from "react-i18next";
@@ -14,6 +15,8 @@ import { ReportContext } from "./TableContext";
 import EditableCell from './EditableCell';
 import EditIcons from './EditIcons';
 import AddRecordModal from './AddRecordModal';
+//const FullDayReport = React.lazy( () => import('./FullDayReport') );
+import FullDayReport from './FullDayReport';
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
 const format = 'HH:mm';
@@ -46,6 +49,9 @@ const TableReport = (props) => {
     const [addModalVisible, setAddModalVisible] = useState(false)
     const [recordToAdd, setRecordToAdd] = useState();
   
+    // Full Day Report
+    const [fullDayReportVisible, setFullDayReportVisible] = useState(false);
+
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -186,17 +192,31 @@ const TableReport = (props) => {
     
       const handleAddRow = (record) => {
         setRecordToAdd(record);
-        setAddModalVisible(true)
+        setAddModalVisible(true);
       }
 
+      const handleReportFullDay = (record) => {
+        setRecordToAdd(record);
+        setFullDayReportVisible(true);
+      }
 
-    const components = {
+      const components = {
         body: {
           cell: EditableCell,
         },
       };
      
       let columns = [
+        {
+          title: '',
+          dataIndex: 'reportWholeDay',
+          align: 'center',
+          editable: false,
+          render: (_, record) => 
+            <Tooltip title={t('report_full_day')}>
+              <ClockCircleTwoTone onClick={() => handleReportFullDay(record)}/>
+            </Tooltip>
+        },
         {
           title: '',
           dataIndex: 'add',
@@ -451,9 +471,17 @@ const TableReport = (props) => {
         props.onValidated && props.onValidated(data)
       }
 
+      const onFullDayReportAdded = ({jobDescription, reportCode}) => {
+
+        setFullDayReportVisible(false);
+        setRecordToAdd(null);
+
+      }
+
       const addRecord = ({inTime, outTime, reportCode, notes}) => {
     
         setAddModalVisible(false);
+        setRecordToAdd(null);
     
         let addedPositions = data.reduce( (accu, current, index) => {
           return {
@@ -495,6 +523,9 @@ const TableReport = (props) => {
       const onCancelAdd = () => 
         setAddModalVisible(false);
 
+      const onCancelFullDayReport = () =>
+        setFullDayReportVisible(false);
+
       const handleRemoveRecord = (record) => {
     
         const index = data.findIndex( item => 
@@ -521,6 +552,15 @@ const TableReport = (props) => {
                   onCancel={onCancelAdd}
                   onAddRecord={addRecord}
                   />
+
+          {/* <Suspense fallback={<div>Loading...</div>}> */}
+            <FullDayReport visible={fullDayReportVisible}
+                          onCancel={onCancelFullDayReport}
+                          onOk={onFullDayReportAdded}
+                          record={recordToAdd}
+                    />
+          {/* </Suspense> */}
+
 
           <Form form={form} component={false}>
             <Table
