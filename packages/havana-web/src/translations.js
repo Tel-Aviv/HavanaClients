@@ -92,7 +92,11 @@ const translations = {
             "collapse": "Collapse",
             "refresh": "Refresh",
             "cancel_edit": "Sure to discard changes?",
-            "why_add_record": "Free text - the essence of the activity"
+            "why_add_record": "Free text - the essence of the activity",
+            "report_full_day": "Report whole day",
+            "job_description": "Job Description",
+            "job_description_tooltip": "This text will be attached to a daily report",
+            "job_description_error": "What do you did on this day?"
         }
     },
     he: {
@@ -188,7 +192,11 @@ const translations = {
             "collapse": "צמצם",
             "refresh": "רענן",
             "cancel_edit": "האם ברצונך לבטל את השינויים ?",
-            "why_add_record": "טקסט חופשי - מהות הפעילות"        
+            "why_add_record": "טקסט חופשי - מהות הפעילות",
+            "report_full_day": "דיווח יום מלא",
+            "job_description": "פירוט העבודה",
+            "job_description_tooltip": "הפירוט ייצורף לדוח יומי",
+            "job_description_error": "מה עשית ביום זה?"    
         }
     }
 }    
