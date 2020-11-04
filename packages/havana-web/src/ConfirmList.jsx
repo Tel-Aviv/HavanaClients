@@ -241,8 +241,8 @@ const ConfirmList = () => {
                                     {t('pending_reports')} ({pendingCount})
                                 </span>
                             </span>
-                        }
-                        key='1'>
+                            }
+                            key='1'>
                             <Table dataSource={pendingList} 
                                     style={{ direction: 'rtl', heigth: '600px', cursor: 'pointer' }}
                                     columns={columns} 
@@ -261,17 +261,17 @@ const ConfirmList = () => {
                                     {t('approved_reports')} ({approvedCount})
                                 </span>
                             </span>
-                        }
-                        key='2'>
+                            }
+                            key='2'>
                             <Table dataSource={approvedList} 
-                                style={{ direction: 'rtl', heigth: '600px', cursor: 'pointer' }}
-                                columns={approvedTableColumns}
-                                size='middle'
-                                bordered={true}
-                                pagination={false}
-                                onRow = { (record, index) => ({
-                                    onClick: (event) => { onApprovedRowClick(record, index, event) }
-                                })}>
+                                    style={{ direction: 'rtl', heigth: '600px', cursor: 'pointer' }}
+                                    columns={approvedTableColumns}
+                                    size='middle'
+                                    bordered={true}
+                                    pagination={false}
+                                    onRow = { (record, index) => ({
+                                        onClick: (event) => { onApprovedRowClick(record, index, event) }
+                                    })}>
 
                             </Table>
                         </TabPane>
@@ -282,9 +282,9 @@ const ConfirmList = () => {
                                     {t('rejected_reports')} ({rejectedCount})
                                 </span>
                             </span>
-                        }
+                            }
                             key='3'>
-                                <Table dataSource={rejectedList}
+                                {/* <Table dataSource={rejectedList}
                                     style={{ direction: 'rtl', heigth: '600px', cursor: 'pointer' }}
                                     columns={rejectedTableColumns}
                                     size='middle'
@@ -293,7 +293,7 @@ const ConfirmList = () => {
                                     onRow = { (record, index) => ({
                                         onClick: (event) => { onRejectedRowClick(record, index, event) }
                                     })}
-                                    />
+                                    /> */}
                         </TabPane>
                     </Tabs>
                 </Col>
