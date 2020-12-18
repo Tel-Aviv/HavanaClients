@@ -5,18 +5,17 @@ import { Table, Popconfirm, Modal, Form, Icon,
         Tag, Row, Col, Tooltip, Menu } from 'antd';
 import { PlusCircleTwoTone, 
   MinusCircleTwoTone,
-  TagOutlined,
-  ClockCircleTwoTone } 
+  TagOutlined } 
 from '@ant-design/icons';
-import moment from 'moment';
+import moment, { max } from 'moment';
 import { useTranslation } from "react-i18next";
 
 import { ReportContext } from "./TableContext";
 import EditableCell from './EditableCell';
 import EditIcons from './EditIcons';
 import AddRecordModal from './AddRecordModal';
-//const FullDayReport = React.lazy( () => import('./FullDayReport') );
-import FullDayReport from './FullDayReport';
+const FullDayReport = React.lazy( () => import('./FullDayReport') );
+//import FullDayReport from './FullDayReport';
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
 const format = 'HH:mm';
@@ -129,6 +128,11 @@ const TableReport = (props) => {
         })
         setEditingKey(record.key);
       }
+
+      const editWholeDay = (record) => {
+        setRecordToAdd(record);
+        setFullDayReportVisible(true);      
+      }
     
       const cancel = () => {
         setEditingKey('');
@@ -195,11 +199,6 @@ const TableReport = (props) => {
         setAddModalVisible(true);
       }
 
-      const handleReportFullDay = (record) => {
-        setRecordToAdd(record);
-        setFullDayReportVisible(true);
-      }
-
       const components = {
         body: {
           cell: EditableCell,
@@ -207,16 +206,6 @@ const TableReport = (props) => {
       };
      
       let columns = [
-        {
-          title: '',
-          dataIndex: 'reportWholeDay',
-          align: 'center',
-          editable: false,
-          render: (_, record) => 
-            <Tooltip title={t('report_full_day')}>
-              <ClockCircleTwoTone onClick={() => handleReportFullDay(record)}/>
-            </Tooltip>
-        },
         {
           title: '',
           dataIndex: 'add',
@@ -386,7 +375,8 @@ const TableReport = (props) => {
                     record={record}
                     editing={isRowEditing(record)} 
                     disable={editingKey !== ''} 
-                    edit={edit} 
+                    edit={edit}
+                    editWholeDay={editWholeDay}
                     save={save} 
                     cancel={cancel}
                 />) : null
@@ -486,12 +476,26 @@ const TableReport = (props) => {
         setFullDayReportVisible(false);
         setRecordToAdd(null);
 
+        var zeroTime = moment().utcOffset(0);
+        zeroTime.set({
+          hour:0,
+          minute:0,
+          second:0,
+          millisecond:0
+        })
+
+        addRecord({
+          inTime: zeroTime, 
+          outTime: zeroTime, 
+          reportCode: reportCode, 
+          notes: jobDescription
+        });
+
       }
 
       const addRecord = ({inTime, outTime, reportCode, notes}) => {
     
         setAddModalVisible(false);
-        setRecordToAdd(null);
     
         let addedPositions = data.reduce( (accu, current, index) => {
           return {
@@ -505,6 +509,9 @@ const TableReport = (props) => {
             item.key == recordToAdd.key
           ) + 1     
           
+        //recordToAdd.stripId + 1;
+        const newStripId = findMaxStripId(recordToAdd.day) + 1;
+
         let newItem = {
             ...recordToAdd,
             key: addedPositions.key + 1,
@@ -512,15 +519,17 @@ const TableReport = (props) => {
             notes: notes,
             entry: inTime,
             exit: outTime,
+            stripId: newStripId,
             reportType: reportCode
-        }      
-    
+        }    
+        setRecordToAdd(null);  
+
         newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format) 
     
         dispatch(
           action_ItemAdded(newItem, index)
         );  
-    
+   
         const newData = [
           ...data.slice(0, index),
           newItem,
@@ -528,6 +537,17 @@ const TableReport = (props) => {
         ]    
     
         setData(newData);
+      }
+
+      const findMaxStripId = (day) => {
+        const dailyItems = data.filter( (item ) =>
+          item.day === day
+        )
+        const max = dailyItems.reduce( (accu, current) => {
+          return current.day === day  ? current.stripId : 0
+        }, 1);
+
+        return max;
       }
 
       const onCancelAdd = () => 
@@ -563,13 +583,13 @@ const TableReport = (props) => {
                   onAddRecord={addRecord}
                   />
 
-          {/* <Suspense fallback={<div>Loading...</div>}> */}
+          <Suspense fallback={<div>Loading...</div>}>
             <FullDayReport visible={fullDayReportVisible}
                           onCancel={onCancelFullDayReport}
                           onOk={onFullDayReportAdded}
                           record={recordToAdd}
                     />
-          {/* </Suspense> */}
+          </Suspense>
 
 
           <Form form={form} component={false}>

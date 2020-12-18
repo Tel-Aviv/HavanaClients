@@ -34,6 +34,10 @@ const AddRecordModal = (props) => {
 
     const [form] = Form.useForm();
 
+    const allowedReportCodes = reportContext.codes.filter( (reportCode) => {
+        return reportCode.goodFor === 1
+    })    
+
     const onOk = async () => {
         try {
             const values = await form.validateFields();
@@ -102,7 +106,7 @@ const AddRecordModal = (props) => {
                         size="small" style={{margin: '2px'}} 
                         style={{width: '120px'}}>
                         {
-                            reportContext.codes.map( item => 
+                            allowedReportCodes.map( item => 
                                 <Select.Option key={uniqid()} 
                                     value={item.Description}>
                                         {item.Description}

@@ -114,7 +114,7 @@ const ConfirmList = () => {
         dataIndex: "reportOwner",
         align: 'right',
         key: "name",
-        filters: namesFilter,
+        //filters: namesFilter,
         onFilter: (value, record) => {
             return record.reportOwner.indexOf(value) === 0
         }
@@ -132,7 +132,7 @@ const ConfirmList = () => {
         dataIndex: "reportOwner",
         align: 'right',
         key: "name",
-        filters: namesFilter,
+        //filters: namesFilter,
         onFilter: (value, record) => {
         } 
     },
@@ -284,7 +284,7 @@ const ConfirmList = () => {
                             </span>
                             }
                             key='3'>
-                                {/* <Table dataSource={rejectedList}
+                                <Table dataSource={rejectedList}
                                     style={{ direction: 'rtl', heigth: '600px', cursor: 'pointer' }}
                                     columns={rejectedTableColumns}
                                     size='middle'
@@ -293,7 +293,7 @@ const ConfirmList = () => {
                                     onRow = { (record, index) => ({
                                         onClick: (event) => { onRejectedRowClick(record, index, event) }
                                     })}
-                                    /> */}
+                                    />
                         </TabPane>
                     </Tabs>
                 </Col>
