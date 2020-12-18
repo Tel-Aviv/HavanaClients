@@ -191,6 +191,8 @@ if( process.env.mock ) {
                     "dayOfWeek":"ד",
                     "entry":"10:54",
                     "exit":"18:22",
+                    "required": "8:18",
+                    "accepted": "8:18",
                     "notes":"",
                     "total":"7:28",
                     "isAdded":false,

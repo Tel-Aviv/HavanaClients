@@ -1,6 +1,7 @@
 node_modules
 
 packages/*/dist/*.js
+packages/*/dist/*.map
 packages/*/public/*.js
 packages/*/public/*.png
 

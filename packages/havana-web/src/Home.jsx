@@ -66,7 +66,7 @@ const Home = () => {
     const [invalidReportItems, setInvalidReportItems] = useState();
 
     const [daysOff, setDaysOff] = useState([]);
-    const [manualUpdates, setManualUpdates] = useState();
+    const [manualUpdates, setManualUpdates] = useState([]);
     const [assignee, setAssignee] = useState({
                                             userId:'direct'
                                         });
@@ -145,9 +145,11 @@ const Home = () => {
             const addedManualUpdates = [{
                     Day: _addedData.item.day,
                     Inout: true,
+                    StripId: _addedData.item.stripId
                 }, {
                     Day: _addedData.item.day,
                     Inout: false,
+                    StripId: _addedData.item.stripId
                 }
             ]
             
@@ -322,6 +324,32 @@ const Home = () => {
 
     }, [reportData])
 
+    useEffect( () => {
+
+        const postData = async () => { 
+
+                    try {
+
+                        // post the manual updates to the server 
+                        const manualUpdate = {
+                            Year: year,
+                            Month: month,
+                            UserID: dataContext.user.account_name,
+                            items: manualUpdates
+                        }
+                        await dataContext.API.post(`/me/reports/manual_updates`, 
+                                                    manualUpdate);
+                    } catch(err) {
+                        handleError(err);
+                    }
+
+                }
+
+        if( manualUpdates.length > 0)
+            postData();
+
+    }, [manualUpdates])
+
     const onSave = async() => {
 
         // convert back entry/exit times from moment to 'HH:mm'
@@ -343,16 +371,6 @@ const Home = () => {
                         employerCode: userCompanyCode
                     }
                 });
-
-            // post to the server the manual update
-            const manualUpdate = {
-                Year: year,
-                Month: month,
-                UserID: dataContext.user.account_name,
-                items: manualUpdates
-            }
-            await dataContext.API.post(`/me/reports/manual_updates`, 
-                                        manualUpdate);              
 
             //message.success(t('saved'))
         } catch( err ) {
@@ -447,7 +465,27 @@ const Home = () => {
         const res = isReportDataValid();
         if( !res.isValid ) {
             setValidateModalOpen(true);
-            const invalidItem = reportData[res.invalidItemIndex]
+            const item = reportData[res.invalidItemIndex];
+            const _date = moment(item.rdate).format('DD/MM/YYYY');
+            console.log(_date);
+            const invalidItem = //{ ...item,
+                                //    rdate : moment(item.rdate).format('DD/MM/YYYY')                         
+                                //}
+                                {
+                                    "id":87864,
+                                    "rdate":"2020-07-01T00:00:00",
+                                    "day":"1",
+                                    "isWorkingDay":false,
+                                    "dayOfWeek":"ד",
+                                    "entry":"10:54",
+                                    "exit":"18:22",
+                                    "required": "8:18",
+                                    "accepted": "8:18",
+                                    "notes":"",
+                                    "total":"7:28",
+                                    "isAdded":false,
+                                    "reportType":""
+                                };                                
             setInvalidReportItems([invalidItem]);
         }
         else {
@@ -688,6 +726,7 @@ const Home = () => {
         ];
 
     const onReportDataChanged = async ( item, inouts ) => {
+        item.isUpdated = true;
         dispatch(action_updateItem(item)) 
 
         let items = []
@@ -698,8 +737,9 @@ const Home = () => {
             });
             if( foundIndex === -1 ) {
                 items = [...items, {
-                    "Day": item.day,
-                    "InOut": true
+                    Day: parseint(item.day),
+                    InOut: true,
+                    StripId: item.stripId
                 }]
             }
     
@@ -711,12 +751,14 @@ const Home = () => {
             });
             if( foundIndex )
                 items = [...items, {
-                    "Day": item.day,
-                    "InOut": false
+                    Day: parseInt(item.day),
+                    InOut: false,
+                    StripId: item.stripId
                 }]                            
         }
-    
-        setManualUpdates([...manualUpdates, ...items]);
+
+        const _manualUpdates = [...manualUpdates, ...items];
+        setManualUpdates(_manualUpdates);
     }
 
     const getMonthName = (monthNum) => {

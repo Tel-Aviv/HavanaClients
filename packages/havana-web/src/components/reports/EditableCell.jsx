@@ -24,6 +24,11 @@ const EditableCell = ({
     }
 
     const getInput = (type) => {
+
+        const allowedReportCodes = reportContext.codes.filter( (reportCode) => {
+            return reportCode.goodFor === 1
+        })
+
         const controls = {
             time: () => {
                 return  <TimePicker
@@ -38,7 +43,7 @@ const EditableCell = ({
                             style={{width: '120px'}}
                             onChange={onReportCodeChanged}> 
                             {
-                                reportContext.codes.map( item => 
+                                allowedReportCodes.map( item => 
                                     <Option key={uniqid()} 
                                         value={item.Description}>
                                             {item.Description}

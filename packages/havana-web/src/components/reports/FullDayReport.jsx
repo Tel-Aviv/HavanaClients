@@ -1,9 +1,11 @@
 import React, { useContext } from 'react';
 import { Modal, Form, 
     Input, Select,
-    Typography, 
+    Typography,
+    Space, 
     Tooltip} from 'antd';
-const { Title } = Typography;
+
+const { Text, Title } = Typography;
 import {
     QuestionCircleOutlined
 } from '@ant-design/icons';
@@ -37,6 +39,10 @@ const FullDayReport = (props) => {
         }
     }
 
+    const allowedReportCodes = reportContext.codes.filter( (reportCode) => {
+        return reportCode.goodFor === 2
+    })
+
     return <Modal visible={props.visible}
                     closable={true}
                     className='rtl'
@@ -46,18 +52,18 @@ const FullDayReport = (props) => {
                 style={{
                     marginTop: '12px'
                 }}>
-            {t('report_full_day')}
+                {t('report_full_day')} { props.record? props.record.rdate: ''}
             </Title>
             <Form {...layout} form={form}
                     size='small'>
                 <Form.Item name='jobDescription'
                         label={
-                            <span>
-                                {t('job_description')}
+                            <Space size={'small'}>
+                                <Text>{t('job_description')}</Text>
                                 <Tooltip title={t('job_description_tooltip')}>
                                     <QuestionCircleOutlined /> 
                                 </Tooltip>
-                           </span>
+                            </Space>
                         }
                         rules={
                             [ {required: true,
@@ -75,11 +81,11 @@ const FullDayReport = (props) => {
                     ]}>
                     <Select size="small">
                         {
-                            reportContext.codes.map( item => 
-                                <Select.Option key={uniqid()} 
-                                    value={item.Description}>
-                                        {item.Description}
-                                </Select.Option>)
+                                allowedReportCodes.map( item => 
+                                    <Select.Option key={uniqid()} 
+                                        value={item.Description}>
+                                            {item.Description}
+                                    </Select.Option>)
                         }
                         </Select>
                 </Form.Item>

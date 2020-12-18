@@ -3,6 +3,7 @@ import React from 'react'
 import { Popconfirm, Icon, Tooltip } from 'antd';
 import { CheckCircleTwoTone,
   CloseCircleTwoTone,
+  ClockCircleTwoTone,
   EditTwoTone } 
 from '@ant-design/icons';
 import { useTranslation } from "react-i18next";
@@ -14,7 +15,7 @@ const iconStyle = {
     fontSize: '100%'
 }
 
-export default ({record, editing, disable, edit, save, cancel}) => {
+export default ({record, editing, disable, edit, editWholeDay, save, cancel}) => {
 
     const {t} = useTranslation();
 
@@ -31,10 +32,16 @@ export default ({record, editing, disable, edit, save, cancel}) => {
     ) : (
           disable ?
             (<EditTwoTone style={iconStyle} />) :
-            (<Tooltip title={t('edit_record')}>
+            (<>
+              <Tooltip title={t('edit_record')}>
                 <EditTwoTone
                       onClick={() => edit(record)} 
                       style={iconStyle} />
-              </Tooltip>) 
+              </Tooltip>
+              <Tooltip title={t('report_full_day')}>
+                <ClockCircleTwoTone
+                    onClick={() => editWholeDay(record)} />
+              </Tooltip>
+            </>) 
     )
   }
