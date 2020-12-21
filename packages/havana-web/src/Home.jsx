@@ -278,16 +278,16 @@ const Home = () => {
                     // Map short description of the report code to the 'normal' description.
                     // At this moment, reportCodes is not yet updated to state, so we use resp.data.items instead of additional useEffect()
                     const reportCode = resp.data.items.find( (el) => 
-                        el.ShortDescription === item.reportType
+                        el.ShortDescription === item.reportCode
                     );
-                    const reportType = reportCode? reportCode.Description : item.reportType;
+                    const _reportCode = reportCode? reportCode.Description : item.reportCode;
 
                     return {
                                 ...item,
                                 entry: moment(item.entry, TIME_FORMAT),
                                 exit: moment(item.exit, TIME_FORMAT),
                                 key: index,
-                                reportType: isWorkingDay(item) ? reportType : ''
+                                reportCode: isWorkingDay(item) ? _reportCode : ''
                             };
                 })
                 setReportData(data);
@@ -484,7 +484,7 @@ const Home = () => {
                                     "notes":"",
                                     "total":"7:28",
                                     "isAdded":false,
-                                    "reportType":""
+                                    "reportCode":""
                                 };                                
             setInvalidReportItems([invalidItem]);
         }
@@ -729,6 +729,10 @@ const Home = () => {
         item.isUpdated = true;
         dispatch(action_updateItem(item)) 
 
+        // No manual updates were passed
+        if( !inouts )
+            return;
+
         let items = []
         if( inouts[0] ) { // entry time was changed for this item
             const foundIndex = manualUpdates.findIndex( arrayItem => {
@@ -737,7 +741,7 @@ const Home = () => {
             });
             if( foundIndex === -1 ) {
                 items = [...items, {
-                    Day: parseint(item.day),
+                    Day: parseInt(item.day),
                     InOut: true,
                     StripId: item.stripId
                 }]
@@ -762,7 +766,7 @@ const Home = () => {
     }
 
     const getMonthName = (monthNum) => {
-        return t('m'+monthNum)
+        return t('m' + monthNum)
     }
 
     const printReportTitle = () => (
@@ -934,7 +938,7 @@ const Home = () => {
                         ]}>
 
                 <div ref={componentRef} style={{textAlign: 'center'}} className='pdf-container'>
-                    <div className='pdf-title'>{dataContext.user.name}</div>
+                    <div className='pdf-title'>{dataContext.user.name} (ת.ז. {dataContext.user.userID})</div>
                     <div className='pdf-title'>{t('summary')} {month}/{year}</div>
                     <TableReport dataSource={reportData}
                                 employeKind={employeKind}

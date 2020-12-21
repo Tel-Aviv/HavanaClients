@@ -51,7 +51,7 @@ const Reports = ({route, navigation}) => {
               total: item.total,
               notes: item.notes,
               date: date,
-              reportCode: item.reportType
+              reportCode: item.reportCode
             },
           ],
         };

@@ -33,7 +33,7 @@ const FullDayReport = (props) => {
         try {
             const values = await form.validateFields();
             form.resetFields();
-            props.onOk && props.onOk(values);
+            props.onOk && props.onOk(values, props.record.key);
         } catch( err ) {
             console.error(err);
         }
