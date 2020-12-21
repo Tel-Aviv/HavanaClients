@@ -148,6 +148,7 @@ const DocsUploader = ({year, month, isOperational, employeeId}) => {
         defaultFileList: docs,
         fileList: docs,
         beforeUpload: beforeUpload,
+        transformFile: null,
         onRemove: removeDoc,
         onPreview: previewDoc,
         onDownload: downloadDoc
@@ -157,7 +158,8 @@ const DocsUploader = ({year, month, isOperational, employeeId}) => {
         <Upload fileList={docs} className='rtl'
                 listType='text'
                 disabled={!isOperational}
-                {...docsUploadProps} className='ltr'>
+                {...docsUploadProps} 
+                className='ltr'>
             { 
                 isOperational ? 
                     <Button>

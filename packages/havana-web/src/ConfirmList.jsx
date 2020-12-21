@@ -22,7 +22,7 @@ const monthsFilter = [...Array(12).keys()].map( i => ({
                                                         value: i + 1
                                                     })
                                               )
-const yearsFilter = [2019, 2020, 2021, 2022, 2023].map( i => ({
+const yearsFilter = [2019, 2020, 2021, 2022, 2023, 2024].map( i => ({
                                                             text: i,
                                                             value: i
                                                         })
@@ -97,7 +97,8 @@ const columns = [{
 
 const ConfirmList = () => {
 
-    const history = useHistory()
+    const history = useHistory();
+
     const [pendingList, setPendingList] = useState([])
     const [pendingCount, setPendingCount] = useState(0)
     const [approvedList, setApprovedList] = useState([])
@@ -105,6 +106,8 @@ const ConfirmList = () => {
     const [rejectedList, setRejectedList] = useState([])
     const [rejectedCount, setRejectedCount] = useState(0)
     const [namesFilter, setNamesFilter] = useState({})
+    const [loadingData, setLoadingData] = useState(false);
+    
     const context = useContext(DataContext)
 
     const { t } = useTranslation();
@@ -148,6 +151,8 @@ const ConfirmList = () => {
     useEffect( () =>  {
 
         async function fetchData() {
+
+            setLoadingData(true);
 
             try {
 
@@ -203,6 +208,8 @@ const ConfirmList = () => {
 
             } catch(error) { // 😨
                 console.log(error.message);
+            } finally {
+                setLoadingData(false)
             }
         }
 
@@ -222,10 +229,16 @@ const ConfirmList = () => {
         history.push(`/confirm/${record.reportOwnerId}/${record.saveReportId}`); 
     }
 
+    const alertOpacity = loadingData ? 0.2 : 1.0; 
+
     return(
         <Content>
             <Row>
                 <Alert closable={false}
+                style={{
+                    opacity: alertOpacity,
+                    width: '100%'
+                }}
                     className='hvn-item-rtl'
                     message={t('approvals_list')}/>
             </Row>

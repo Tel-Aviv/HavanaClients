@@ -15,7 +15,7 @@ const iconStyle = {
     fontSize: '100%'
 }
 
-export default ({record, editing, disable, edit, editWholeDay, save, cancel}) => {
+export default ({record, editing, disable, edit, editFullDay, save, cancel}) => {
 
     const {t} = useTranslation();
 
@@ -31,17 +31,20 @@ export default ({record, editing, disable, edit, editWholeDay, save, cancel}) =>
       </span>
     ) : (
           disable ?
-            (<EditTwoTone style={iconStyle} />) :
+            (<ClockCircleTwoTone style={iconStyle} />) :
             (<>
-              <Tooltip title={t('edit_record')}>
-                <EditTwoTone
-                      onClick={() => edit(record)} 
-                      style={iconStyle} />
-              </Tooltip>
+              {
+                !record.isFullDay ? 
+                <Tooltip title={t('edit_record')}>
+                  <ClockCircleTwoTone
+                      onClick={() => edit(record)} />
+                </Tooltip> : null
+              }
               <Tooltip title={t('report_full_day')}>
-                <ClockCircleTwoTone
-                    onClick={() => editWholeDay(record)} />
-              </Tooltip>
+                    <EditTwoTone  
+                          onClick={() => editFullDay(record)} 
+                          style={iconStyle} />
+                  </Tooltip>              
             </>) 
     )
   }

@@ -2,7 +2,8 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { ADD_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
 import { Table, Popconfirm, Modal, Form, Icon,
-        Tag, Row, Col, Tooltip, Menu } from 'antd';
+        Tag, Row, Col, Tooltip, Typography } from 'antd';
+const { Text, Title } = Typography;        
 import { PlusCircleTwoTone, 
   MinusCircleTwoTone,
   TagOutlined } 
@@ -129,7 +130,7 @@ const TableReport = (props) => {
         setEditingKey(record.key);
       }
 
-      const editWholeDay = (record) => {
+      const editFullDay = (record) => {
         setRecordToAdd(record);
         setFullDayReportVisible(true);      
       }
@@ -269,10 +270,14 @@ const TableReport = (props) => {
                         style={{
                           marginRight: '0'
                       }}>
+
                         { 
-                          moment.isMoment(text) ?
-                            text.format(format) : '-'
+                          
+                            moment.isMoment(text) ?
+                              text.format(format) : '-'
+                          
                         }
+
                       </Tag>
                       {
                         manuallyEditedTag(isEditedManually)
@@ -324,23 +329,36 @@ const TableReport = (props) => {
             align: 'right',
             editable: false,
           },
-          {
-            title: 'נחשב',
-            width: '6%',
-            dataIndex: 'accepted',
-            align: 'right',
-            editable: false
-          },
+          // {
+          //   title: 'נחשב',
+          //   width: '6%',
+          //   dataIndex: 'accepted',
+          //   align: 'right',
+          //   editable: false
+          // },
           {
             title: t('report_code'),
-            width: '10%',
-            dataIndex: 'reportType',
+            //width: '14%',
+            dataIndex: 'reportCode',
             align: 'right',
             editable: true,
-            render: (text, _) => 
-              <div style={{whiteSpace: 'nowrap'}}>
-                {text}
-              </div>
+            render: (text, record) => {
+              //const isEditedManually = isRecordUpdatedManually(record, 'entry')
+
+              return <Row>
+                <Col>
+                  <div style={{whiteSpace: 'nowrap'}}>
+                    {text}
+                  </div>
+                </Col>
+                <Col>
+                {
+                  record.isFullDay ?
+                    manuallyEditedTag(true) : null
+                }
+                </Col>
+              </Row>
+            }
           },
           {
             title: t('notes'),
@@ -376,7 +394,7 @@ const TableReport = (props) => {
                     editing={isRowEditing(record)} 
                     disable={editingKey !== ''} 
                     edit={edit}
-                    editWholeDay={editWholeDay}
+                    editFullDay={editFullDay}
                     save={save} 
                     cancel={cancel}
                 />) : null
@@ -410,13 +428,13 @@ const TableReport = (props) => {
         };
       });
 
-      if( props.employeKind === 1) { // Contractor 
+      if( props.employeKind === 1) { // Do not display 'required' columns for Contractors 
         let index = columns.findIndex( item => item.dataIndex === 'required');
         columns = [...columns.slice(0, index),
                   ...columns.slice(index+1)];
-        index = columns.findIndex( item => item.dataIndex === 'accepted');
-        columns = [...columns.slice(0, index),
-          ...columns.slice(index+1)];
+        // index = columns.findIndex( item => item.dataIndex === 'accepted');
+        // columns = [...columns.slice(0, index),
+        //   ...columns.slice(index+1)];
       }
     
       const getInputType = (type) => {
@@ -427,7 +445,7 @@ const TableReport = (props) => {
           exit: function () {
             return 'time';
           },
-          reportType: function () {
+          reportCode: function () {
             return 'select';
           },
           default: function () {
@@ -441,9 +459,9 @@ const TableReport = (props) => {
 
         return isEditedManually ?
                 <Tooltip title={t('manual_tag')}>
-                <Tag color='magenta'>
+                  <Tag color='magenta'>
                         <TagOutlined />
-                </Tag> 
+                  </Tag> 
                 </Tooltip>: null
       }
 
@@ -471,7 +489,7 @@ const TableReport = (props) => {
         props.onValidated && props.onValidated(data)
       }
 
-      const onFullDayReportAdded = ({jobDescription, reportCode}) => {
+      const onFullDayReportAdded = ({jobDescription, reportCode}, key) => {
 
         setFullDayReportVisible(false);
         setRecordToAdd(null);
@@ -484,16 +502,19 @@ const TableReport = (props) => {
           millisecond:0
         })
 
-        addRecord({
-          inTime: zeroTime, 
-          outTime: zeroTime, 
-          reportCode: reportCode, 
-          notes: jobDescription
-        });
+        const item = {
+            inTime: zeroTime, 
+            outTime: zeroTime, 
+            reportCode: reportCode, 
+            notes: jobDescription,
+            isFullDay: true
+        }
+
+        replaceRecord(key, item);
 
       }
 
-      const addRecord = ({inTime, outTime, reportCode, notes}) => {
+      const addRecord = ({inTime, outTime, reportCode, notes, isFullDay}) => {
     
         setAddModalVisible(false);
     
@@ -508,8 +529,7 @@ const TableReport = (props) => {
         const index = data.findIndex( item => 
             item.key == recordToAdd.key
           ) + 1     
-          
-        //recordToAdd.stripId + 1;
+
         const newStripId = findMaxStripId(recordToAdd.day) + 1;
 
         let newItem = {
@@ -520,7 +540,8 @@ const TableReport = (props) => {
             entry: inTime,
             exit: outTime,
             stripId: newStripId,
-            reportType: reportCode
+            reportCode: reportCode,
+            isFullDay: isFullDay
         }    
         setRecordToAdd(null);  
 
@@ -537,6 +558,30 @@ const TableReport = (props) => {
         ]    
     
         setData(newData);
+      }
+
+      const replaceRecord = (key, newItem) => {
+        const newData = [...data];
+        const index = newData.findIndex(item => key === item.key);
+        if (index > -1) {
+
+          const item = newData[index];
+          let replacedItem = {
+            ...item,
+            inTime: newItem.inTime, 
+            outTime: newItem.outTime, 
+            reportCode: newItem.reportCode, 
+            notes: newItem.notes,
+            isFullDay: true
+          }
+
+          replacedItem.valid = true;
+          newData.splice(index, 1, replacedItem);
+          setData(newData);
+          setRecordToAdd(null);
+
+          props.onChange && props.onChange(replacedItem, null);
+        }
       }
 
       const findMaxStripId = (day) => {

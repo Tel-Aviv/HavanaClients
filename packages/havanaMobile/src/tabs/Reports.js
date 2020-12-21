@@ -84,9 +84,9 @@ const Reports = ({route, navigation}) => {
       const date = moment(item.rdate).format('YYYY-MM-DD');
 
       const reportCode = reportCodes.find(
-        (el) => el.ShortDescription === item.reportType,
+        (el) => el.ShortDescription === item.reportCode,
       );
-      const reportType = reportCode ? reportCode.Description : item.reportType;
+      const _reportCode = reportCode ? reportCode.Description : item.reportCode;
 
       return {
         title: `${date} (${item.dayOfWeek})`,
@@ -96,7 +96,7 @@ const Reports = ({route, navigation}) => {
             exit: item.exit,
             total: item.total,
             required: item.required,
-            reportType: reportType || 'Usual',
+            reportCode: _reportCode || 'Usual',
             notes: item.notes,
             date: date,
           },
