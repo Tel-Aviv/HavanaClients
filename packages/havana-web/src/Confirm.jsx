@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 
 import { Button, Typography, 
         Row, Col, Card, Tooltip, 
-        Collapse, Alert } from 'antd';
+        Collapse, Alert, Space } from 'antd';
 const { Panel } = Collapse;
 import { Input, Modal } from 'antd';
 
@@ -16,6 +16,10 @@ const { Title } = Typography;
 
 import { Layout } from 'antd';
 const { Content } = Layout;
+import { 
+    PrinterOutlined
+} 
+from '@ant-design/icons'
 import { Pie } from 'ant-design-pro/lib/Charts';        
 import ReactToPrint from 'react-to-print';
 
@@ -25,6 +29,8 @@ import DocsUploader from '@components/DocsUploader';
 
 import { DECREASE_NOTIFICATIONS_COUNT,
          INCREASE_NOTIFICATION_COUNT } from "./redux/actionTypes";
+
+const TIME_FORMAT = 'HH:mm';
 
 const ref = React.createRef();
 
@@ -64,12 +70,15 @@ const Confirm = (props) => {
             setLoadingData(true)
             try {
 
-                const resp = context.API.get(`/me/employees/reports/${routeParams.saveReportId}`, {
+                let resp = await context.API.get(`/me/employees/reports/${routeParams.saveReportId}`, {
                     withCredentials: true
                 }); 
 
                 const data = resp.data.items.map( (item, index ) => {
-                    const _item = {...item, key: index};
+                    const _item = {...item, 
+                        entry: moment(item.entry, TIME_FORMAT),
+                        exit: moment(item.exit, TIME_FORMAT),
+                        key: index};
                     return _item;
                 })
                 setTableData(data);            
@@ -220,72 +229,91 @@ const Confirm = (props) => {
             return t('approval_status');
     }
 
+    const getMonthName = (monthNum) => {
+        return t('m'+monthNum)
+    }
+
+    const alertOpacity = loadingData ? 0.2 : 1.0; 
+
     return (
         <Content>
             <Title level={1} className='hvn-title'>{title}</Title>
                 <Row  className='hvn-item-ltr' align={'middle'} type='flex'>
-                    <Col span={2} >
-                        {
-                            isReportApproved ? (
-                                    <Button
-                                    icon='printer'
-                                    onClick={onPrint}>
-                                        {t('print')}
-                                    </Button>
-                                )
-                                : (
-                                    <Button type='primary' loading={approvalSending}
-                                            onClick={ () => onContinue() }>
-                                                {t('continue')}
-                                    </Button>                
-                                )
-                        }
-                    </Col>
-                    <Col span={22}>
+                    <Col span={3}>
+                        <Space>
+                            <Button type='primary' loading={approvalSending}
+                                    onClick={ () => onContinue() }>
+                                        {t('continue')}
+                            </Button>                           
+                            <Button
+                                icon={<PrinterOutlined />}
+                                onClick={onPrint}>
+                                    {t('print')}
+                            </Button>
+                        </Space>
+                     </Col>
+                    <Col span={21} style={{
+                        direction: 'rtl'
+                    }}>
                         <Alert closable={false} 
+                            style={{
+                                opacity: alertOpacity,
+                                width: '100%'
+                            }}
                             message={formatAlertMessage()}
-                            showIcon 
-                            className='hvn-item-rtl' 
+                            showIcon
                             type={ isReportRejected ? 'error' : 'info'}/>
                     </Col>
                 </Row>
-            <Row gutter={[32, 32]} style={{
-                    margin: '0% 4%' 
-                }}>
-                <Col span={8}>
-                    <Row gutter={[40, 32]}>
-                        <Col>
-                            <Card title='סיכום חודשי' bordered={false}
-                                className='rtl' loading={loadingData}>
-                                    <div>סה"כ { totals } שעות</div>
-                                    <Pie percent={getTotalHoursPercentage()} total={getTotalHoursPercentage() + '%'} height={140} />
-                            </Card>                
-                        </Col>
-                    </Row>
-                    <Row gutter={[32, 32]}>
-                        <Col>
-                            <Card title={t('abs_docs')} bordered={true}
-                                className='rtl'>
-                                <DocsUploader year={year} month={month} 
-                                            employeeId={routeParams.userid}
-                                            isOperational={false}/>
-                            </Card>
-                        </Col>                    
-                    </Row>
-                </Col>
-                <Col span={16}>
-                    <div className='hvn-item'>
-                        <div ref={ref}>
-                            <TableReport dataSource={tableData} 
-                                        loading={loadingData} 
-                                        manualUpdates={manualUpdates}
-                                        scroll={{y: '400px'}}
-                                        editable={false} />
+                <Row gutter={[32, 0]}>
+                    <Col span={5} style={{
+                        paddingTop: '16px'
+                   }}>
+                        <Row gutter={[32, 32]}>
+                            <Col style={{
+                                paddingRight: '0px'
+                            }}>
+                                <Card title={ `סיכום חודשי: ${getMonthName(month)} ${year} ` } 
+                                    bordered={false}
+                                    style={{ width: 270}}
+                                    className='rtl' 
+                                    loading={loadingData}>
+                                        <Pie percent={getTotalHoursPercentage()} 
+                                            total={getTotalHoursPercentage() + '%'} 
+                                            title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
+                                            animate={false}
+                                            height={140} />
+                                </Card>                
+                            </Col>
+                        </Row>
+                        <Row gutter={[32, 32]}>
+                            <Col>
+                                <Card title={t('abs_docs')} 
+                                    bordered={true}
+                                    style={{ width: 270}}
+                                    className='rtl'
+                                    loading={loadingData}>
+                                    <DocsUploader year={year} month={month} 
+                                                employeeId={routeParams.userid}
+                                                isOperational={false}/>
+                                </Card>
+                            </Col>                    
+                        </Row>
+                    </Col>
+                    <Col span={19} style={{
+                        paddingLeft: '16px',
+                        paddingTop: '16px'
+                    }}>
+                            <div ref={ref}>
+                                <TableReport dataSource={tableData} 
+                                            loading={loadingData} 
+                                            manualUpdates={manualUpdates}
+                                            scroll={{y: '400px'}}
+                                            editable={false} />
 
-                        </div>
-                    </div>
-                </Col>
-            </Row>
+                            </div>
+                    </Col>
+                </Row>
             <Modal width='54%'
                     visible={printModalVisible}
                     closable={true}

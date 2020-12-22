@@ -274,7 +274,7 @@ const TableReport = (props) => {
                         { 
                           
                             moment.isMoment(text) ?
-                              text.format(format) : '-'
+                              text.format(format) : text
                           
                         }
 
@@ -306,7 +306,7 @@ const TableReport = (props) => {
                     }}>
                       {
                         moment.isMoment(text) ?
-                        text.format(format) : '-'
+                        text.format(format) : text
                       }
                     </Tag>
                     {
@@ -643,7 +643,7 @@ const TableReport = (props) => {
                 style={{ 
                         direction: 'rtl', 
                         heigth: '600px',
-                        margin: '12px'
+                        // margin: '12px'
                         }}
                 tableLayout='auto'
                 bordered={false}
