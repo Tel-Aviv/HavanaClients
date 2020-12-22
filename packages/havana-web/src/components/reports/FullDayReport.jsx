@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { Modal, Form, 
     Input, Select,
     Typography,
@@ -23,36 +23,50 @@ const layout = {
     },
   };
 
-const FullDayReport = (props) => {
+const FullDayReport = ({visible, onOk, onCancel, record}) => {
 
     const reportContext = useContext(ReportContext);
     const { t } = useTranslation();
     const [form] = Form.useForm();
 
-    const onOk = async () => {
+    useEffect( () => {
+        if( record ) 
+            form.setFieldsValue({
+                jobDescription: record.notes,
+                reportCode: record.reportCode
+            })
+    }
+    ,[record])
+
+    const onOkHandle = async() => {
         try {
             const values = await form.validateFields();
-            form.resetFields();
-            props.onOk && props.onOk(values, props.record.key);
+            //form.resetFields();
+            onOk && onOk(values, record.key);
         } catch( err ) {
             console.error(err);
         }
+    }
+
+    const onCancelHandle = async() => {
+        form.resetFields();
+        onCancel && onCancel();
     }
 
     const allowedReportCodes = reportContext.codes.filter( (reportCode) => {
         return reportCode.goodFor === 2
     })
 
-    return <Modal visible={props.visible}
+    return <Modal visible={visible}
                     closable={true}
                     className='rtl'
-                    onOk={onOk}
-                    onCancel={props.onCancel}>
+                    onOk={onOkHandle}
+                    onCancel={onCancelHandle}>
             <Title level={3} className='rtl'
                 style={{
                     marginTop: '12px'
                 }}>
-                {t('report_full_day')} { props.record? props.record.rdate: ''}
+                {t('report_full_day')} { record? record.rdate: ''}
             </Title>
             <Form {...layout} form={form}
                     size='small'>
@@ -87,7 +101,7 @@ const FullDayReport = (props) => {
                                             {item.Description}
                                     </Select.Option>)
                         }
-                        </Select>
+                    </Select>
                 </Form.Item>
             </Form>
         </Modal>

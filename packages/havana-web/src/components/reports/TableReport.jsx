@@ -118,7 +118,7 @@ const TableReport = (props) => {
     
       const isRowEditable = (record) => {
         return props.editable && (!isTotalled(record) && isWorkingDay(record) 
-                              || record.isAdded 
+                              || record.isAdded || record.isUpdated
                               || isRecordUpdatedManually(record, 'entry') 
                               || hasSytemNotes(record));
       }
@@ -343,7 +343,9 @@ const TableReport = (props) => {
             align: 'right',
             editable: true,
             render: (text, record) => {
-              //const isEditedManually = isRecordUpdatedManually(record, 'entry')
+              
+              if( !moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) )
+                return null;
 
               return <Row>
                 <Col>
@@ -365,21 +367,26 @@ const TableReport = (props) => {
             dataIndex: 'notes',
             align: 'right',
             editable: true,
-            render: (text, _) => 
-              ( text !== '' ) ?
+            render: (text, record) => {
+
+              if( !moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) )
+                return null;
+
+              return ( text !== '' ) ?
                   <Tag color="blue"
                     style={{
                       marginRight: '0'
                     }}>
                       {
-                        text && text.length > 42 ?
-                        <Tooltip title={text}>
-                          <Ellipsis length={42}>{text}</Ellipsis>
-                        </Tooltip> :
-                          <div>{text}</div>
+                          text && text.length > 42 ?
+                          <Tooltip title={text}>
+                            <Ellipsis length={42}>{text}</Ellipsis>
+                          </Tooltip> :
+                            <div>{text}</div>
                       }
                   </Tag>
                   : null
+            }
           },
           {
             title: '',
@@ -628,7 +635,7 @@ const TableReport = (props) => {
                   onAddRecord={addRecord}
                   />
 
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<div>Loading FullDayReport...</div>}>
             <FullDayReport visible={fullDayReportVisible}
                           onCancel={onCancelFullDayReport}
                           onOk={onFullDayReportAdded}
