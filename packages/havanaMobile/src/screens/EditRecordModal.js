@@ -132,7 +132,7 @@ const EditRecordModal = ({route, navigation}) => {
           <ListItem>
             <Icon ios="ios-create" style={{color: 'green'}} />
             <Label>Notes</Label>
-            <TextInput style={styles.panelSubtitle}>{item.notes}</TextInput>
+            <TextInput style={styles.panelSubtitle}>{item.userNotes}</TextInput>
           </ListItem>
         </List>
         <Button onPress={() => navigation.goBack()} title="Update" />

@@ -115,7 +115,7 @@ const AddRecordModal = (props) => {
                     </Select>
                 </Form.Item>
                 <Form.Item name='notes' required
-                        label={<span>{t('notes')}
+                        label={<span>{t('user_notes')}
                                     <Tooltip title={t('why_add_record')}>
                                         <QuestionCircleOutlined />
                                     </Tooltip>
