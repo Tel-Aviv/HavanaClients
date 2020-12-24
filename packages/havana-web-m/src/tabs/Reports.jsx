@@ -49,7 +49,7 @@ const Reports = ({route, navigation}) => {
               entry: item.entry,
               exit: item.exit,
               total: item.total,
-              notes: item.notes,
+              userNotes: item.userNotes,
               date: date,
               reportCode: item.reportCode
             },
@@ -111,7 +111,7 @@ const Reports = ({route, navigation}) => {
           /> */}
         </View>
         <Text style={[styles.itemTitleText, styles.cellItem]}>
-          {item.notes}
+          {item.userNotes}
         </Text>
       </TouchableOpacity>
     );

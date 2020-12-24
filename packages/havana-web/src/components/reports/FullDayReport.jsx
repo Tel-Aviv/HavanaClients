@@ -32,7 +32,7 @@ const FullDayReport = ({visible, onOk, onCancel, record}) => {
     useEffect( () => {
         if( record ) 
             form.setFieldsValue({
-                jobDescription: record.notes,
+                userNotes: record.userNotes,
                 reportCode: record.reportCode
             })
     }
@@ -70,7 +70,7 @@ const FullDayReport = ({visible, onOk, onCancel, record}) => {
             </Title>
             <Form {...layout} form={form}
                     size='small'>
-                <Form.Item name='jobDescription'
+                <Form.Item name='userNotes'
                         label={
                             <Space size={'small'}>
                                 <Text>{t('job_description')}</Text>

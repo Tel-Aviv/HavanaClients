@@ -97,7 +97,7 @@ const Reports = ({route, navigation}) => {
             total: item.total,
             required: item.required,
             reportCode: _reportCode || 'Usual',
-            notes: item.notes,
+            userNotes: item.userNotes,
             date: date,
           },
         ],
@@ -235,7 +235,7 @@ const Reports = ({route, navigation}) => {
           />
         </View>
         <Text style={[styles.itemTitleText, styles.cellItem]}>
-          {item.notes}
+          {item.userNotes}
         </Text>
       </TouchableOpacity>
     );
@@ -251,7 +251,7 @@ const Reports = ({route, navigation}) => {
     // });
     monthlyReportData.forEach((item) => {
       if (item.data && item.data.length > 0 && !_.isEmpty(item.data[0])) {
-        marked[item.notes] = {marked: true, dotColor: 'green'};
+        marked[item.userNotes] = {marked: true, dotColor: 'green'};
       }
     });
     // monthlyReportData.forEach((item) => {
@@ -289,7 +289,7 @@ const Reports = ({route, navigation}) => {
   //         </Item>
   //         <Item>
   //           <Label>Notes:</Label>
-  //           <TextInput value={edtingRecord.notes} />
+  //           <TextInput value={edtingRecord.userNotes} />
   //         </Item>
   //         <View style={styles.panelButton}>
   //           <Text style={styles.panelButtonTitle}>Apply</Text>

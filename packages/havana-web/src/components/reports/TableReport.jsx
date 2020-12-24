@@ -113,7 +113,7 @@ const TableReport = (props) => {
       }
     
       const hasSytemNotes = (record) => {
-        return record.notes && record.notes.startsWith('*');
+        return record.indicator && record.indicator.startsWith('*');
       }
     
       const isRowEditable = (record) => {
@@ -338,7 +338,7 @@ const TableReport = (props) => {
           // },
           {
             title: t('report_code'),
-            //width: '14%',
+            width: '14%',
             dataIndex: 'reportCode',
             align: 'right',
             editable: true,
@@ -363,10 +363,10 @@ const TableReport = (props) => {
             }
           },
           {
-            title: t('notes'),
-            dataIndex: 'notes',
+            title: t('system_notes'),
+            dataIndex: 'indicator',
             align: 'right',
-            editable: true,
+            editable: false,
             render: (text, record) => {
 
               if( !moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) )
@@ -377,15 +377,25 @@ const TableReport = (props) => {
                     style={{
                       marginRight: '0'
                     }}>
-                      {
-                          text && text.length > 42 ?
-                          <Tooltip title={text}>
-                            <Ellipsis length={42}>{text}</Ellipsis>
-                          </Tooltip> :
-                            <div>{text}</div>
-                      }
+                      <Tooltip title={text}>
+                        <Ellipsis length={42}>{text}</Ellipsis>
+                      </Tooltip>
                   </Tag>
                   : null
+            }
+          },
+          {
+            title: t('user_notes'),
+            dataIndex: 'userNotes',
+            width: '10%',
+            align: 'rigth',
+            editable: true,
+            render: (text, _) => {
+              return text && text.length > 20 ?
+                    <Tooltip title={text}>
+                      <Ellipsis length={12}>{text}</Ellipsis>
+                    </Tooltip> :
+                      <div>{text}</div>
             }
           },
           {
@@ -496,7 +506,7 @@ const TableReport = (props) => {
         props.onValidated && props.onValidated(data)
       }
 
-      const onFullDayReportAdded = ({jobDescription, reportCode}, key) => {
+      const onFullDayReportAdded = ({userNotes, reportCode}, key) => {
 
         setFullDayReportVisible(false);
         setRecordToAdd(null);
@@ -513,7 +523,7 @@ const TableReport = (props) => {
             inTime: zeroTime, 
             outTime: zeroTime, 
             reportCode: reportCode, 
-            notes: jobDescription,
+            userNotes: userNotes,
             isFullDay: true
         }
 
@@ -521,7 +531,7 @@ const TableReport = (props) => {
 
       }
 
-      const addRecord = ({inTime, outTime, reportCode, notes, isFullDay}) => {
+      const addRecord = ({inTime, outTime, reportCode, userNotes, isFullDay}) => {
     
         setAddModalVisible(false);
     
@@ -543,7 +553,7 @@ const TableReport = (props) => {
             ...recordToAdd,
             key: addedPositions.key + 1,
             isAdded: true,
-            notes: notes,
+            userNotes: userNotes,
             entry: inTime,
             exit: outTime,
             stripId: newStripId,
@@ -577,8 +587,9 @@ const TableReport = (props) => {
             ...item,
             inTime: newItem.inTime, 
             outTime: newItem.outTime, 
+            rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('YYYY-MM-DD'),
             reportCode: newItem.reportCode, 
-            notes: newItem.notes,
+            userNotes: newItem.userNotes,
             isFullDay: true
           }
 

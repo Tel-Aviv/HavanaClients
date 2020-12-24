@@ -36,6 +36,7 @@ import { UPDATE_ITEM, SET_DIRECT_MANAGER } from "./redux/actionTypes";
 import TableReport from '@reports/TableReport';
 const YearReport = React.lazy( () => import('@reports/YearReport') )
 import DocsUploader from '@components/DocsUploader';
+const ValidationReport = React.lazy( () => import('@reports/ValidationsReport') )
 
 const TIME_FORMAT = 'HH:mm';
 
@@ -481,7 +482,7 @@ const Home = () => {
                                     "exit":"18:22",
                                     "required": "8:18",
                                     "accepted": "8:18",
-                                    "notes":"",
+                                    "indicator":"",
                                     "total":"7:28",
                                     "isAdded":false,
                                     "reportCode":""
@@ -530,7 +531,7 @@ const Home = () => {
             const workingDay = isWorkingDay(item);
             const hasTotal = isTotalled(item);
 
-            const isItemInvalid = workingDay && !hasTotal && !item.notes || item.notes.startsWith('*');
+            const isItemInvalid = workingDay && !hasTotal && !item.indicator || item.indicator.startsWith('*');
             if( isItemInvalid ) {
                 invalidItemIndex = index;
                 return true;
@@ -652,78 +653,6 @@ const Home = () => {
                             </Button>
                         </div>;
 
-        let columns = [
-            {
-                title: 'יום',
-                dataIndex: 'day',
-                align: 'right',
-                ellipsis: true,
-                editable: false,
-            }, {
-                title: 'יום בשבוע',
-                dataIndex: 'dayOfWeek',
-                align: 'right',
-                ellipsis: true,
-                editable: false,
-            }, {
-                title: 'כניסה',
-                dataIndex: 'entry',
-                align: 'right',
-                editable: true,
-                render: (text) => {
-                    let tagColor = 'green';
-                    if( text === '0:00' ) {
-                    tagColor = 'volcano'
-                    }
-                    return <Tag color={tagColor}
-                            style={{
-                                marginRight: '0'
-                            }}>
-                            {text}
-                            </Tag>
-                }          
-            }, {
-                title: 'יציאה',
-                dataIndex: 'exit',
-                align: 'right',
-                editable: true,
-                render: (text) => {
-                    let tagColor = 'green';
-                    if( text === '0:00' ) {
-                    tagColor = 'volcano'
-                    }
-                    return <Tag color={tagColor}
-                            style={{
-                                marginRight: '0'
-                            }}>
-                            {text}
-                            </Tag>
-                }
-            }, {
-                title: 'סיכום',
-                dataIndex: 'total',
-                align: 'right',
-                editable: false,
-            }, {
-                title: 'הערות',
-                dataIndex: 'notes',
-                align: 'right',
-                editable: true,
-                render: (text, _) => 
-                    ( text !== '' ) ?
-                        <Tag color="volcano"
-                            style={{
-                                marginRight: '0'
-                            }}>
-                            {text}
-                        </Tag>
-                        : null
-            }, {
-                title: '',
-                width: '3%',
-                dataIndex: 'operation'
-            }
-        ];
 
     const onReportDataChanged = async ( item, inouts ) => {
         item.isUpdated = true;
@@ -785,39 +714,12 @@ const Home = () => {
 
     return (
         <Content>
-             <Modal visible={validateModalOpen}
-                    closable={true}
-                    forceRender={true}
-                    onCancel={() => setValidateModalOpen(false)}
-                    footer={
-                        [<Button type='primary' 
-                                key={uniqid()}
-                                onClick={() => setValidateModalOpen(false)}>
-                                    {t('close')}
-                        </Button>]
-                    }>
-                 <div>
-                    <Title className='rtl'
-                        style={{
-                            marginTop: '12px'
-                        }}>
-                        {t('invalid_items')}
-                    </Title>
-                </div>
-                <Row>
-                    <Col>
-                        <Table style={{
-                                    direction: 'rtl'
-                                }}
-                                dataSource={invalidReportItems}
-                                columns={columns} 
-                                pagination={false}
-                                size="small"
-                                tableLayout='auto'
-                            />
-                    </Col>
-                </Row>
-            </Modal>
+            <Suspense fallback={<div>Loading Validation Report...</div>}>
+                <ValidationReport visible={validateModalOpen}
+                    onClosed={setValidateModalOpen}
+                    invalidItems={invalidReportItems}
+                />
+            </Suspense>
             <Row className='hvn-item-ltr' align={'middle'} type='flex'>
                 <Col span={10} >
                     {operations}
