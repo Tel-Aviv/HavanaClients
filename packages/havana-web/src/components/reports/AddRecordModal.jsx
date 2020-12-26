@@ -42,6 +42,7 @@ const AddRecordModal = (props) => {
         try {
             const values = await form.validateFields();
             form.resetFields();
+            values.isFullDay = false;
             props.onAddRecord && props.onAddRecord(values);
         } catch( err ) {
             console.error(err);
@@ -114,7 +115,7 @@ const AddRecordModal = (props) => {
                         }
                     </Select>
                 </Form.Item>
-                <Form.Item name='notes' required
+                <Form.Item name='userNotes' required
                         label={<span>{t('user_notes')}
                                     <Tooltip title={t('why_add_record')}>
                                         <QuestionCircleOutlined />

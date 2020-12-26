@@ -113,7 +113,7 @@ const TableReport = (props) => {
       }
     
       const hasSytemNotes = (record) => {
-        return record.indicator && record.indicator.startsWith('*');
+        return record.systemNotes && record.systemNotes.startsWith('*');
       }
     
       const isRowEditable = (record) => {
@@ -270,14 +270,10 @@ const TableReport = (props) => {
                         style={{
                           marginRight: '0'
                       }}>
-
                         { 
-                          
                             moment.isMoment(text) ?
                               text.format(format) : text
-                          
                         }
-
                       </Tag>
                       {
                         manuallyEditedTag(isEditedManually)
@@ -364,7 +360,7 @@ const TableReport = (props) => {
           },
           {
             title: t('system_notes'),
-            dataIndex: 'indicator',
+            dataIndex: 'systemNotes',
             align: 'right',
             editable: false,
             render: (text, record) => {
@@ -395,7 +391,9 @@ const TableReport = (props) => {
                     <Tooltip title={text}>
                       <Ellipsis length={12}>{text}</Ellipsis>
                     </Tooltip> :
-                      <div>{text}</div>
+                      <div style={{
+                        whiteSpace: 'nowrap'
+                      }}>{text}</div>
             }
           },
           {
@@ -551,6 +549,7 @@ const TableReport = (props) => {
 
         let newItem = {
             ...recordToAdd,
+            rdate: moment(recordToAdd.rdate, 'DD/MM/YYYY').startOf('day').format('YYYY-MM-DD'),
             key: addedPositions.key + 1,
             isAdded: true,
             userNotes: userNotes,

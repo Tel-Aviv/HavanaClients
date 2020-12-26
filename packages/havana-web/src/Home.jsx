@@ -271,14 +271,14 @@ const Home = () => {
                         month: month
                     }
                 })
-                setReportCodes(resp.data.items);
+                setReportCodes(resp.data.codes);
 
                 // Now process the report items
                 data = report.items.map( (item, index ) => {
         
                     // Map short description of the report code to the 'normal' description.
                     // At this moment, reportCodes is not yet updated to state, so we use resp.data.items instead of additional useEffect()
-                    const reportCode = resp.data.items.find( (el) => 
+                    const reportCode = resp.data.codes.find( (el) => 
                         el.ShortDescription === item.reportCode
                     );
                     const _reportCode = reportCode? reportCode.Description : item.reportCode;
@@ -482,7 +482,7 @@ const Home = () => {
                                     "exit":"18:22",
                                     "required": "8:18",
                                     "accepted": "8:18",
-                                    "indicator":"",
+                                    "systemNotes":"",
                                     "total":"7:28",
                                     "isAdded":false,
                                     "reportCode":""
@@ -531,7 +531,7 @@ const Home = () => {
             const workingDay = isWorkingDay(item);
             const hasTotal = isTotalled(item);
 
-            const isItemInvalid = workingDay && !hasTotal && !item.indicator || item.indicator.startsWith('*');
+            const isItemInvalid = workingDay && !hasTotal && !item.systemNotes || item.systemNotes.startsWith('*');
             if( isItemInvalid ) {
                 invalidItemIndex = index;
                 return true;

@@ -58,7 +58,7 @@ const columns = [{
       key: "submitted"
    },{
       title: "סימון",
-      dataIndex: "indicator",
+      dataIndex: "systemNotes",
       align: 'right',
       key: "comment",
       render: (text, _) => 
