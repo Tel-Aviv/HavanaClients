@@ -26,7 +26,7 @@ const translations = {
             "missing_out": "missing exit",
             "in": "In",
             "out": "Out",
-            "indicator": "Indicator",
+            "systemNotes": "Sys Notes",
             "user_notes": "Notes",
             "notes_for_report": "Notes for Report",
             "missing_notes": "Please provide notes",

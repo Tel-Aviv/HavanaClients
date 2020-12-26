@@ -69,7 +69,7 @@ const ValidationReport = ({visible, onClosed, invalidItems}) => {
             editable: false,
         }, {
             title: 'סימון',
-            dataIndex: 'indicator',
+            dataIndex: 'systemNotes',
             align: 'right',
             editable: true,
             render: (text, _) => 
