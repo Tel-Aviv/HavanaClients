@@ -1,14 +1,13 @@
 import React, { useState, useEffect, Suspense } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { ADD_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
 import { Table, Popconfirm, Modal, Form, Icon,
-        Tag, Row, Col, Tooltip, Typography } from 'antd';
-const { Text, Title } = Typography;        
+        Tag, Row, Col, Tooltip } from 'antd';
 import { PlusCircleTwoTone, 
   MinusCircleTwoTone,
   TagOutlined } 
 from '@ant-design/icons';
-import moment, { max } from 'moment';
+import moment from 'moment';
 import { useTranslation } from "react-i18next";
 
 import { ReportContext } from "./TableContext";
@@ -106,7 +105,7 @@ const TableReport = (props) => {
       }
     
       const isTotalled = (item) => {
-        const tokens = item.total.split(':');
+        const tokens = item.acceptedHours.split(':');
         const hours = parseInt(tokens[0]);
         const minutes = parseInt(tokens[1]);
         return item.total != '0:00';
@@ -321,14 +320,14 @@ const TableReport = (props) => {
           {
             title: 'נדרש',
             width: '6%',
-            dataIndex: 'required',
+            dataIndex: 'requiredHours',
             align: 'right',
             editable: false,
           },
           // {
           //   title: 'נחשב',
           //   width: '6%',
-          //   dataIndex: 'accepted',
+          //   dataIndex: 'acceptedHours',
           //   align: 'right',
           //   editable: false
           // },
@@ -443,8 +442,8 @@ const TableReport = (props) => {
         };
       });
 
-      if( props.employeKind === 1) { // Do not display 'required' columns for Contractors 
-        let index = columns.findIndex( item => item.dataIndex === 'required');
+      if( props.employeKind === 1) { // Do not display 'requiredHours' columns for Contractors 
+        let index = columns.findIndex( item => item.dataIndex === 'requiredHours');
         columns = [...columns.slice(0, index),
                   ...columns.slice(index+1)];
         // index = columns.findIndex( item => item.dataIndex === 'accepted');

@@ -1,0 +1,464 @@
+import React, { useEffect, useState, Suspense } from 'react';
+import { useDispatch } from 'react-redux';
+import { ADD_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
+import { Table, Popconfirm, Modal, Form, Icon,
+    Tag, Row, Col, Tooltip, Typography } from 'antd';
+import Ellipsis from 'ant-design-pro/lib/Ellipsis';
+import { PlusCircleTwoTone, 
+    MinusCircleTwoTone,
+    TagOutlined } 
+    from '@ant-design/icons';
+import { useTranslation } from "react-i18next";
+import { ReportContext } from "./TableContext";       
+import moment from 'moment'; 
+
+import EditIcons from './EditIcons';
+import AddRecordModal from './AddRecordModal';
+const FullDayReport = React.lazy( () => import('./FullDayReport') );
+//import FullDayReport from './FullDayReport';
+
+const format = 'HH:mm';
+
+const DailyTable = (props) => {
+
+    const [form] = Form.useForm()
+
+    const [tableData, setTableData] = useState([]);
+    const [reportCodes, setReportCodes] = useState([]);
+    const [manualUpdates, setManualUpdates] = useState([]);
+    const [editingKey, setEditingKey] = useState('')
+
+    // Full Day Report
+    const [fullDayReportVisible, setFullDayReportVisible] = useState(false); 
+
+    // States for adding new record
+    const [addModalVisible, setAddModalVisible] = useState(false)
+    const [recordToAdd, setRecordToAdd] = useState();
+
+    const { t } = useTranslation();
+
+    const dispatch = useDispatch();
+    const action_ItemAdded = (item, index) => ({
+        type: ADD_ITEM,
+        addIndex: index,
+        addItem: item
+      });  
+    
+      const action_ItemDeleted = (item, index) => ({
+        type: DELETE_ITEM,
+        deleteIndex: index,
+        deletedItem: item
+      })
+
+    useEffect( () => {
+
+        const _originalData = props.dataSource.map( record =>  {
+
+            const _isRowEditable = isRowEditable(record);
+
+            return { 
+                ...record, 
+                requireChange : _isRowEditable, // isRowEditable(record),
+                valid : _isRowEditable ? false : true, // (record.requireChange)?  false : true,
+                rdate : moment(record.rdate).format('DD/MM/YYYY')
+            }
+          })
+
+          setTableData(_originalData)
+       
+    }, [props.dataSource])
+
+    useEffect( () => {
+
+        if( props.reportCodes )
+            setReportCodes(props.reportCodes);
+    
+    }, [props.reportCodes])    
+        
+    useEffect( () => {
+
+        setManualUpdates(props.manualUpdates);
+    
+    }, [props.manualUpdates])
+
+    const isRowEditing = record => {
+        return record.key === editingKey
+    }
+
+    const handleAddRow = (record) => {
+        setRecordToAdd(record);
+        setAddModalVisible(true);
+    }
+
+    const manuallyEditedTag = ( isEditedManually ) => {
+
+        return isEditedManually ?
+                <Tooltip title={t('manual_tag')}>
+                  <Tag color='magenta'>
+                        <TagOutlined />
+                  </Tag> 
+                </Tooltip>: null
+    }
+
+    const hasSytemNotes = (record) => {
+        return record.systemNotes && record.systemNotes.startsWith('*');
+    }
+
+    const isTotalled = (item) => {
+        const tokens = item.acceptedHours.split(':');
+        const hours = parseInt(tokens[0]);
+        const minutes = parseInt(tokens[1]);
+        return item.total != '0:00';
+    }
+
+    const isRowEditable = (record) => {
+        return props.editable && (!isTotalled(record) && isWorkingDay(record) 
+                              || record.isAdded || record.isUpdated
+                              || isRecordUpdatedManually(record, 'entry') 
+                              || hasSytemNotes(record));
+    } 
+
+    const isRecordUpdatedManually = (record, columnName) => {
+
+        if( !manualUpdates )
+                return false;
+
+        let found = false;  
+        if( columnName === 'entry' ) {
+                found = manualUpdates.find( item => {
+                return item.Day == parseInt(record.day) && item.InOut === true
+                })
+        }  else if ( columnName === 'exit') {
+                found = manualUpdates.find( item => {
+                return item.Day == parseInt(record.day) && item.InOut === false
+                })
+        }
+    
+        return found ? true: false;
+    }
+
+    const onCancelAdd = () => 
+        setAddModalVisible(false);
+
+    const onCancelFullDayReport = () =>
+        setFullDayReportVisible(false);        
+
+    const onFullDayReportAdded = ({userNotes, reportCode}, key) => {
+
+        setFullDayReportVisible(false);
+        setRecordToAdd(null);
+
+        var zeroTime = moment().utcOffset(0);
+        zeroTime.set({
+            hour:0,
+            minute:0,
+            second:0,
+            millisecond:0
+        })
+
+        const item = {
+            inTime: zeroTime, 
+            outTime: zeroTime, 
+            reportCode: reportCode, 
+            userNotes: userNotes,
+            isFullDay: true
+        }
+
+        replaceRecord(key, item);
+
+    }
+
+    const addRecord = ({inTime, outTime, reportCode, userNotes, isFullDay}) => {
+    
+            setAddModalVisible(false);
+        
+            let addedPositions = data.reduce( (accu, current, index) => {
+                return {
+                key: Math.max(accu.key, parseInt(current.key)),
+                position: index
+                }      
+            },  {key:0,
+                position: 0})
+        
+            const index = data.findIndex( item => 
+                item.key == recordToAdd.key
+                ) + 1     
+
+            const newStripId = findMaxStripId(recordToAdd.day) + 1;
+
+            let newItem = {
+                ...recordToAdd,
+                rdate: moment(recordToAdd.rdate, 'DD/MM/YYYY').startOf('day').format('YYYY-MM-DD'),
+                key: addedPositions.key + 1,
+                isAdded: true,
+                userNotes: userNotes,
+                entry: inTime,
+                exit: outTime,
+                stripId: newStripId,
+                reportCode: reportCode,
+                isFullDay: isFullDay
+            }    
+            setRecordToAdd(null);  
+
+            newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format) 
+        
+            dispatch(
+                action_ItemAdded(newItem, index)
+            );  
+        
+            const newData = [
+                ...data.slice(0, index),
+                newItem,
+                ...data.slice(index)
+            ]    
+    
+        setData(newData);
+    }
+
+    const edit = (record) => {
+        form.setFieldsValue({
+          ...record
+        })
+        setEditingKey(record.key);
+      }
+
+    const editFullDay = (record) => {
+        setRecordToAdd(record);
+        setFullDayReportVisible(true);      
+    }
+
+    const cancel = () => {
+        setEditingKey('');
+    };
+
+    const save = async (key) => {
+    
+        try {
+
+          const row = await form.validateFields();
+          const entryTime = row.entry;
+          const exitTime = row.exit;
+
+          if( exitTime.isBefore(entryTime) ) {
+            form.setFields([{
+              name: 'entry',
+              value: entryTime,
+              errors: [t('exit_before_entry')]
+            }]);
+            return;
+          }
+
+          const inouts = [entryTime, exitTime]; 
+
+          const newData = [...data];
+          const index = newData.findIndex(item => key === item.key);
+          if (index > -1) {
+            const item = newData[index];
+            let newItem = {
+              ...item,
+              ...row,
+              rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('DD/MM/YYYY')
+            }
+            newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
+            newItem.valid = true;
+            
+            newData.splice(index, 1, newItem);
+            setEditingKey('');
+            props.onChange && props.onChange(newItem, inouts);        
+            setData(newData)
+          }
+
+        } catch( errorInfo ) {
+          console.error(errorInfo)
+        }
+
+      }    
+
+    const columns = [ {
+        title: '',
+        dataIndex: 'add',
+        align: 'center',
+        width: '6%',
+        editable: false,
+        render: (_, record) => 
+          props.editable ? (
+            <Row>
+              <Col span={12}>
+                <Tooltip title={t('add_record')}>
+                  <PlusCircleTwoTone
+                        onClick={() => handleAddRow(record)}/>
+                </Tooltip>      
+              </Col>
+              <Col span={12}>
+              {
+                  record.isAdded ? 
+                    <Popconfirm
+                      title={t('sure')}
+                      onConfirm={() => handleRemoveRecord(record)}>
+                        <MinusCircleTwoTone />  
+                    </Popconfirm>    
+                  : null
+              }
+              </Col>
+            </Row> 
+            ) : null
+      },
+        {
+        title: t('in'),
+        width: '15%',
+        dataIndex: 'entry',
+        align: 'right',
+        editable: true,
+        render: (text, record) => {
+            let tagColor = 'green';
+
+            return <Tag color={tagColor}
+                        style={{
+                        marginRight: '0'
+                    }}>
+                    {
+                        moment.isMoment(text) ?
+                            text.format(format) : text
+                    }
+                    </Tag>
+        }          
+    }, {
+        title: t('out'),
+        width: '15%',
+        dataIndex: 'exit',
+        align: 'right',
+        editable: true,
+        render: (text, record) => {
+            let tagColor = 'green';
+            
+            return <>
+                <Tag color={tagColor}
+                style={{
+                    marginRight: '0'
+                }}>
+                        {
+                            moment.isMoment(text) ?
+                                text.format(format) : text
+                        }
+                </Tag>
+            </>
+        }
+    }, {
+        title: t('report_code'),
+        width: '14%',
+        dataIndex: 'reportCode',
+        align: 'right',
+        editable: true,
+        render: (text, record) => {
+          
+          if( !moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) )
+            return null;
+
+          return <Row>
+            <Col>
+              <div style={{whiteSpace: 'nowrap'}}>
+                {text}
+              </div>
+            </Col>
+            <Col>
+            {
+              record.isFullDay ?
+                manuallyEditedTag(true) : null
+            }
+            </Col>
+          </Row>
+        }
+      },
+      {
+        title: t('system_notes'),
+        dataIndex: 'systemNotes',
+        align: 'right',
+        editable: false,
+        render: (text, record) => {
+
+          if( !moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) )
+            return null;
+
+          return ( text !== '' ) ?
+              <Tag color="blue"
+                style={{
+                  marginRight: '0'
+                }}>
+                  <Tooltip title={text}>
+                    <Ellipsis length={42}>{text}</Ellipsis>
+                  </Tooltip>
+              </Tag>
+              : null
+        }
+      },           {
+        title: t('user_notes'),
+        dataIndex: 'userNotes',
+        width: '10%',
+        align: 'rigth',
+        editable: true,
+        render: (text, _) => {
+          return text && text.length > 20 ?
+                <Tooltip title={text}>
+                  <Ellipsis length={12}>{text}</Ellipsis>
+                </Tooltip> :
+                  <div style={{
+                    whiteSpace: 'nowrap'
+                  }}>{text}</div>
+        }
+      }, {
+        title: '',
+        dataIndex: 'operation',
+        width: '10%',
+        render: (_, record) => {
+
+          return ( moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) // no edits for future
+                    && record.requireChange)? 
+            (<EditIcons 
+                record={record}
+                editing={isRowEditing(record)} 
+                disable={editingKey !== ''} 
+                edit={edit}
+                editFullDay={editFullDay}
+                save={save} 
+                cancel={cancel}
+            />) : null
+
+        }
+      },
+    ];
+
+    return <ReportContext.Provider value={ {
+        codes: reportCodes
+       }
+     }>
+        
+        <AddRecordModal 
+            visible={addModalVisible}
+            record = {recordToAdd}
+            onCancel={onCancelAdd}
+            onAddRecord={addRecord}
+        />
+
+        <Suspense fallback={<div>Loading FullDayReport...</div>}>
+            <FullDayReport visible={fullDayReportVisible}
+                          onCancel={onCancelFullDayReport}
+                          onOk={onFullDayReportAdded}
+                          record={recordToAdd}
+                    />
+        </Suspense>
+
+        <Form form={form} component={false}>
+            <Table 
+                {...props}
+                dataSource={tableData}
+                columns={columns}
+                tableLayout='auto'
+                bordered={false}  
+                rowClassName="editable-row"
+                size="small"
+            />
+        </Form>
+    </ReportContext.Provider>
+}
+
+export default DailyTable;
