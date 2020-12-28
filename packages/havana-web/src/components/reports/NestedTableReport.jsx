@@ -44,6 +44,32 @@ const NestedTableReport = (props) => {
         )
     }
 
+    const replaceRecord = (key, newItem) => {
+        const newData = [...originalData];
+        const index = newData.findIndex(item => key === item.key);
+        if (index > -1) {
+
+          const item = newData[index];
+          let replacedItem = {
+            ...item,
+            inTime: newItem.inTime, 
+            outTime: newItem.outTime, 
+            rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('YYYY-MM-DD'),
+            reportCode: newItem.reportCode, 
+            userNotes: newItem.userNotes,
+            isFullDay: true
+          }
+
+          replacedItem.valid = true;
+          newData.splice(index, 1, replacedItem);
+          setOriginalData(newData);
+          //setRecordToAdd(null);
+
+          props.onChange && props.onChange(replacedItem, null);
+        }
+      }
+
+
     const expandedRowRender = (record) => {
  
         const secondLevelData = getSecondLevelData(record.day)
@@ -52,6 +78,7 @@ const NestedTableReport = (props) => {
                          editable={true}
                          reportCodes={props.reportCodes}
                          manualUpdates={props.manualUpdates}
+                         onReplace={replaceRecord}
                 />
     }
 

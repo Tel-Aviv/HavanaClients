@@ -530,9 +530,12 @@ const Home = () => {
         const res = reportData.some( (item, index) => {
 
             const workingDay = isWorkingDay(item);
-            const hasTotal = isTotalled(item);
+            // const hasTotal = isTotalled(item);
 
-            const isItemInvalid = workingDay && !hasTotal && !item.systemNotes || item.systemNotes.startsWith('*');
+            const isItemInvalid = workingDay 
+                // && !hasTotal 
+                && !item.systemNotes 
+                || item.systemNotes.startsWith('*');
             if( isItemInvalid ) {
                 invalidItemIndex = index;
                 return true;
@@ -805,7 +808,7 @@ const Home = () => {
                                 onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
                                 editable={isReportEditable}
                             />        
-                            {/* <TableReport dataSource={reportData}
+                            <TableReport dataSource={reportData}
                                         employeKind={employeKind}
                                         reportCodes={reportCodes}
                                         daysOff={daysOff}
@@ -814,7 +817,7 @@ const Home = () => {
                                         scroll={{y: '400px'}}
                                         onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
                                         editable={isReportEditable}>
-                            </TableReport> */}
+                            </TableReport>
                         </TabPane>
                         <TabPane tab={<span>
                                         <FundOutlined />

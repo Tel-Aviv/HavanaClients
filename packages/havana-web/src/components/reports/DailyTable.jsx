@@ -13,6 +13,7 @@ import { ReportContext } from "./TableContext";
 import moment from 'moment'; 
 
 import EditIcons from './EditIcons';
+import EditableCell from './EditableCell';
 import AddRecordModal from './AddRecordModal';
 const FullDayReport = React.lazy( () => import('./FullDayReport') );
 //import FullDayReport from './FullDayReport';
@@ -163,7 +164,7 @@ const DailyTable = (props) => {
             isFullDay: true
         }
 
-        replaceRecord(key, item);
+        props.onReplace(key, item);
 
     }
 
@@ -206,9 +207,9 @@ const DailyTable = (props) => {
             );  
         
             const newData = [
-                ...data.slice(0, index),
+                ...tableData.slice(0, index),
                 newItem,
-                ...data.slice(index)
+                ...tableData.slice(index)
             ]    
     
         setData(newData);
@@ -249,7 +250,7 @@ const DailyTable = (props) => {
 
           const inouts = [entryTime, exitTime]; 
 
-          const newData = [...data];
+          const newData = [...tableData];
           const index = newData.findIndex(item => key === item.key);
           if (index > -1) {
             const item = newData[index];
@@ -271,9 +272,15 @@ const DailyTable = (props) => {
           console.error(errorInfo)
         }
 
-      }    
+    }
+    
+    const components = {
+        body: {
+          cell: EditableCell,
+        },
+    };
 
-    const columns = [ {
+    let columns = [{
         title: '',
         dataIndex: 'add',
         align: 'center',
@@ -426,6 +433,42 @@ const DailyTable = (props) => {
       },
     ];
 
+    columns = columns.map(col => {
+        if (!col.editable) 
+            return col;
+
+        return {
+            ...col,
+            onCell: (record, rowIndex) => {
+        
+                return {
+                record,
+                inputType: getInputType(col.dataIndex),
+                dataIndex: col.dataIndex,
+                title: col.title,
+                rowEditing: isRowEditing(record),
+            }}
+        };            
+    })
+
+    const getInputType = (type) => {
+        const controls = {
+          entry: function () {
+            return 'time';
+          },
+          exit: function () {
+            return 'time';
+          },
+          reportCode: function () {
+            return 'select';
+          },
+          default: function () {
+            return 'text';
+          }
+        };
+        return (controls[type] || controls['default'])();
+    }     
+
     return <ReportContext.Provider value={ {
         codes: reportCodes
        }
@@ -448,12 +491,13 @@ const DailyTable = (props) => {
 
         <Form form={form} component={false}>
             <Table style={{
-                marginRight: "38px",
-                marginLeft: "8px"
-            }}
+                    marginRight: "38px",
+                    marginLeft: "8px"
+                }}
                 pagination={false}
                 dataSource={tableData}
                 columns={columns}
+                components={components}
                 tableLayout='auto'
                 bordered={false}  
                 rowClassName="editable-row"
