@@ -264,7 +264,7 @@ const DailyTable = (props) => {
             
             newData.splice(index, 1, newItem);
             setEditingKey('');
-            props.onChange && props.onChange(newItem, inouts);        
+            props.onSave && props.onSave(newItem, inouts);        
             setData(newData)
           }
 

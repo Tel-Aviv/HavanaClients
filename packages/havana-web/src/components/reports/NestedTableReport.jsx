@@ -1,6 +1,5 @@
 import React, { useEffect, useState} from 'react';
-import { Table, Popconfirm, Modal, Form, Icon,
-    Tag, Row, Col, Tooltip, Typography } from 'antd';
+import { Table, Tag, Tooltip } from 'antd';
 import { DownCircleTwoTone, 
     UpCircleTwoTone } 
     from '@ant-design/icons';    
@@ -44,6 +43,34 @@ const NestedTableReport = (props) => {
         )
     }
 
+    const saveRecord = async (record, inouts) => {
+    
+        try {
+
+          const newData = [...originalData];
+          const index = newData.findIndex(item => record.key === item.key);
+          if (index > -1) {
+            const item = newData[index];
+            let newItem = {
+              ...item,
+              ...record,
+              rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('DD/MM/YYYY')
+            }
+            newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
+            newItem.valid = true;
+            
+            newData.splice(index, 1, newItem);
+            props.onChange && props.onChange(newItem, inouts);  
+            setOriginalData(newData)
+          }
+
+        } catch( errorInfo ) {
+          console.error(errorInfo)
+        }
+
+      }
+
+
     const replaceRecord = (key, newItem) => {
         const newData = [...originalData];
         const index = newData.findIndex(item => key === item.key);
@@ -78,6 +105,7 @@ const NestedTableReport = (props) => {
                          editable={true}
                          reportCodes={props.reportCodes}
                          manualUpdates={props.manualUpdates}
+                         onSave={saveRecord}
                          onReplace={replaceRecord}
                 />
     }

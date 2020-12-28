@@ -808,7 +808,7 @@ const Home = () => {
                                 onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
                                 editable={isReportEditable}
                             />        
-                            <TableReport dataSource={reportData}
+                            {/* <TableReport dataSource={reportData}
                                         employeKind={employeKind}
                                         reportCodes={reportCodes}
                                         daysOff={daysOff}
@@ -817,7 +817,7 @@ const Home = () => {
                                         scroll={{y: '400px'}}
                                         onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
                                         editable={isReportEditable}>
-                            </TableReport>
+                            </TableReport> */}
                         </TabPane>
                         <TabPane tab={<span>
                                         <FundOutlined />
