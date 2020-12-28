@@ -53,6 +53,10 @@ const NestedTableReport = (props) => {
                 />
     }
 
+    const isInPast = (record) => {
+        return moment(record.rdate, 'DD/MM/YYYY').isAfter(moment());
+    }
+
     let columns = [{
         title: 'יום',
         width: '4%',
@@ -62,35 +66,42 @@ const NestedTableReport = (props) => {
         editable: false,
     }, {
         title: 'יום בשבוע',
-        width: '10%',
+        // width: '10%',
         dataIndex: 'dayOfWeek',
         align: 'center',
         ellipsis: true,
         editable: false,
     }, {
         title: 'נדרש',
-        width: '6%',
+        // width: '6%',
         dataIndex: 'requiredHours',
         align: 'right',
         editable: false,
+        render: (text, record) => (
+           isInPast(record) ? null 
+                : <span>{text}</span>
+        )
     }, {
         title: 'נחשב',
-        width: '6%',
+        // width: '6%',
         dataIndex: 'acceptedHours',
         align: 'right',
-        editable: false
+        editable: false,
+        render: (text, record) => (
+           isInPast(record) ? null 
+                : <span>{text}</span>
+        )
     }, {
         title: t('system_notes'),
-        width: '6%',
+        // width: '6%',
         dataIndex: 'systemNotes',
         align: 'right',
         editable: false,
-            render: (text, record) => {
+        render: (text, record) => (
 
-              if( !moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) )
-                return null;
-
-              return ( text !== '' ) ?
+              isInPast(record) ? null 
+                :
+              ( text !== '' ) ?
                   <Tag color="blue"
                     style={{
                       marginRight: '0'
@@ -99,9 +110,10 @@ const NestedTableReport = (props) => {
                         <Ellipsis length={42}>{text}</Ellipsis>
                       </Tooltip>
                   </Tag>
-                  : null
-            }
-          },  ];
+                  : null 
+        )
+    }
+    ];
 
     return  <Table
                 {...props}
