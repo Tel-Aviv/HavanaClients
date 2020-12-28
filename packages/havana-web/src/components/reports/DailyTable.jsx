@@ -58,9 +58,8 @@ const DailyTable = (props) => {
 
             return { 
                 ...record, 
-                requireChange : _isRowEditable, // isRowEditable(record),
-                valid : _isRowEditable ? false : true, // (record.requireChange)?  false : true,
-                rdate : moment(record.rdate).format('DD/MM/YYYY')
+                requireChange : _isRowEditable, 
+                valid : _isRowEditable ? false : true
             }
           })
 
@@ -448,8 +447,11 @@ const DailyTable = (props) => {
         </Suspense>
 
         <Form form={form} component={false}>
-            <Table 
-                {...props}
+            <Table style={{
+                marginRight: "38px",
+                marginLeft: "8px"
+            }}
+                pagination={false}
                 dataSource={tableData}
                 columns={columns}
                 tableLayout='auto'

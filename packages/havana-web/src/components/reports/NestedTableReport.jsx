@@ -1,6 +1,9 @@
 import React, { useEffect, useState} from 'react';
 import { Table, Popconfirm, Modal, Form, Icon,
     Tag, Row, Col, Tooltip, Typography } from 'antd';
+import { DownCircleTwoTone, 
+    UpCircleTwoTone } 
+    from '@ant-design/icons';    
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 import moment from 'moment';
 import { useTranslation } from "react-i18next";
@@ -46,7 +49,6 @@ const NestedTableReport = (props) => {
         const secondLevelData = getSecondLevelData(record.day)
 
         return <DailyTable dataSource={secondLevelData}
-                         pagination={false}
                          editable={true}
                          reportCodes={props.reportCodes}
                          manualUpdates={props.manualUpdates}
@@ -58,21 +60,21 @@ const NestedTableReport = (props) => {
     }
 
     let columns = [{
-        title: 'יום',
+        title: t('day'),
         width: '4%',
         dataIndex: 'day',
         align: 'right',
         ellipsis: true,
         editable: false,
     }, {
-        title: 'יום בשבוע',
+        title: t('day_of_week'),
         // width: '10%',
         dataIndex: 'dayOfWeek',
         align: 'center',
         ellipsis: true,
         editable: false,
     }, {
-        title: 'נדרש',
+        title: t('required'),
         // width: '6%',
         dataIndex: 'requiredHours',
         align: 'right',
@@ -82,7 +84,7 @@ const NestedTableReport = (props) => {
                 : <span>{text}</span>
         )
     }, {
-        title: 'נחשב',
+        title: t('accepted'),
         // width: '6%',
         dataIndex: 'acceptedHours',
         align: 'right',
@@ -124,8 +126,16 @@ const NestedTableReport = (props) => {
                 }}
                 tableLayout='auto'
                 columns={columns}
-                expandable={{ expandedRowRender,
-                    indentSize: 100 }}
+                expandable={{ 
+                    expandedRowRender,
+                    indentSize: 100,
+                    expandIcon: ({ expanded, onExpand, record }) => 
+                    expanded ? (
+                        <UpCircleTwoTone onClick={e => onExpand(record, e)} />
+                      ) : (
+                        <DownCircleTwoTone onClick={e => onExpand(record, e)} />
+                      ),
+                    rowExpandable: record => !isInPast(record) }}
                 dataSource={firstLevelData}
                 pagination={false}
                 size="small"

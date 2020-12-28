@@ -25,9 +25,9 @@ export default ({record, editing, disable, edit, editFullDay, save, cancel}) => 
                     className='rtl'>
           <CloseCircleTwoTone twoToneColor="#eb2f96" style={iconStyle} />
         </Popconfirm>
-            <CheckCircleTwoTone twoToneColor="#52c41a"
-              onClick={() => save(record.key)}
-              style={iconStyle} />
+        <CheckCircleTwoTone twoToneColor="#52c41a"
+                    onClick={() => save(record.key)}
+                    style={iconStyle} />
       </span>
     ) : (
           disable ?
