@@ -390,9 +390,7 @@ const DailyTable = (props) => {
                 style={{
                   marginRight: '0'
                 }}>
-                  <Tooltip title={text}>
-                    <Ellipsis length={42}>{text}</Ellipsis>
-                  </Tooltip>
+                {text}
               </Tag>
               : null
         }

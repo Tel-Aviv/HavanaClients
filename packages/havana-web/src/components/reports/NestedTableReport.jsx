@@ -1,9 +1,10 @@
 import React, { useEffect, useState} from 'react';
 import { Table, Tag, Tooltip } from 'antd';
 import { DownCircleTwoTone, 
-    UpCircleTwoTone } 
+    UpCircleTwoTone,
+    CheckCircleTwoTone,
+    ExclamationCircleTwoTone } 
     from '@ant-design/icons';    
-import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 import moment from 'moment';
 import { useTranslation } from "react-i18next";
 
@@ -148,14 +149,16 @@ const NestedTableReport = (props) => {
            isInPast(record) ? null 
                 : <span>{text}</span>
         )
-    }, {
+    }, 
+
+    {
         title: t('system_notes'),
         // width: '6%',
         dataIndex: 'systemNotes',
         align: 'right',
         editable: false,
         render: (text, record) => (
-
+            
               isInPast(record) ? null 
                 :
               ( text !== '' ) ?
@@ -163,13 +166,31 @@ const NestedTableReport = (props) => {
                     style={{
                       marginRight: '0'
                     }}>
-                      <Tooltip title={text}>
-                        <Ellipsis length={42}>{text}</Ellipsis>
-                      </Tooltip>
+                    {text}
                   </Tag>
                   : null 
         )
-    }
+    },
+    {
+        title: '',
+        width: '1%',
+        key: 'state',
+        render: (text, record) => {
+            if( record.systemNotes )
+                return (
+                     <Tooltip title={t('day_status_invalid')}> 
+                        <ExclamationCircleTwoTone twoToneColor="#eb2f96"/>
+                    </Tooltip>
+                )
+            else {
+                return (
+                    <Tooltip title={t('day_status_ok')}>
+                        <CheckCircleTwoTone twoToneColor="#52c41a" />
+                    </Tooltip>
+                )
+            }
+        },
+    },     
     ];
 
     return  <Table
