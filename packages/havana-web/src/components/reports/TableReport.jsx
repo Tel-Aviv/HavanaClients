@@ -236,7 +236,7 @@ const TableReport = (props) => {
               ) : null
         },
           {
-            title: 'יום',
+            title: t('day'),
             width: '4%',
             dataIndex: 'day',
             align: 'right',
@@ -244,7 +244,7 @@ const TableReport = (props) => {
             editable: false,
           },
           {
-            title: 'יום בשבוע',
+            title: t('day_of_week'),
             width: '10%',
             dataIndex: 'dayOfWeek',
             align: 'center',
@@ -310,27 +310,27 @@ const TableReport = (props) => {
                 </>                  
             }
           },
+          // {
+          //   title: 'סיכום',
+          //   width: '6%',
+          //   dataIndex: 'total',
+          //   align: 'right',
+          //   editable: false,
+          // },
           {
-            title: 'סיכום',
-            width: '6%',
-            dataIndex: 'total',
-            align: 'right',
-            editable: false,
-          },
-          {
-            title: 'נדרש',
+            title: t('required'),
             width: '6%',
             dataIndex: 'requiredHours',
             align: 'right',
             editable: false,
           },
-          // {
-          //   title: 'נחשב',
-          //   width: '6%',
-          //   dataIndex: 'acceptedHours',
-          //   align: 'right',
-          //   editable: false
-          // },
+          {
+            title: t('accepted'),
+            width: '6%',
+            dataIndex: 'acceptedHours',
+            align: 'right',
+            editable: false
+          },
           {
             title: t('report_code'),
             width: '14%',

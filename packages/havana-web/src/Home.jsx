@@ -35,6 +35,7 @@ import { UPDATE_ITEM, SET_DIRECT_MANAGER } from "./redux/actionTypes";
 
 import TableReport from '@reports/TableReport';
 import NestedTableReport from "@reports/NestedTableReport";
+import CalendarReport from '@reports/CalendarReport';
 const YearReport = React.lazy( () => import('@reports/YearReport') )
 import DocsUploader from '@components/DocsUploader';
 const ValidationReport = React.lazy( () => import('@reports/ValidationsReport') )
@@ -798,7 +799,13 @@ const Home = () => {
                                     </span>
                                 }
                                 key="1">
-                            <NestedTableReport 
+                            <CalendarReport 
+                                dataSource={reportData}
+                                employeKind={employeKind}
+                                reportCodes={reportCodes} 
+                                manualUpdates={manualUpdates}
+                            />
+                            {/* <NestedTableReport 
                                 dataSource={reportData}
                                 employeKind={employeKind}
                                 reportCodes={reportCodes}
@@ -807,7 +814,7 @@ const Home = () => {
                                 scroll={{y: '400px'}}
                                 onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
                                 editable={isReportEditable}
-                            />        
+                            />         */}
                             {/* <TableReport dataSource={reportData}
                                         employeKind={employeKind}
                                         reportCodes={reportCodes}

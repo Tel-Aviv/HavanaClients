@@ -212,6 +212,10 @@ margin: 12px;
   background-color: rgb(252, 246, 219) !important
 }
 
+.ant-table-thead > tr > th {
+  background-color: transparent !important;
+}
+
 /* table adaptation for print */
 @media print {
   div.pdf-container {
