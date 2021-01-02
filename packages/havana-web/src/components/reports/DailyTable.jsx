@@ -111,6 +111,21 @@ const DailyTable = (props) => {
         return item.total != '0:00';
     }
 
+    const isWorkingDay = (item) => {
+    
+        const itemDate = moment(item.rdate);
+    
+        const index = daysOff.findIndex( dayOff => 
+             dayOff.getDate() === itemDate.date() &&
+             dayOff.getMonth() === itemDate.month() &&
+             dayOff.getFullYear() === itemDate.year()
+        );
+    
+        return index !== -1 
+          ? false:   
+          !(itemDate.day() == 5  || itemDate.day() == 6);
+      }
+
     const isRowEditable = (record) => {
         return props.editable && (!isTotalled(record) && isWorkingDay(record) 
                               || record.isAdded || record.isUpdated
