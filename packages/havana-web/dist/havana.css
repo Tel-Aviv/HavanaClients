@@ -216,6 +216,22 @@ margin: 12px;
   background-color: transparent !important;
 }
 
+
+/* calendar styles */
+.calendar-events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.calendar-events .ant-badge-status {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+
 /* table adaptation for print */
 @media print {
   div.pdf-container {

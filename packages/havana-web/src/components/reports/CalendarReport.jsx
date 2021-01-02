@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar, Row, Col, Tag,
-    Modal } from 'antd';
+    Modal, Badge, Tooltip } from 'antd';
 import moment from 'moment';
+import { useTranslation } from "react-i18next";
 
 const DailyTable = React.lazy( () => import('./DailyTable') );
 
@@ -11,6 +12,8 @@ const CalendarReport = (props) => {
     const [firstLevelData, setFirstLevelData] = useState([]);
     const [dailyReportVisible, setDailyReportVisible] = useState(false);
     const [secondLevelData, setSecondLevelData] = useState([]);
+
+    const { t } = useTranslation();
 
     useEffect( () => {
 
@@ -35,25 +38,49 @@ const CalendarReport = (props) => {
     }, [props.dataSource])
 
     const onSelect = value => {
+
+        // No edits for the future
+        if( value.isAfter(moment()) )
+            return;
+
         const day = value.date();
         setSecondLevelData(getSecondLevelData(day));
         setDailyReportVisible(true);
     }
 
     const dateCellRender = (date) => {
-
+       
         const originalItem = firstLevelData.find( item => item.rdate.isSame(date, 'day') )
+
+        if( !originalItem )  
+            return null;
 
         return <Row>
             <Col>
             {
-                ( originalItem ) ?
-                    <Tag color='magenta'
-                        style={{
-                            marginRight: '0'
-                        }}>
-                        {originalItem.systemNotes}
-                    </Tag>
+                ( !isInPast(originalItem) ) ?
+                    <ul className='calendar-events'>
+                        <li>
+                            <Tooltip title={t('required')}>
+                                <Badge status='success' text={t('required') + ': ' + originalItem.requiredHours } />
+                            </Tooltip>
+                        </li>
+                        <li>
+                            <Tooltip title={t('accepted')}>
+                                <Badge status='success' text={t('accepted') + ': ' + originalItem.acceptedHours} />
+                            </Tooltip>
+                        </li>
+                        <li>
+                            <Tag color='magenta'
+                                style={{
+                                    marginRight: '0',
+                                    width: '100%',
+                                    textAlign: 'start'
+                                }}>
+                                {originalItem.systemNotes}
+                            </Tag>
+                        </li>
+                    </ul>
                 : null
             }
             </Col>
@@ -61,9 +88,18 @@ const CalendarReport = (props) => {
     }
 
     const getSecondLevelData = (day) => {
-        return originalData.filter( item =>
+
+        const dailyData =  originalData.filter( item =>
             parseInt(item.day) === day
         )
+        
+        return ( dailyData.length === 1 ) ?
+            dailyData :
+            dailyData.filter( item => parseInt(item.stripId) > 1 )
+    }
+
+    const isInPast = (record) => {
+        return moment(record.rdate, 'DD/MM/YYYY').isAfter(moment());
     }
 
     const saveRecord = async (record, inouts) => {
@@ -120,7 +156,10 @@ const CalendarReport = (props) => {
 
     return (
         <>
-            <Modal visible={dailyReportVisible}>
+            <Modal visible={dailyReportVisible}
+                closable={true} 
+                className='rtl'
+                onCancel={ () => setDailyReportVisible(false) }>
                 <DailyTable 
                     dataSource={secondLevelData}
                     reportCodes={props.reportCodes}
@@ -132,7 +171,10 @@ const CalendarReport = (props) => {
 
             {
                 originalData.length > 0 ?
-                <Calendar 
+                <Calendar
+                    style={{
+                        margin: '12px'
+                    }}
                     mode='month'
                     onSelect={onSelect}
                     dateCellRender={dateCellRender}
