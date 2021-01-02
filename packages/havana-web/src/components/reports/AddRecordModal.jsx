@@ -4,7 +4,8 @@ import { Modal, Form, Button, TimePicker,
 const { Option } = Select;
 const { Title } = Typography;
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { useTranslation } from "react-i18next";   
+import { useTranslation } from "react-i18next";
+import moment from 'moment';
 import uniqid from 'uniqid';
 
 const format = 'HH:mm';
@@ -25,12 +26,10 @@ const tailLayout = {
 
 import { ReportContext } from "./TableContext";
 
-const AddRecordModal = (props) => {
+const AddRecordModal = ({visible, record, onCancel, onAddRecord}) => {
 
     const reportContext = useContext(ReportContext);
     const { t } = useTranslation();
-
-    const visible = props.visible;
 
     const [form] = Form.useForm();
 
@@ -43,7 +42,7 @@ const AddRecordModal = (props) => {
             const values = await form.validateFields();
             form.resetFields();
             values.isFullDay = false;
-            props.onAddRecord && props.onAddRecord(values);
+            onAddRecord && onAddRecord(values);
         } catch( err ) {
             console.error(err);
         } 
@@ -52,7 +51,7 @@ const AddRecordModal = (props) => {
     return (
         <Modal visible={visible}
               closable={true}   
-              onCancel={props.onCancel}
+              onCancel={onCancel}
               className='rtl'
               onOk={onOk}>
             <Title level={3} className='rtl'
@@ -61,8 +60,11 @@ const AddRecordModal = (props) => {
                 }}>
                 {t('add_record')}{ t('to_day')} 
                 { 
-                    props.record ?  
-                    props.record.rdate : null
+                    record ?  
+                        moment.isMoment(record.rdate) ? 
+                            record.rdate.format('DD/MM/YYYY') :
+                            record.rdate
+                    : null
                 }
             </Title> 
 
