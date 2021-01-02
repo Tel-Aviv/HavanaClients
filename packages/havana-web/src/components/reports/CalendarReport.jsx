@@ -176,6 +176,7 @@ const CalendarReport = (props) => {
                 <DailyTable 
                     dataSource={secondLevelData}
                     reportCodes={props.reportCodes}
+                    daysOff={props.daysOff}
                     manualUpdates={props.manualUpdates}
                     editable={true}
                     onSave={saveRecord}

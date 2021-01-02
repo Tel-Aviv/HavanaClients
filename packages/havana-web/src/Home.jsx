@@ -802,7 +802,8 @@ const Home = () => {
                             <CalendarReport 
                                 dataSource={reportData}
                                 employeKind={employeKind}
-                                reportCodes={reportCodes} 
+                                reportCodes={reportCodes}
+                                daysOff={daysOff}
                                 manualUpdates={manualUpdates}
                             />
                             {/* <NestedTableReport 

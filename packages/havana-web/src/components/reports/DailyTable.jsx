@@ -115,7 +115,7 @@ const DailyTable = (props) => {
     
         const itemDate = moment(item.rdate);
     
-        const index = daysOff.findIndex( dayOff => 
+        const index = props.daysOff.findIndex( dayOff => 
              dayOff.getDate() === itemDate.date() &&
              dayOff.getMonth() === itemDate.month() &&
              dayOff.getFullYear() === itemDate.year()
