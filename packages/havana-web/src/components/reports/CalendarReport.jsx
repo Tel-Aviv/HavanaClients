@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 
 const DailyTable = React.lazy( () => import('./DailyTable') );
 
+const format = 'HH:mm';
+
 const CalendarReport = (props) => {
 
     const [originalData, setOriginalData] = useState([]);
