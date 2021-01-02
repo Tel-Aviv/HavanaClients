@@ -51,7 +51,7 @@ body {
 }   
 
 .rtl {
-direction: rtl;
+  direction: rtl;
 }
 
 .ltr {
@@ -309,28 +309,28 @@ p {
 }
 
 @keyframes move {
-0% {left: 0;}
-50% {left: 100%; -webkit-transform: rotate(450deg); width: 150px; height: 150px;}
-75% {left: 100%; -webkit-transform: rotate(450deg); width: 150px; height: 150px;}
-100% {right: 100%;}
+  0% {left: 0;}
+  50% {left: 100%; -webkit-transform: rotate(450deg); width: 150px; height: 150px;}
+  75% {left: 100%; -webkit-transform: rotate(450deg); width: 150px; height: 150px;}
+  100% {right: 100%;}
 } 
 
 .ant-modal-title {
-margin: 0 auto;
-width: 20%;
+  margin: 0 auto;
+  width: 20%;
 
-color: rgba(0, 0, 0, 0.85);
-font-weight: 500;
-font-size: 16px;
-line-height: 22px;
-word-wrap: break-word;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 22px;
+  word-wrap: break-word;
 }  
 
 .ant-modal-footer {
-display: flex;
-padding: 10px 16px;
-background: transparent;
-border-top: 1px solid #e8e8e8;
-border-radius: 0 0 4px 4px;
-direction: ltr;
+  display: flex;
+  padding: 10px 16px;
+  background: transparent;
+  border-top: 1px solid #e8e8e8;
+  border-radius: 0 0 4px 4px;
+  direction: ltr;
 }

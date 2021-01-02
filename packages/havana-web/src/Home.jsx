@@ -805,7 +805,7 @@ const Home = () => {
                                 reportCodes={reportCodes} 
                                 manualUpdates={manualUpdates}
                             />
-                            <NestedTableReport 
+                            {/* <NestedTableReport 
                                 dataSource={reportData}
                                 employeKind={employeKind}
                                 reportCodes={reportCodes}
@@ -814,7 +814,7 @@ const Home = () => {
                                 scroll={{y: '400px'}}
                                 onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
                                 editable={isReportEditable}
-                            />        
+                            />         */}
                             {/* <TableReport dataSource={reportData}
                                         employeKind={employeKind}
                                         reportCodes={reportCodes}

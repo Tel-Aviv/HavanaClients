@@ -103,7 +103,8 @@ const translations = {
             "job_description_tooltip": "This text will be attached to a daily report",
             "job_description_error": "What do you did on this day?",
             "day_status_ok": "Record is valid",
-            "day_status_invalid": "Record is invalid"
+            "day_status_invalid": "Record is invalid",
+            "inout_details_caption": "Entrance/Exit details for "
         }
     },
     he: {
@@ -210,7 +211,8 @@ const translations = {
             "job_description_tooltip": "הפירוט ייצורף לדוח יומי",
             "job_description_error": "מה עשית ביום זה?",
             "day_status_ok": "רישום תקין",
-            "day_status_invalid": "רישום צריך תיקון"    
+            "day_status_invalid": "רישום צריך תיקון",
+            "inout_details_caption": " פירוט כניסות ויציאות לתאריך"   
         }
     }
 }    

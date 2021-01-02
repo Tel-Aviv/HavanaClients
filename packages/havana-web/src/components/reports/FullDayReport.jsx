@@ -9,7 +9,8 @@ const { Text, Title } = Typography;
 import {
     QuestionCircleOutlined
 } from '@ant-design/icons';
-import { useTranslation } from "react-i18next"; 
+import { useTranslation } from "react-i18next";
+import moment from 'moment';
 import uniqid from 'uniqid';
 
 import { ReportContext } from "./TableContext";
@@ -66,7 +67,14 @@ const FullDayReport = ({visible, onOk, onCancel, record}) => {
                 style={{
                     marginTop: '12px'
                 }}>
-                {t('report_full_day')} { record? record.rdate: ''}
+                {t('report_full_day')} 
+                { 
+                    record ? 
+                        moment.isMoment(record.rdate) ? 
+                            record.rdate.format('DD/MM/YYYY') :
+                            record.rdate
+                        : null
+                }
             </Title>
             <Form {...layout} form={form}
                     size='small'>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar, Row, Col, Tag,
-    Modal, Badge, Tooltip } from 'antd';
+    Modal, Tooltip } from 'antd';
 import moment from 'moment';
 import { useTranslation } from "react-i18next";
 
@@ -12,6 +12,7 @@ const CalendarReport = (props) => {
     const [firstLevelData, setFirstLevelData] = useState([]);
     const [dailyReportVisible, setDailyReportVisible] = useState(false);
     const [secondLevelData, setSecondLevelData] = useState([]);
+    const [selectedDate, setSelectedDate] = useState();
 
     const { t } = useTranslation();
 
@@ -46,6 +47,12 @@ const CalendarReport = (props) => {
         const day = value.date();
         setSecondLevelData(getSecondLevelData(day));
         setDailyReportVisible(true);
+        setSelectedDate(value.format('DD/MM/YYYY'))
+    }
+
+    const onDailyReportClosed = () => {
+        setSelectedDate(null);
+        setDailyReportVisible(false);
     }
 
     const dateCellRender = (date) => {
@@ -62,23 +69,27 @@ const CalendarReport = (props) => {
                     <ul className='calendar-events'>
                         <li>
                             <Tooltip title={t('required')}>
-                                <Badge status='success' text={t('required') + ': ' + originalItem.requiredHours } />
+                                { t('required') + ': ' + originalItem.requiredHours }
                             </Tooltip>
                         </li>
                         <li>
                             <Tooltip title={t('accepted')}>
-                                <Badge status='success' text={t('accepted') + ': ' + originalItem.acceptedHours} />
+                                { t('accepted') + ': ' + originalItem.acceptedHours }
                             </Tooltip>
                         </li>
-                        <li>
-                            <Tag color='magenta'
-                                style={{
-                                    marginRight: '0',
-                                    width: '100%',
-                                    textAlign: 'start'
-                                }}>
-                                {originalItem.systemNotes}
-                            </Tag>
+                        <li style={{
+                            float: 'right'
+                        }}>
+                            { originalItem.systemNotes ? 
+                                <Tag color='magenta'
+                                    style={{
+                                        marginRight: '0',
+                                        width: '100%',
+                                        textAlign: 'start'
+                                    }}>
+                                    {originalItem.systemNotes}
+                                </Tag> : null
+                            }
                         </li>
                     </ul>
                 : null
@@ -156,10 +167,12 @@ const CalendarReport = (props) => {
 
     return (
         <>
-            <Modal visible={dailyReportVisible}
+            <Modal title={selectedDate}
+                visible={dailyReportVisible}
+                width='64%'
                 closable={true} 
                 className='rtl'
-                onCancel={ () => setDailyReportVisible(false) }>
+                onCancel={ () => onDailyReportClosed() }>
                 <DailyTable 
                     dataSource={secondLevelData}
                     reportCodes={props.reportCodes}
