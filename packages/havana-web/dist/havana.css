@@ -232,6 +232,10 @@ margin: 12px;
   font-size: 12px;
 }
 
+.calendar-date {
+  color: rgb(24, 144, 255)
+}
+
 /* table adaptation for print */
 @media print {
   div.pdf-container {

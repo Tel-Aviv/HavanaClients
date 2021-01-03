@@ -57,14 +57,20 @@ const CalendarReport = (props) => {
         setDailyReportVisible(false);
     }
 
-    const dateCellRender = (date) => {
-       
+    const dateFullCellRender = (date) => {
         const originalItem = firstLevelData.find( item => item.rdate.isSame(date, 'day') )
 
         if( !originalItem )  
             return null;
 
-        return <Row>
+        return <div className='ant-picker-cell-inner ant-picker-calendar-date'>
+            <div className='ant-picker-calendar-date-value'>
+                <span className='calendar-date'>
+                    {date.date()}
+                </span>
+            </div>
+            <div className='ant-picker-calendar-date-content'>
+        <Row>
             <Col>
             {
                 ( !isInPast(originalItem) ) ?
@@ -98,6 +104,8 @@ const CalendarReport = (props) => {
             }
             </Col>
         </Row>
+        </div>
+        </div>   
     }
 
     const getSecondLevelData = (day) => {
@@ -174,7 +182,8 @@ const CalendarReport = (props) => {
                 width='64%'
                 closable={true} 
                 className='rtl'
-                onCancel={ () => onDailyReportClosed() }>
+                onCancel={ () => onDailyReportClosed() }
+                onOk={ () => onDailyReportClosed() }>
                 <DailyTable 
                     dataSource={secondLevelData}
                     reportCodes={props.reportCodes}
@@ -193,7 +202,7 @@ const CalendarReport = (props) => {
                     }}
                     mode='month'
                     onSelect={onSelect}
-                    dateCellRender={dateCellRender}
+                    dateFullCellRender={dateFullCellRender}
                     value={new moment(originalData[0].rdate)}
                     headerRender={ () => null }
                 /> : null
