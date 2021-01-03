@@ -24,14 +24,14 @@ from '@ant-design/icons'
 const { Title } = Typography;
 const { MonthPicker } = DatePicker;
 
-import { Tabs, Dropdown, Menu, message  } from 'antd';
+import { Tabs, message  } from 'antd';
 const { TabPane } = Tabs;
 
 import { Pie } from 'ant-design-pro/lib/Charts';
 import ReactToPrint from 'react-to-print';  
 
 import { DataContext } from './DataContext';
-import { UPDATE_ITEM, SET_DIRECT_MANAGER } from "./redux/actionTypes";
+import { UPDATE_ITEM } from "./redux/actionTypes";
 
 import TableReport from '@reports/TableReport';
 import NestedTableReport from "@reports/NestedTableReport";
@@ -47,7 +47,6 @@ const Home = () => {
     const [month, setMonth] = useState(moment().month()+1);
     const [year, setYear] = useState(moment().year());
     const [reportData, setReportData] = useState([])
-    const [managers, setManagers] = useState([])
     const [reportDataValid, setReportDataValid] = useState(false);
     const [isReportSubmitted, setReportSubmitted] = useState(false);
     const [isReportEditable, setIsReportEditable] = useState(true);
@@ -70,9 +69,7 @@ const Home = () => {
 
     const [daysOff, setDaysOff] = useState([]);
     const [manualUpdates, setManualUpdates] = useState([]);
-    const [assignee, setAssignee] = useState({
-                                            userId:'direct'
-                                        });
+    const [assignee, setAssignee] = useState();
     const [reportCodes, setReportCodes] = useState([]);
     const [employeKind, setEmployeKind] = useState()
 
@@ -81,23 +78,8 @@ const Home = () => {
 
     const dispatch = useDispatch();
     const { t } = useTranslation();
-
-    const action_setDirectManager = (manager) => ({
-        type: SET_DIRECT_MANAGER,
-        data: manager
-    })
     
     //#region Redux selectors and corresponding Effects
-    const _directManager = useSelector(
-        store => store.directManagerReducer.directManager
-    )
-    useEffect( () => {
-        if( _directManager ) {
-            setAssignee(_directManager);
-        }
-        
-    }, [_directManager])
-
     const _calendarDate = useSelector(
         store => store.reportDateReducer.reportDate
     );
@@ -186,10 +168,6 @@ const Home = () => {
             try {
 
                 const resp = await dataContext.API.get('/me')
-                if( !resp.data.managers )
-                    throw new Error(t('no_managers'));
-                    
-                setManagers(resp.data.managers);
 
                 const signature = resp.data.signature;
                 if( signature ) {
@@ -201,14 +179,8 @@ const Home = () => {
                     }
                 }
 
-                if( assignee.userId === 'direct' ) {
-                    const directManager = resp.data.direct_manager;
-                    if( directManager ) {
-                        setAssignee(directManager);
-                        dispatch(action_setDirectManager(directManager));
-                    }
-                }
 
+                setAssignee(resp.data.direct_manager);
                 setEmployeKind(resp.data.kind);
 
             } catch(err) {
@@ -584,23 +556,8 @@ const Home = () => {
     }  
 
     const handleMenuClick = (e) => {
-        setAssignee(managers[e.key].userId);
-        message.info(`הדוח יועבר לאישור ${managers[e.key].userName}`);
+        message.info(`הדוח יועבר לאישור ${assignee}`);
     }
-
-    const menu = 
-        <Menu onClick={handleMenuClick}>
-            {
-                managers ? 
-                managers.map((manager, index) => (
-                        <Menu.Item  key={index}>
-                            <UserOutlined />
-                            {manager.userName}
-                        </Menu.Item>
-                )) : 
-                null
-            }
-        </Menu>
 
     const onMonthChange = (date, dateString) => {
         if( date ) {
@@ -632,13 +589,13 @@ const Home = () => {
                             <Tooltip placement='bottom' title={getSubmitTitle}>
                                 <Popconfirm title={t('send_to_approval')} 
                                     onConfirm={onSubmit}>
-                                    <Dropdown.Button type="primary" overlay={menu}
-                                                        disabled={ isReportSubmitted || !reportDataValid }
+                                    <Button type="primary"
+                                            disabled={ isReportSubmitted || !reportDataValid }
                                         style={{
                                             marginRight: '6px'
                                         }}>
                                         {t('submit')}
-                                    </Dropdown.Button>
+                                    </Button>
                                 </Popconfirm>
                             </Tooltip>
                             <Tooltip placement='bottom' title={t('validate_report')}>

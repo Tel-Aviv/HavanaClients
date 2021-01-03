@@ -2,13 +2,13 @@ import React, { useState, useContext, useEffect, useReducer } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from "react-i18next";
 
-import { Upload, Button, message } from 'antd';
-import { Row, Col } from 'antd';
+import { Upload, Button, message, 
+    Typography, Space,
+    Row, Col
+} from 'antd';
+const { Title, Text, Link } = Typography;
 
-import { Typography } from 'antd';
-const { Title } = Typography;
-
-import { UserOutlined,
+import {
     UploadOutlined,
     SettingTwoTone,
     EditTwoTone,
@@ -22,7 +22,7 @@ const { Meta } = Card;
 import { TextualEmployeKind } from './utils';
 
 import { DataContext } from './DataContext';
-import { UPDATE_ITEM, SET_DIRECT_MANAGER } from "./redux/actionTypes"
+import { UPDATE_ITEM } from "./redux/actionTypes"
 
 // Only let to webpack to know which file to consider,
 // but you neither can access its rules or its styles.
@@ -38,22 +38,17 @@ const Settings = () => {
                 userID: '',
                 signature: '',
                 stamp: '',
-                managers: [],
+                assignee: '',
                 employeKind: ''
             }
 
         )
 
     const [loading, setLoading] = useState();
-    const [directManager, setDirectManager] = useState({});
     
     const context = useContext(DataContext);
     const dispatch = useDispatch();
-    
-    const action_setDirectManager = (manager) => ({
-        type: SET_DIRECT_MANAGER,
-        data: manager
-    })
+
     const { t } = useTranslation();
 
     useEffect( () => {
@@ -74,7 +69,7 @@ const Settings = () => {
                             : null,
                     stamp: stamp ? stamp.startsWith('data:') ? stamp : `data:/image/*;base64,${stamp}`
                             : null,
-                    managers: resp.data.managers,
+                    assignee: resp.data.direct_manager,
                     employeKind: resp.data.kind
                 })
 
@@ -86,17 +81,6 @@ const Settings = () => {
         fetchData()
         
     }, [])
-
-    const _directManager = useSelector(
-        store => store.directManagerReducer.directManager
-    )
-
-    useEffect( () => {
-        if( _directManager ) {
-            setDirectManager(_directManager);
-        }
-        
-    }, [_directManager])
 
     const beforeUpload = (file) => {
         const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -196,26 +180,6 @@ const Settings = () => {
         </Button>
     )
 
-    const handleManagersMenuClick = (e) => {
-        console.log( me.managers[e.key].userId )
-        setAssignee(managers[e.key].userId);
-        message.info(`הדוח יועבר לאישור ${managers[e.key].userName}`);
-    }
-
-    const onDirectManagerChanged = (val) => {
-        const _directManager = me.managers[val];
-        dispatch(action_setDirectManager(_directManager));
-    }
-
-    const managersMenu = <Menu onClick={handleManagersMenuClick}>
-        { me.managers.map( (manager, index) => (
-                <Menu.Item  key={index}>
-                    <UserOutlined />
-                    {manager.userName}
-                </Menu.Item>
-        ))}
-    </Menu>
-
     return (
         <div className='rtl' >
             <Row style={{
@@ -239,16 +203,10 @@ const Settings = () => {
                     <Card title={t('reports_to')}>
                          <Row>
                             <Col span={24}>
-                                <Select showSearch
-                                        style={{ width: 200 }}
-                                        onChange={onDirectManagerChanged}
-                                        placeholder={directManager.userName}>
-                                    {
-                                        me.managers.map((manager, index) => (
-                                            <Option key={index}>{manager.userName}</Option>
-                                        ))
-                                    }
-                                </Select>
+                                <Space size='middle'>
+                                    <Text>{me.assignee.userName}</Text>
+                                    (<Text>{me.assignee.userAccountName}</Text>)
+                                </Space>
                             </Col>
                         </Row> 
                     </Card>

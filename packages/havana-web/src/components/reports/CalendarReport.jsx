@@ -179,6 +179,8 @@ const CalendarReport = (props) => {
         <>
             <Modal title={selectedDate}
                 visible={dailyReportVisible}
+                destroyOnClose='true'
+                footer={null}
                 width='64%'
                 closable={true} 
                 className='rtl'
