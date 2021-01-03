@@ -1,6 +1,6 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useDispatch } from 'react-redux';
-import { ADD_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
+import { ADD_ITEM, UPDATE_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
 import { Table, Popconfirm, Modal, Form, Icon,
     Tag, Row, Col, Tooltip, Typography } from 'antd';
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
@@ -49,6 +49,11 @@ const DailyTable = (props) => {
         type: DELETE_ITEM,
         deleteIndex: index,
         deletedItem: item
+      })
+
+      const action_ItemUpdated = (item, index) => ({
+        type: UPDATE_ITEM,
+        item
       })
 
     useEffect( () => {
@@ -133,6 +138,17 @@ const DailyTable = (props) => {
                               || hasSytemNotes(record));
     } 
 
+    const findMaxStripId = (day) => {
+        const dailyItems = tableData.filter( (item ) =>
+          item.day === day
+        )
+        const max = dailyItems.reduce( (accu, current) => {
+          return current.day === day  ? current.stripId : 0
+        }, 1);
+
+        return max;
+      }
+
     const isRecordUpdatedManually = (record, columnName) => {
 
         if( !manualUpdates )
@@ -157,77 +173,76 @@ const DailyTable = (props) => {
 
     const onCancelFullDayReport = () =>
         setFullDayReportVisible(false);        
+ 
 
-    const onFullDayReportAdded = ({userNotes, reportCode}, key) => {
+    const replaceRecord = (newValues, recordKey) => {
+ 
+        const newData = [...tableData];
+        const index = newData.findIndex(item => recordKey === item.key);
+        if (index > -1) {
+            const item = newData[index];
 
-        setFullDayReportVisible(false);
-        setRecordToAdd(null);
+            let replacedItem = {
+                ...item,
+                ...newValues,
+                valid: true
+            }
 
-        var zeroTime = moment().utcOffset(0);
-        zeroTime.set({
-            hour:0,
-            minute:0,
-            second:0,
-            millisecond:0
-        })
-
-        const item = {
-            inTime: zeroTime, 
-            outTime: zeroTime, 
-            reportCode: reportCode, 
-            userNotes: userNotes,
-            isFullDay: true
+            newData.splice(index, 1, replacedItem);
+            setTableData(newData);
         }
 
-        props.onReplace(key, item);
+        setFullDayReportVisible(false);
+        setRecordToAdd(null);        
 
     }
 
     const addRecord = ({inTime, outTime, reportCode, userNotes, isFullDay}) => {
     
-            setAddModalVisible(false);
+        setAddModalVisible(false);
         
-            let addedPositions = data.reduce( (accu, current, index) => {
-                return {
+        let addedPositions = tableData.reduce( (accu, current, index) => {
+            return {
                 key: Math.max(accu.key, parseInt(current.key)),
                 position: index
-                }      
-            },  {key:0,
-                position: 0})
-        
-            const index = data.findIndex( item => 
-                item.key == recordToAdd.key
-                ) + 1     
-
-            const newStripId = findMaxStripId(recordToAdd.day) + 1;
-
-            let newItem = {
-                ...recordToAdd,
-                rdate: moment(recordToAdd.rdate, 'DD/MM/YYYY').startOf('day').format('YYYY-MM-DD'),
-                key: addedPositions.key + 1,
-                isAdded: true,
-                userNotes: userNotes,
-                entry: inTime,
-                exit: outTime,
-                stripId: newStripId,
-                reportCode: reportCode,
-                isFullDay: isFullDay
-            }    
-            setRecordToAdd(null);  
-
-            newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format) 
-        
-            dispatch(
-                action_ItemAdded(newItem, index)
-            );  
-        
-            const newData = [
-                ...tableData.slice(0, index),
-                newItem,
-                ...tableData.slice(index)
-            ]    
+            }      
+        },  {key:0,
+            position: 0})
     
-        setData(newData);
+        const index = tableData.findIndex( item => 
+            item.key == recordToAdd.key
+            ) + 1     
+
+        const newStripId = findMaxStripId(recordToAdd.day) + 1;
+
+        let newItem = {
+            ...recordToAdd,
+            rdate: recordToAdd.rdate,
+            key: addedPositions.key + 1,
+            isAdded: true,
+            userNotes: userNotes,
+            entry: inTime,
+            exit: outTime,
+            stripId: newStripId,
+            systemNotes: '',
+            reportCode: reportCode,
+            isFullDay: isFullDay
+        }    
+        setRecordToAdd(null);  
+
+        newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format) 
+    
+        dispatch(
+            action_ItemAdded(newItem, index)
+        );  
+        
+        const newData = [
+            ...tableData.slice(0, index),
+            newItem,
+            ...tableData.slice(index)
+        ]    
+    
+        setTableData(newData);
     }
 
     const edit = (record) => {
@@ -280,7 +295,7 @@ const DailyTable = (props) => {
             newData.splice(index, 1, newItem);
             setEditingKey('');
             props.onSave && props.onSave(newItem, inouts);        
-            setData(newData)
+            setTableData(newData)
           }
 
         } catch( errorInfo ) {
@@ -412,8 +427,7 @@ const DailyTable = (props) => {
       },           {
         title: t('user_notes'),
         dataIndex: 'userNotes',
-        width: '10%',
-        align: 'rigth',
+        align: 'right',
         editable: true,
         render: (text, _) => {
           return text && text.length > 20 ?
@@ -497,7 +511,7 @@ const DailyTable = (props) => {
         <Suspense fallback={<div>Loading FullDayReport...</div>}>
             <FullDayReport visible={fullDayReportVisible}
                           onCancel={onCancelFullDayReport}
-                          onOk={onFullDayReportAdded}
+                          onOk={replaceRecord}
                           record={recordToAdd}
                     />
         </Suspense>
