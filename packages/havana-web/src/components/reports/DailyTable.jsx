@@ -346,17 +346,27 @@ const DailyTable = (props) => {
         align: 'right',
         editable: true,
         render: (text, record) => {
-            let tagColor = 'green';
+            
+            const isEditedManually = isRecordUpdatedManually(record, 'entry')
 
-            return <Tag color={tagColor}
-                        style={{
-                        marginRight: '0'
-                    }}>
-                    {
-                        moment.isMoment(text) ?
-                            text.format(format) : text
-                    }
-                    </Tag>
+            let tagColor = 'green';
+            if( text === '0:00' ) {
+                tagColor = 'volcano'
+            }
+            return <>
+                        <Tag color={tagColor}
+                            style={{
+                            marginRight: '0'
+                        }}>
+                        {
+                            moment.isMoment(text) ?
+                                text.format(format) : text
+                        }
+                        </Tag>
+                        {
+                            manuallyEditedTag(isEditedManually)
+                        }
+                    </>
         }          
     }, {
         title: t('out'),
@@ -365,18 +375,27 @@ const DailyTable = (props) => {
         align: 'right',
         editable: true,
         render: (text, record) => {
+
+            const isEditedManually = isRecordUpdatedManually(record, 'exit')
+
             let tagColor = 'green';
-            
+            if( text === '0:00' ) {
+                tagColor = 'volcano'
+            }
+
             return <>
                 <Tag color={tagColor}
                 style={{
                     marginRight: '0'
                 }}>
-                        {
-                            moment.isMoment(text) ?
-                                text.format(format) : text
-                        }
+                {
+                    moment.isMoment(text) ?
+                        text.format(format) : text
+                }
                 </Tag>
+                {
+                    manuallyEditedTag(isEditedManually)
+                }
             </>
         }
     }, {

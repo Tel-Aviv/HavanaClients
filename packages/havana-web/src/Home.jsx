@@ -652,6 +652,11 @@ const Home = () => {
                 }]                            
         }
 
+        const manualUpdatesSet = new Set(manualUpdates);
+        items.map( item => 
+            manualUpdatesSet.add(item) 
+        )
+
         const _manualUpdates = [...manualUpdates, ...items];
         setManualUpdates(_manualUpdates);
     }
@@ -762,6 +767,7 @@ const Home = () => {
                                 reportCodes={reportCodes}
                                 daysOff={daysOff}
                                 manualUpdates={manualUpdates}
+                                onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
                             />
                             {/* <NestedTableReport 
                                 dataSource={reportData}
