@@ -69,6 +69,7 @@ const Home = () => {
 
     const [daysOff, setDaysOff] = useState([]);
     const [manualUpdates, setManualUpdates] = useState([]);
+    const [manualChanges, setManualChanges] = useState(new Set([]));
     const [assignee, setAssignee] = useState();
     const [reportCodes, setReportCodes] = useState([]);
     const [employeKind, setEmployeKind] = useState()
@@ -128,13 +129,13 @@ const Home = () => {
             setReportData(newData);
 
             const addedManualUpdates = [{
-                    Day: _addedData.item.day,
-                    Inout: true,
-                    StripId: _addedData.item.stripId
+                    day: _addedData.item.day,
+                    inout: true,
+                    stripId: _addedData.item.stripId
                 }, {
-                    Day: _addedData.item.day,
-                    Inout: false,
-                    StripId: _addedData.item.stripId
+                    day: _addedData.item.day,
+                    inout: false,
+                    stripId: _addedData.item.stripId
                 }
             ]
             
@@ -227,7 +228,14 @@ const Home = () => {
 
                 // 2. process manual updates
                 data = respArr[1].data.items;
-                setManualUpdates(data)
+                setManualUpdates(data);
+                setManualChanges(data.map( item => (
+                    {
+                        day: item.day,
+                        stripId: item.stripId,
+                        inout: item.inout
+                    }
+                )));
 
                 // 3. process report data
                 let report = respArr[2].data;
@@ -306,14 +314,14 @@ const Home = () => {
                     try {
 
                         // post the manual updates to the server 
-                        const manualUpdate = {
+                        const requestBody = {
                             Year: year,
                             Month: month,
                             UserID: dataContext.user.account_name,
                             items: manualUpdates
                         }
-                        await dataContext.API.post(`/me/reports/manual_updates`, 
-                                                    manualUpdate);
+                        await dataContext.API.post('/me/reports/manual_updates', 
+                                                    requestBody);
                     } catch(err) {
                         handleError(err);
                     }
@@ -624,41 +632,41 @@ const Home = () => {
         if( !inouts )
             return;
 
-        let items = []
-        if( inouts[0] ) { // entry time was changed for this item
-            const foundIndex = manualUpdates.findIndex( arrayItem => {
-                return arrayItem.day === item.day
-                    && arrayItem.InOut === true
-            });
-            if( foundIndex === -1 ) {
-                items = [...items, {
-                    Day: parseInt(item.day),
-                    InOut: true,
-                    StripId: item.stripId
-                }]
-            }
+        const _manualChanges = new Set(manualUpdates)
+        _manualChanges.add(...inouts);
+        const _changes = [..._manualChanges];
+        console.log(_changes);
+
+        // let items = []
+        // if( inouts[0] ) { // entry time was changed for this item
+        //     const foundIndex = manualUpdates.findIndex( arrayItem => {
+        //         return arrayItem.day === item.day
+        //             && arrayItem.InOut === true
+        //     });
+        //     if( foundIndex === -1 ) {
+        //         items = [...items, {
+        //             day: parseInt(item.day),
+        //             inout: true,
+        //             stripId: item.stripId
+        //         }]
+        //     }
     
-        }
-        if( inouts[1] ) { // exit time was changed
-            const foundIndex = manualUpdates.findIndex( arrayItem => {
-                return arrayItem.day === item.day
-                    && arrayItem.InOut === false
-            });
-            if( foundIndex )
-                items = [...items, {
-                    Day: parseInt(item.day),
-                    InOut: false,
-                    StripId: item.stripId
-                }]                            
-        }
+        // }
+        // if( inouts[1] ) { // exit time was changed
+        //     const foundIndex = manualUpdates.findIndex( arrayItem => {
+        //         return arrayItem.day === item.day
+        //             && arrayItem.InOut === false
+        //     });
+        //     if( foundIndex )
+        //         items = [...items, {
+        //             day: parseInt(item.day),
+        //             inout: false,
+        //             stripId: item.stripId
+        //         }]                            
+        // }
 
-        const manualUpdatesSet = new Set(manualUpdates);
-        items.map( item => 
-            manualUpdatesSet.add(item) 
-        )
-
-        const _manualUpdates = [...manualUpdates, ...items];
-        setManualUpdates(_manualUpdates);
+        // const _manualUpdates = [...manualUpdates, ...items];
+        // setManualUpdates(_manualUpdates);
     }
 
     const getMonthName = (monthNum) => {
@@ -761,14 +769,19 @@ const Home = () => {
                                     </span>
                                 }
                                 key="1">
-                            <CalendarReport 
-                                dataSource={reportData}
-                                employeKind={employeKind}
-                                reportCodes={reportCodes}
-                                daysOff={daysOff}
-                                manualUpdates={manualUpdates}
-                                onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
-                            />
+                            <div style={{
+                                border: '1px solid rgb(240, 242, 245)',
+                                margin: '12px'
+                            }}>
+                                <CalendarReport 
+                                    dataSource={reportData}
+                                    employeKind={employeKind}
+                                    reportCodes={reportCodes}
+                                    daysOff={daysOff}
+                                    manualUpdates={manualUpdates}
+                                    onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
+                                />
+                            </div>
                             {/* <NestedTableReport 
                                 dataSource={reportData}
                                 employeKind={employeKind}

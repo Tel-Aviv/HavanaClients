@@ -75,15 +75,15 @@ const CalendarReport = (props) => {
             {
                 ( !isInPast(originalItem) ) ?
                     <ul className='calendar-events'>
-                        <li>
-                            <Tooltip title={t('required')}>
-                                { t('required') + ': ' + originalItem.requiredHours }
-                            </Tooltip>
+                        <li style={{
+                            margin: '3px'
+                        }}>
+                            { t('required') + ': ' + originalItem.requiredHours }
                         </li>
-                        <li>
-                            <Tooltip title={t('accepted')}>
-                                { t('accepted') + ': ' + originalItem.acceptedHours }
-                            </Tooltip>
+                        <li style={{
+                            margin: '3px'
+                        }}>
+                            { t('accepted') + ': ' + originalItem.acceptedHours }
                         </li>
                         <li style={{
                             float: 'right'
