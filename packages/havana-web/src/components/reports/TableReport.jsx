@@ -487,11 +487,11 @@ const TableReport = (props) => {
         let found = false;  
         if( columnName === 'entry' ) {
                 found = manualUpdates.find( item => {
-                return item.Day == parseInt(record.day) && item.InOut === true
+                  return item.day == parseInt(record.day) && item.inout === true
                 })
         }  else if ( columnName === 'exit') {
                 found = manualUpdates.find( item => {
-                return item.Day == parseInt(record.day) && item.InOut === false
+                  return item.day == parseInt(record.day) && item.inout === false
                 })
         }
     

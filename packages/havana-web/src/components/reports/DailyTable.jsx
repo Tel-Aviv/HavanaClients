@@ -18,7 +18,7 @@ import AddRecordModal from './AddRecordModal';
 const FullDayReport = React.lazy( () => import('./FullDayReport') );
 //import FullDayReport from './FullDayReport';
 
-const format = 'HH:mm';
+const TIME_FORMAT = 'HH:mm';
 
 const DailyTable = (props) => {
 
@@ -157,11 +157,11 @@ const DailyTable = (props) => {
         let found = false;  
         if( columnName === 'entry' ) {
                 found = manualUpdates.find( item => {
-                return item.Day == parseInt(record.day) && item.InOut === true
+                    return item.day == parseInt(record.day) && item.inout === true
                 })
         }  else if ( columnName === 'exit') {
                 found = manualUpdates.find( item => {
-                return item.Day == parseInt(record.day) && item.InOut === false
+                    return item.day == parseInt(record.day) && item.inout === false
                 })
         }
     
@@ -230,7 +230,7 @@ const DailyTable = (props) => {
         }    
         setRecordToAdd(null);  
 
-        newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format) 
+        newItem.total = moment.utc(moment(newItem.exit, TIME_FORMAT).diff(moment(newItem.entry, TIME_FORMAT))).format(TIME_FORMAT) 
     
         dispatch(
             action_ItemAdded(newItem, index)
@@ -289,7 +289,7 @@ const DailyTable = (props) => {
               ...row,
               rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('DD/MM/YYYY')
             }
-            newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
+            newItem.total = moment.utc(moment(newItem.exit, TIME_FORMAT).diff(moment(newItem.entry, TIME_FORMAT))).format(TIME_FORMAT)
             newItem.valid = true;
             
             newData.splice(index, 1, newItem);
@@ -349,23 +349,27 @@ const DailyTable = (props) => {
             
             const isEditedManually = isRecordUpdatedManually(record, 'entry')
 
-            let tagColor = 'green';
+            let tagColor = 'blue';
             if( text === '0:00' ) {
-                tagColor = 'volcano'
+                tagColor = 'magenta'
             }
             return <>
-                        <Tag color={tagColor}
-                            style={{
-                            marginRight: '0'
-                        }}>
                         {
-                            moment.isMoment(text) ?
-                                text.format(format) : text
+                            text.format(TIME_FORMAT) === '00:00' ?
+                                <div>-</div> :
+                                <>
+                                    <Tag color={tagColor}
+                                        style={{
+                                        marginRight: '0'
+                                    }}>
+                                        {
+                                            text.format(TIME_FORMAT)
+                                        }
+                                    </Tag>
+                                    { manuallyEditedTag(isEditedManually) }
+                                </>
                         }
-                        </Tag>
-                        {
-                            manuallyEditedTag(isEditedManually)
-                        }
+
                     </>
         }          
     }, {
@@ -378,23 +382,26 @@ const DailyTable = (props) => {
 
             const isEditedManually = isRecordUpdatedManually(record, 'exit')
 
-            let tagColor = 'green';
+            let tagColor = 'blue';
             if( text === '0:00' ) {
-                tagColor = 'volcano'
+                tagColor = 'magenta'
             }
 
             return <>
-                <Tag color={tagColor}
-                style={{
-                    marginRight: '0'
-                }}>
                 {
-                    moment.isMoment(text) ?
-                        text.format(format) : text
-                }
-                </Tag>
-                {
-                    manuallyEditedTag(isEditedManually)
+                    text.format(TIME_FORMAT) === '00:00' ?
+                    <div>-</div> :
+                    <>
+                        <Tag color={tagColor}
+                            style={{
+                                marginRight: '0'
+                            }}>
+                            {
+                                text.format(TIME_FORMAT)
+                            }
+                        </Tag>
+                        { manuallyEditedTag(isEditedManually) }
+                    </>
                 }
             </>
         }
@@ -435,7 +442,7 @@ const DailyTable = (props) => {
             return null;
 
           return ( text !== '' ) ?
-              <Tag color="blue"
+              <Tag color="magenta"
                 style={{
                   marginRight: '0'
                 }}>

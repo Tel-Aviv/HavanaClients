@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useRef, Suspense } from 'react'
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
+import _ from 'lodash';
 import uniqid from 'uniqid';
 import Img from 'react-image';
 
@@ -69,7 +70,7 @@ const Home = () => {
 
     const [daysOff, setDaysOff] = useState([]);
     const [manualUpdates, setManualUpdates] = useState([]);
-    const [manualChanges, setManualChanges] = useState(new Set([]));
+    // const [manualChanges, setManualChanges] = useState(new Set([]));
     const [assignee, setAssignee] = useState();
     const [reportCodes, setReportCodes] = useState([]);
     const [employeKind, setEmployeKind] = useState()
@@ -228,14 +229,10 @@ const Home = () => {
 
                 // 2. process manual updates
                 data = respArr[1].data.items;
-                setManualUpdates(data);
-                setManualChanges(data.map( item => (
-                    {
-                        day: item.day,
-                        stripId: item.stripId,
-                        inout: item.inout
-                    }
-                )));
+                setManualUpdates(data.map( item => {
+                    let {whenUpdated, ...x} = item;
+                    return x;
+                }));
 
                 // 3. process report data
                 let report = respArr[2].data;
@@ -632,10 +629,34 @@ const Home = () => {
         if( !inouts )
             return;
 
-        const _manualChanges = new Set(manualUpdates)
-        _manualChanges.add(...inouts);
-        const _changes = [..._manualChanges];
-        console.log(_changes);
+        // This nor wants to be immutable
+        let _manualChanges = [...manualUpdates]; // new Set(manualUpdates)
+
+        if( inouts[0] ) {
+            _manualChanges.push({
+                day: parseInt(item.day),
+                stripId: item.stripId,
+                inout: true
+            })
+        }
+
+        if( inouts[1] ) {
+            _manualChanges.push({
+                day: parseInt(item.day),
+                stripId: item.stripId,
+                inout: false
+            })
+        }
+
+        // Make this list unique.
+        // This is the same idea as new Set(), but Set uses only built-in JS reference comparison
+        // Thanks to compararer function (2-nd operand to _uniqWith)
+        // it work for object values too.
+        _manualChanges = _.uniqWith(_manualChanges, (arrVal, othVal) => {
+            return arrVal.day === othVal.day
+                && arrVal.stripId === othVal.stripId
+                && arrVal.inout === othVal.inout
+        })
 
         // let items = []
         // if( inouts[0] ) { // entry time was changed for this item
@@ -666,7 +687,7 @@ const Home = () => {
         // }
 
         // const _manualUpdates = [...manualUpdates, ...items];
-        // setManualUpdates(_manualUpdates);
+        setManualUpdates([..._manualChanges]);
     }
 
     const getMonthName = (monthNum) => {
@@ -764,7 +785,7 @@ const Home = () => {
                                         <span style={{
                                             marginRight: '6px'
                                         }}>
-                                            {t('plain')}
+                                            {t('calendar')}
                                         </span>
                                     </span>
                                 }
