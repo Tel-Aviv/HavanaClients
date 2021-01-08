@@ -34,7 +34,9 @@ const AddRecordModal = ({visible, record, onCancel, onAddRecord}) => {
     const [form] = Form.useForm();
 
     const allowedReportCodes = reportContext.codes.filter( (reportCode) => {
+        // only daily codes
         return reportCode.goodFor === 1
+            || reportCode.goodFor === 2
     })    
 
     const onOk = async () => {

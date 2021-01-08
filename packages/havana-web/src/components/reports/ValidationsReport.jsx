@@ -34,9 +34,9 @@ const ValidationReport = ({visible, onClosed, invalidItems}) => {
             align: 'right',
             editable: true,
             render: (text) => {
-                let tagColor = 'green';
+                let tagColor = 'blue';
                 if( text === '0:00' ) {
-                tagColor = 'volcano'
+                tagColor = 'magenta'
                 }
                 return <Tag color={tagColor}
                         style={{
@@ -51,9 +51,9 @@ const ValidationReport = ({visible, onClosed, invalidItems}) => {
             align: 'right',
             editable: true,
             render: (text) => {
-                let tagColor = 'green';
+                let tagColor = 'blue';
                 if( text === '0:00' ) {
-                tagColor = 'volcano'
+                tagColor = 'magenta'
                 }
                 return <Tag color={tagColor}
                         style={{
@@ -74,7 +74,7 @@ const ValidationReport = ({visible, onClosed, invalidItems}) => {
             editable: true,
             render: (text, _) => 
                 ( text !== '' ) ?
-                    <Tag color="volcano"
+                    <Tag color="magenta"
                         style={{
                             marginRight: '0'
                         }}>

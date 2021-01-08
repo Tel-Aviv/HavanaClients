@@ -260,9 +260,9 @@ const TableReport = (props) => {
             render: (text, record) => {
               const isEditedManually = isRecordUpdatedManually(record, 'entry')
     
-              let tagColor = 'green';
+              let tagColor = 'blue';
               if( text === '0:00' ) {
-                tagColor = 'volcano'
+                tagColor = 'magenta'
               }
               return <Row>
                       <Tag color={tagColor}
@@ -290,9 +290,9 @@ const TableReport = (props) => {
     
               const isEditedManually = isRecordUpdatedManually(record, 'exit')
     
-              let tagColor = 'green';
+              let tagColor = 'blue';
               if( text === '0:00' ) {
-                tagColor = 'volcano'
+                tagColor = 'magenta'
               }
               return <>
                     <Tag color={tagColor}

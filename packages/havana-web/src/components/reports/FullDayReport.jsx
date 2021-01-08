@@ -50,12 +50,14 @@ const FullDayReport = ({visible, onOk, onCancel, record}) => {
     }
 
     const onCancelHandle = async() => {
-        form.resetFields();
+        //form.resetFields();
         onCancel && onCancel();
     }
 
     const allowedReportCodes = reportContext.codes.filter( (reportCode) => {
-        return reportCode.goodFor === 2
+        // only daily codes
+        return reportCode.goodFor === 1 
+                || reportCode.goodFor === 2
     })
 
     return <Modal visible={visible}
@@ -78,6 +80,26 @@ const FullDayReport = ({visible, onOk, onCancel, record}) => {
             </Title>
             <Form {...layout} form={form}
                     size='small'>
+                <Form.Item label={t('report_code')}
+                    name="reportCode"
+                    rules={[
+                        {
+                            required: true,
+                        }
+                    ]}>
+                    <Select size="small" allowClear autoFocus defaultActiveFirstOption>
+                        {
+                            allowedReportCodes.map( item => 
+
+                                <Select.Option key={uniqid()} 
+                                    defaultValue={null}
+                                    value={item.Description}>
+                                        {item.Description}
+                                </Select.Option>
+                            )
+                        }
+                    </Select>
+                </Form.Item>
                 <Form.Item name='userNotes'
                         label={
                             <Space size={'small'}>
@@ -93,23 +115,6 @@ const FullDayReport = ({visible, onOk, onCancel, record}) => {
                                 whitespace: true }]
                         }>
                     <Input />
-                </Form.Item>
-                <Form.Item label={t('report_code')}
-                    name="reportCode"
-                    rules={[
-                        {
-                            required: true,
-                        }
-                    ]}>
-                    <Select size="small">
-                        {
-                                allowedReportCodes.map( item => 
-                                    <Select.Option key={uniqid()} 
-                                        value={item.Description}>
-                                            {item.Description}
-                                    </Select.Option>)
-                        }
-                    </Select>
                 </Form.Item>
             </Form>
         </Modal>

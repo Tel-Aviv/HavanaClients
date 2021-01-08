@@ -40,7 +40,7 @@ import CalendarReport from '@reports/CalendarReport';
 const YearReport = React.lazy( () => import('@reports/YearReport') )
 import DocsUploader from '@components/DocsUploader';
 const ValidationReport = React.lazy( () => import('@reports/ValidationsReport') )
-
+const ExtraHoursModal = React.lazy( () => import('@reports/ExtraHoursModal'))
 const TIME_FORMAT = 'HH:mm';
 
 const Home = () => {
@@ -59,6 +59,7 @@ const Home = () => {
     const [reportDataLoaded, setReportDataLoaded] = useState(false);
     const [calendarDate, setCalendarDate] = useState(moment());
     const [printModalVisible, setPrintModalVisible] = useState(false);
+    const [extraHoursModalVisible, setExtraHoursModalVisible] = useState(false);
     const [signature, setSignature] = useState('');
     // Report Status Alert
     const [alert, setAlert] = useState({
@@ -532,6 +533,10 @@ const Home = () => {
         setPrintModalVisible(!printModalVisible);
     }
 
+    const onShowExtraHours = () => {
+        setExtraHoursModalVisible(!extraHoursModalVisible)
+    }
+
     const onSubmit = async () => {
         
         let _message = `דוח שעות לחודש ${month}/${year} נשלח לאישור`;
@@ -706,6 +711,20 @@ const Home = () => {
         setPrintModalVisible(false);
     }
 
+    const getExtraHoursDataSet = () => (
+        reportData.map( item => (
+            {
+                day: item.day,
+                dayOfWeek: item.dayOfWeek,
+                extra_hours75: item.extra_hours75,
+                extra_hours100: item.extra_hours100,
+                extra_hours125: item.extra_hours125,
+                extra_hours150: item.extra_hours150,
+                extra_hours200: item.extra_hours200,
+            }
+        ))
+    )
+
     const alertOpacity = loadingData ? 0.2 : 1.0;   
 
     return (
@@ -751,12 +770,19 @@ const Home = () => {
                                 style={{ width: 270}}
                                 bordered={false}
                                 className='rtl' loading={loadingData}>
-                                        <Pie percent={getTotalHoursPercentage()} 
-                                            total={getTotalHoursPercentage() + '%'} 
-                                            title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
-                                            animate={false}
-                                            subTitle={ `${totals} שעות`}
-                                            height={140} />                               
+                                <Pie percent={getTotalHoursPercentage()} 
+                                    total={getTotalHoursPercentage() + '%'} 
+                                    title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
+                                    animate={false}
+                                    subTitle={ `${totals} שעות`}
+                                    height={140} />
+                                <Col>
+                                    <Row>
+                                        <Button type="primary" onClick={onShowExtraHours}>
+                                            {t('extra_hours')}
+                                        </Button>
+                                    </Row>
+                                </Col>                            
                             </Card>
                         </Col>
                     </Row>
@@ -841,6 +867,11 @@ const Home = () => {
                     </Tabs>
                 </Col>
             </Row>
+            <Suspense fallback={<div>Loading Extra Hours...</div>}>
+                <ExtraHoursModal
+                    dataSource={getExtraHoursDataSet()}
+                    visible={extraHoursModalVisible}/>
+            </Suspense>
             <Modal title={printReportTitle()}
                     width='64%'
                     visible={printModalVisible}

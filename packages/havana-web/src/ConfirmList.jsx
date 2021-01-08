@@ -62,7 +62,7 @@ const columns = [{
       align: 'right',
       key: "comment",
       render: (text, _) => 
-          <Tag color='volcano'
+          <Tag color='magenta'
                 style={{
                     marginRight: '0'
                 }}>

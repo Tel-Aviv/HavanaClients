@@ -104,7 +104,8 @@ const translations = {
             "job_description_error": "What do you did on this day?",
             "day_status_ok": "Record is valid",
             "day_status_invalid": "Record is invalid",
-            "inout_details_caption": "Entrance/Exit details for "
+            "inout_details_caption": "Entrance/Exit details for ",
+            "extra_hours": "Extra Hours" 
         }
     },
     he: {
@@ -212,7 +213,8 @@ const translations = {
             "job_description_error": "מה עשית ביום זה?",
             "day_status_ok": "רישום תקין",
             "day_status_invalid": "רישום צריך תיקון",
-            "inout_details_caption": " פירוט כניסות ויציאות לתאריך"   
+            "inout_details_caption": " פירוט כניסות ויציאות לתאריך",
+            "extra_hours": "שעות נוספות" 
         }
     }
 }    
