@@ -19,6 +19,7 @@ const FullDayReport = React.lazy( () => import('./FullDayReport') );
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
 const format = 'HH:mm';
+const DATE_FORMAT = 'DD/MM/YYYY';
 
 const TableReport = (props) => {
 
@@ -62,7 +63,7 @@ const TableReport = (props) => {
                 ...record, 
                 requireChange : _isRowEditable, // isRowEditable(record),
                 valid : _isRowEditable ? false : true, // (record.requireChange)?  false : true,
-                rdate : moment(record.rdate).format('DD/MM/YYYY')
+                rdate : moment(record.rdate).format(DATE_FORMAT)
             }
           })
         )
@@ -177,7 +178,7 @@ const TableReport = (props) => {
             let newItem = {
               ...item,
               ...row,
-              rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('DD/MM/YYYY')
+              rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT)
             }
             newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
             newItem.valid = true;
@@ -339,7 +340,7 @@ const TableReport = (props) => {
             editable: true,
             render: (text, record) => {
               
-              if( !moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) )
+              if( !moment(record.rdate, DATE_FORMAT).isBefore(moment()) )
                 return null;
 
               return <Row>
@@ -364,11 +365,11 @@ const TableReport = (props) => {
             editable: false,
             render: (text, record) => {
 
-              if( !moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) )
+              if( !moment(record.rdate, DATE_FORMAT).isBefore(moment()) )
                 return null;
 
               return ( text !== '' ) ?
-                  <Tag color="blue"
+                  <Tag color="magenta"
                     style={{
                       marginRight: '0'
                     }}>
@@ -401,7 +402,7 @@ const TableReport = (props) => {
             width: '10%',
             render: (_, record) => {
 
-              return ( moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) // no edits for future
+              return ( moment(record.rdate, DATE_FORMAT).isBefore(moment()) // no edits for future
                         && record.requireChange)? 
                 (<EditIcons 
                     record={record}
@@ -548,7 +549,7 @@ const TableReport = (props) => {
 
         let newItem = {
             ...recordToAdd,
-            rdate: moment(recordToAdd.rdate, 'DD/MM/YYYY').startOf('day').format('YYYY-MM-DD'),
+            rdate: moment(recordToAdd.rdate, DATE_FORMAT).startOf('day').format('YYYY-MM-DD'),
             key: addedPositions.key + 1,
             isAdded: true,
             userNotes: userNotes,
@@ -585,7 +586,7 @@ const TableReport = (props) => {
             ...item,
             inTime: newItem.inTime, 
             outTime: newItem.outTime, 
-            rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('YYYY-MM-DD'),
+            rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format('YYYY-MM-DD'),
             reportCode: newItem.reportCode, 
             userNotes: newItem.userNotes,
             isFullDay: true

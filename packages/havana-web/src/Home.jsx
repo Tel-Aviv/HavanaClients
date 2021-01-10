@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import _ from 'lodash';
 import uniqid from 'uniqid';
-import Img from 'react-image';
 
 import { useTranslation } from "react-i18next";
 
@@ -15,7 +14,7 @@ import  { Layout, Popconfirm,
             Row, Col,
             DatePicker }
 from 'antd';
-import { UserOutlined,
+import { IssuesCloseOutlined,
     BarsOutlined,
     FundOutlined,
     PrinterOutlined,
@@ -41,7 +40,9 @@ const YearReport = React.lazy( () => import('@reports/YearReport') )
 import DocsUploader from '@components/DocsUploader';
 const ValidationReport = React.lazy( () => import('@reports/ValidationsReport') )
 const ExtraHoursModal = React.lazy( () => import('@reports/ExtraHoursModal'))
+
 const TIME_FORMAT = 'HH:mm';
+const DATE_FORMAT = 'YYYY-MM-DD';
 
 const Home = () => {
 
@@ -427,7 +428,7 @@ const Home = () => {
                     });
                 }
             } else {
-                const whenApproved = moment(data.whenApproved).format('DD/MM/YYYY')
+                const whenApproved = moment(data.whenApproved).format(DATE_FORMAT)
                 setAlert({
                     type: 'info',
                     message: `דוח שעות לחודש ${month}/${year} אושר בתאריך ${whenApproved} ע"י ${data.assignedToName}`
@@ -447,10 +448,10 @@ const Home = () => {
         if( !res.isValid ) {
             setValidateModalOpen(true);
             const item = reportData[res.invalidItemIndex];
-            const _date = moment(item.rdate).format('DD/MM/YYYY');
+            const _date = moment(item.rdate).format(DATE_FORMAT);
             console.log(_date);
             const invalidItem = //{ ...item,
-                                //    rdate : moment(item.rdate).format('DD/MM/YYYY')                         
+                                //    rdate : moment(item.rdate).format(DATE_FORMAT)                         
                                 //}
                                 {
                                     "id":87864,
@@ -601,9 +602,10 @@ const Home = () => {
                                     onConfirm={onSubmit}>
                                     <Button type="primary"
                                             disabled={ isReportSubmitted || !reportDataValid }
-                                        style={{
-                                            marginRight: '6px'
-                                        }}>
+                                            icon={<IssuesCloseOutlined />}
+                                            style={{
+                                                marginRight: '6px'
+                                            }}>
                                         {t('submit')}
                                     </Button>
                                 </Popconfirm>
@@ -663,35 +665,6 @@ const Home = () => {
                 && arrVal.inout === othVal.inout
         })
 
-        // let items = []
-        // if( inouts[0] ) { // entry time was changed for this item
-        //     const foundIndex = manualUpdates.findIndex( arrayItem => {
-        //         return arrayItem.day === item.day
-        //             && arrayItem.InOut === true
-        //     });
-        //     if( foundIndex === -1 ) {
-        //         items = [...items, {
-        //             day: parseInt(item.day),
-        //             inout: true,
-        //             stripId: item.stripId
-        //         }]
-        //     }
-    
-        // }
-        // if( inouts[1] ) { // exit time was changed
-        //     const foundIndex = manualUpdates.findIndex( arrayItem => {
-        //         return arrayItem.day === item.day
-        //             && arrayItem.InOut === false
-        //     });
-        //     if( foundIndex )
-        //         items = [...items, {
-        //             day: parseInt(item.day),
-        //             inout: false,
-        //             stripId: item.stripId
-        //         }]                            
-        // }
-
-        // const _manualUpdates = [...manualUpdates, ...items];
         setManualUpdates([..._manualChanges]);
     }
 
@@ -711,11 +684,22 @@ const Home = () => {
         setPrintModalVisible(false);
     }
 
-    const getExtraHoursDataSet = () => (
-        reportData.map( item => (
+    const lazyShowExtraHours = () => (
+        extraHoursModalVisible ?
+            <ExtraHoursModal
+                title={`${getMonthName(month)} ${year} `}
+                dataSource={getExtraHoursDataSet()}
+                visible={extraHoursModalVisible}
+                cancel={onShowExtraHours}/> :
+            null
+    )
+
+    const getExtraHoursDataSet = () => {
+        const data = reportData.map( item => (
             {
                 day: item.day,
                 dayOfWeek: item.dayOfWeek,
+                rdate: item.rdate,
                 extra_hours75: item.extra_hours75,
                 extra_hours100: item.extra_hours100,
                 extra_hours125: item.extra_hours125,
@@ -723,7 +707,13 @@ const Home = () => {
                 extra_hours200: item.extra_hours200,
             }
         ))
-    )
+
+        return data.filter( record => 
+            moment(record.rdate).isBefore(moment())
+        )
+
+        // return data;
+    }
 
     const alertOpacity = loadingData ? 0.2 : 1.0;   
 
@@ -776,13 +766,14 @@ const Home = () => {
                                     animate={false}
                                     subTitle={ `${totals} שעות`}
                                     height={140} />
-                                <Col>
-                                    <Row>
-                                        <Button type="primary" onClick={onShowExtraHours}>
-                                            {t('extra_hours')}
-                                        </Button>
-                                    </Row>
-                                </Col>                            
+                                <Card.Grid hoverable={false} style={{
+                                        width: '100%',
+                                        textAlign: 'center',
+                                        }}>
+                                    <Button type="primary" onClick={onShowExtraHours}>
+                                        {t('extra_hours')}
+                                    </Button>
+                                </Card.Grid>                      
                             </Card>
                         </Col>
                     </Row>
@@ -868,9 +859,9 @@ const Home = () => {
                 </Col>
             </Row>
             <Suspense fallback={<div>Loading Extra Hours...</div>}>
-                <ExtraHoursModal
-                    dataSource={getExtraHoursDataSet()}
-                    visible={extraHoursModalVisible}/>
+            {
+                lazyShowExtraHours()
+            }
             </Suspense>
             <Modal title={printReportTitle()}
                     width='64%'
@@ -917,7 +908,7 @@ const Home = () => {
                             <div className='footer-print'>סה"כ { totals } שעות</div>
                         </Col>
                         <Col span={6}>
-                            <div className='footer-print'>{t('printed_when')} {moment().format('DD/MM/YYYY')}</div>
+                            <div className='footer-print'>{t('printed_when')} {moment().format(DATE_FORMAT)}</div>
                         </Col> 
                     </Row>
                 </div>

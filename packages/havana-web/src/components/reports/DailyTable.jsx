@@ -19,6 +19,7 @@ const FullDayReport = React.lazy( () => import('./FullDayReport') );
 //import FullDayReport from './FullDayReport';
 
 const TIME_FORMAT = 'HH:mm';
+const DATE_FORMAT = 'DD/MM/YYYY';
 
 const DailyTable = (props) => {
 
@@ -287,7 +288,7 @@ const DailyTable = (props) => {
             let newItem = {
               ...item,
               ...row,
-              rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('DD/MM/YYYY')
+              rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT)
             }
             newItem.total = moment.utc(moment(newItem.exit, TIME_FORMAT).diff(moment(newItem.entry, TIME_FORMAT))).format(TIME_FORMAT)
             newItem.valid = true;
@@ -413,7 +414,7 @@ const DailyTable = (props) => {
         editable: true,
         render: (text, record) => {
           
-          if( !moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) )
+          if( !moment(record.rdate, DATE_FORMAT).isBefore(moment()) )
             return null;
 
           return <Row>
@@ -438,7 +439,7 @@ const DailyTable = (props) => {
         editable: false,
         render: (text, record) => {
 
-          if( !moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) )
+          if( !moment(record.rdate, DATE_FORMAT).isBefore(moment()) )
             return null;
 
           return ( text !== '' ) ?
@@ -470,7 +471,7 @@ const DailyTable = (props) => {
         width: '10%',
         render: (_, record) => {
 
-          return ( moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) // no edits for future
+          return ( moment(record.rdate, DATE_FORMAT).isBefore(moment()) // no edits for future
                     && record.requireChange)? 
             (<EditIcons 
                 record={record}

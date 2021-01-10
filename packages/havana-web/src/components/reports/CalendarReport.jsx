@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 const DailyTable = React.lazy( () => import('./DailyTable') );
 
 const format = 'HH:mm';
+const DATE_FORMAT = 'DD/MM/YYYY';
 
 const CalendarReport = (props) => {
 
@@ -49,7 +50,7 @@ const CalendarReport = (props) => {
         const day = value.date();
         setSecondLevelData(getSecondLevelData(day));
         setDailyReportVisible(true);
-        setSelectedDate(value.format('DD/MM/YYYY'))
+        setSelectedDate(value.format(DATE_FORMAT))
     }
 
     const onDailyReportClosed = () => {
@@ -120,7 +121,7 @@ const CalendarReport = (props) => {
     }
 
     const isInPast = (record) => {
-        return moment(record.rdate, 'DD/MM/YYYY').isAfter(moment());
+        return moment(record.rdate, DATE_FORMAT).isAfter(moment());
     }
 
     const saveRecord = async (record, inouts) => {
@@ -134,7 +135,7 @@ const CalendarReport = (props) => {
             let newItem = {
               ...item,
               ...record,
-              rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('DD/MM/YYYY')
+              rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT)
             }
             newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
             newItem.valid = true;
@@ -160,7 +161,7 @@ const CalendarReport = (props) => {
             ...item,
             inTime: newItem.inTime, 
             outTime: newItem.outTime, 
-            rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('YYYY-MM-DD'),
+            rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format('YYYY-MM-DD'),
             reportCode: newItem.reportCode, 
             userNotes: newItem.userNotes,
             isFullDay: true

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Table } from 'antd';
 import { useTranslation } from "react-i18next";
 
-const ExtraHoursModal = ({visible, dataSource}) => {
+const ExtraHoursModal = ({title, visible, dataSource, cancel}) => {
 
     const [tableData, setTableData] = useState([])
 
@@ -15,10 +15,12 @@ const ExtraHoursModal = ({visible, dataSource}) => {
     const columns = [{
         title: t('day'),
         key: t('day'),
+        align: 'center',
         dataIndex: 'day'
     }, {
         title: t('day_of_week'),
         key: t('day_of_week'),
+        align: 'center',
         dataIndex: 'dayOfWeek'
     }, {
         title: t('extra_hours'),
@@ -49,8 +51,11 @@ const ExtraHoursModal = ({visible, dataSource}) => {
     }
     ]
 
-    return <Modal visible={visible}
-                  closable={true}>
+    return <Modal title={title}
+                visible={visible}
+                  closable={true}
+                  onCancel={cancel}
+                  onOk={cancel}>
         <Table
             style={{ 
                 direction: 'rtl', 

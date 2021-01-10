@@ -36,7 +36,7 @@ const ValidationReport = ({visible, onClosed, invalidItems}) => {
             render: (text) => {
                 let tagColor = 'blue';
                 if( text === '0:00' ) {
-                tagColor = 'magenta'
+                    tagColor = 'magenta'
                 }
                 return <Tag color={tagColor}
                         style={{

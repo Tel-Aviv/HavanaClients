@@ -12,6 +12,7 @@ const DailyTable = React.lazy( () => import('./DailyTable') );
 //import DailyTable from './DailyTable';
 
 const format = 'HH:mm';
+const DATE_FORMAT = 'DD/MM/YYYY';
 
 const NestedTableReport = (props) => {
 
@@ -26,7 +27,7 @@ const NestedTableReport = (props) => {
 
             return { 
                 ...record, 
-                rdate : moment(record.rdate).format('DD/MM/YYYY')
+                rdate : moment(record.rdate).format(DATE_FORMAT)
             }
           })
 
@@ -55,7 +56,7 @@ const NestedTableReport = (props) => {
             let newItem = {
               ...item,
               ...record,
-              rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('DD/MM/YYYY')
+              rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT)
             }
             newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
             newItem.valid = true;
@@ -82,7 +83,7 @@ const NestedTableReport = (props) => {
             ...item,
             inTime: newItem.inTime, 
             outTime: newItem.outTime, 
-            rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('YYYY-MM-DD'),
+            rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format('YYYY-MM-DD'),
             reportCode: newItem.reportCode, 
             userNotes: newItem.userNotes,
             isFullDay: true
@@ -112,7 +113,7 @@ const NestedTableReport = (props) => {
     }
 
     const isInPast = (record) => {
-        return moment(record.rdate, 'DD/MM/YYYY').isAfter(moment());
+        return moment(record.rdate, DATE_FORMAT).isAfter(moment());
     }
 
     let columns = [{

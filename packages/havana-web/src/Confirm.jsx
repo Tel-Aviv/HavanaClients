@@ -31,6 +31,7 @@ import { DECREASE_NOTIFICATIONS_COUNT,
          INCREASE_NOTIFICATION_COUNT } from "./redux/actionTypes";
 
 const TIME_FORMAT = 'HH:mm';
+const DATE_FORMAT = 'DD/MM/YYYY';
 
 const ref = React.createRef();
 
@@ -343,7 +344,7 @@ const Confirm = (props) => {
                         <Col span={6}>
                             { 
                                 whenApproved ?
-                                    <div className='footer-print'>{t('approved_when')} {whenApproved.format('DD/MM/YYYY')}</div> :
+                                    <div className='footer-print'>{t('approved_when')} {whenApproved.format(DATE_FORMAT)}</div> :
                                     null
                             }
                         </Col>                        
