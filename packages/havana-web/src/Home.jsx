@@ -697,6 +697,7 @@ const Home = () => {
     const getExtraHoursDataSet = () => {
         const data = reportData.map( item => (
             {
+                key: uniqid(),
                 day: item.day,
                 dayOfWeek: item.dayOfWeek,
                 rdate: item.rdate,
@@ -704,15 +705,20 @@ const Home = () => {
                 extra_hours100: item.extra_hours100,
                 extra_hours125: item.extra_hours125,
                 extra_hours150: item.extra_hours150,
-                extra_hours200: item.extra_hours200,
+                extra_hours200: item.extra_hours200
             }
         ))
 
         return data.filter( record => 
             moment(record.rdate).isBefore(moment())
+            && ( (record.extra_hours75 && record.extra_hours75 !== '0:00' )
+                || (record.extra_hours100 && record.extra_hours100 !== '0:00' )
+                || (record.extra_hours125 && record.extra_hours125 !== '0:00' )
+                || (record.extra_hours150 && record.extra_hours150 !== '0:00' )
+                || (record.extra_hours200 && record.extra_hours200 !== '0:00' )
+            )
         )
 
-        // return data;
     }
 
     const alertOpacity = loadingData ? 0.2 : 1.0;   

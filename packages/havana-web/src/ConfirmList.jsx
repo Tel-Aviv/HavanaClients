@@ -282,7 +282,7 @@ const ConfirmList = () => {
                                     style={{ direction: 'rtl', heigth: '600px', cursor: 'pointer' }}
                                     columns={approvedTableColumns}
                                     size='middle'
-                                    bordered={true}
+                                    bordered={false}
                                     pagination={false}
                                     onRow = { (record, index) => ({
                                         onClick: (event) => { onApprovedRowClick(record, index, event) }

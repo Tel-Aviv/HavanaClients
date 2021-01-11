@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Table } from 'antd';
+import { Modal, Table, Tag, Button } from 'antd';
+import uniqid from 'uniqid';
 import { useTranslation } from "react-i18next";
 
 const ExtraHoursModal = ({title, visible, dataSource, cancel}) => {
@@ -11,6 +12,15 @@ const ExtraHoursModal = ({title, visible, dataSource, cancel}) => {
     useEffect( () => {
         setTableData(dataSource);
     },[dataSource])
+
+
+    const renderTime = (text) => {
+        if( text === '0:00' )
+            return <div>{ text }</div>
+        else return <Tag color='blue'>
+                {text}
+            </Tag>
+    }
 
     const columns = [{
         title: t('day'),
@@ -29,33 +39,42 @@ const ExtraHoursModal = ({title, visible, dataSource, cancel}) => {
             {
                 title: '75%',
                 key: '75',
-                dataIndex: 'extra_hours75'
+                dataIndex: 'extra_hours75',
+                render: renderTime
             }, {
                 title: '100%',
                 key: '100',
-                dataIndex: 'extra_hours100'       
+                dataIndex: 'extra_hours100',
+                render: renderTime     
             }, {
                 title: '125%',
                 key: '125',
-                dataIndex: 'extra_hours125'       
+                dataIndex: 'extra_hours125',
+                render: renderTime      
             }, {
                 title: '150%',
                 key: '150',
-                dataIndex: 'extra_hours150'       
+                dataIndex: 'extra_hours150',
+                render: renderTime       
             }, {
                 title: '200%',
                 key: '200',
-                dataIndex: 'extra_hours200'       
+                dataIndex: 'extra_hours200',
+                render: renderTime     
             }
         ]
     }
     ]
 
     return <Modal title={title}
-                visible={visible}
+                  visible={visible}
                   closable={true}
                   onCancel={cancel}
-                  onOk={cancel}>
+                  footer={[
+                      <Button type='primary' key={uniqid()} onClick={cancel}>
+                          {t('close')}
+                      </Button>
+                  ]}>
         <Table
             style={{ 
                 direction: 'rtl', 
