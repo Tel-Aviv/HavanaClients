@@ -762,7 +762,7 @@ const Home = () => {
                 <Col span={5}>
                     <Row gutter={[32, 32]}>
                         <Col>
-                            <Card title={ `סיכום חודשי: ${getMonthName(month)} ${year} ` } 
+                            <Card title={ `${t('extra_hours')}: ${getMonthName(month)} ${year} ` } 
                                 style={{ width: 270}}
                                 bordered={false}
                                 className='rtl' loading={loadingData}>
@@ -777,7 +777,7 @@ const Home = () => {
                                         textAlign: 'center',
                                         }}>
                                     <Button type="primary" onClick={onShowExtraHours}>
-                                        {t('extra_hours')}
+                                        {t('details')}
                                     </Button>
                                 </Card.Grid>                      
                             </Card>

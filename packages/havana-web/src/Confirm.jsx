@@ -317,7 +317,7 @@ const Confirm = (props) => {
                         <Col style={{
                             paddingRight: '0px'
                         }}>
-                            <Card title={ `סיכום חודשי: ${getMonthName(month)} ${year} ` } 
+                            <Card title={ `${t('extra_hours')}: ${getMonthName(month)} ${year} ` } 
                                 bordered={false}
                                 style={{ width: 270}}
                                 className='rtl' 
@@ -332,7 +332,7 @@ const Confirm = (props) => {
                                         textAlign: 'center',
                                         }}>
                                     <Button type="primary" onClick={onShowExtraHours}>
-                                        {t('extra_hours')}
+                                        {t('details')}
                                     </Button>
                                 </Card.Grid>
                             </Card>                

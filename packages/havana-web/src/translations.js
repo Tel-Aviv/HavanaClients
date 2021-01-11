@@ -121,7 +121,7 @@ const translations = {
             "signature": "חתימה",
             "stamp": "חותמת",
             "setting_title": "הגדרות אישיות",
-            "details": "פרטים",
+            "details": "פירוט",
             "notifications": "דוחות לטיפולך",
             "plain": "טבלה",
             "calendar": "לוח חודשי",
