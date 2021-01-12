@@ -75,7 +75,8 @@ const Home = () => {
     // const [manualChanges, setManualChanges] = useState(new Set([]));
     const [assignee, setAssignee] = useState();
     const [reportCodes, setReportCodes] = useState([]);
-    const [employeKind, setEmployeKind] = useState()
+    const [employeKind, setEmployeKind] = useState();
+    const [spareHours, setSpareHours] = useState({});
 
     const dataContext = useContext(DataContext);
     const componentRef = useRef();
@@ -239,6 +240,10 @@ const Home = () => {
                 // 3. process report data
                 let report = respArr[2].data;
                 defineAlert(report);
+                setSpareHours({
+                    actual: report.spareHours,
+                    granted: report.spaceHoursGranted
+                })
                 setIsReportRejected( report.isRejected );
                 const employerCode = report.employerCode || 0;
                 setUserCompanyCode( employerCode );
@@ -596,6 +601,17 @@ const Home = () => {
         return Math.floor( parseFloat(totals) / 160. * 100 );
     }
 
+    const getSpareHoursPercentage = () => {
+        if( !spareHours.granted 
+            || spareHours.granted === 0 
+            || !spareHours.actual 
+            || spareHours.actual === 0)
+            return '0%';
+
+        return  `% ${Math.floor(spareHours.actual/spareHours.granted * 100)}`
+
+    }
+
     const operations = <div>
                             <Tooltip placement='bottom' title={getSubmitTitle}>
                                 <Popconfirm title={t('send_to_approval')} 
@@ -766,17 +782,20 @@ const Home = () => {
                                 style={{ width: 270}}
                                 bordered={false}
                                 className='rtl' loading={loadingData}>
-                                <Pie percent={getTotalHoursPercentage()} 
-                                    total={getTotalHoursPercentage() + '%'} 
+                                <Pie percent={ getSpareHoursPercentage()} 
+                                    // total={ getSpareHoursPercentage() } 
                                     title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
                                     animate={false}
-                                    subTitle={ `${totals} שעות`}
+                                    subTitle={ `${spareHours.actual ?? 0} שעות`}
                                     height={140} />
                                 <Card.Grid hoverable={false} style={{
                                         width: '100%',
                                         textAlign: 'center',
                                         }}>
-                                    <Button type="primary" onClick={onShowExtraHours}>
+                                    <Button type="primary" 
+                                        disabled={!spareHours.actual 
+                                                    || spareHours.actual === 0}
+                                        onClick={onShowExtraHours}>
                                         {t('details')}
                                     </Button>
                                 </Card.Grid>                      
