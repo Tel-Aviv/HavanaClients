@@ -9,7 +9,8 @@ const { Text, Title } = Typography;
 import {
     QuestionCircleOutlined
 } from '@ant-design/icons';
-import { useTranslation } from "react-i18next"; 
+import { useTranslation } from "react-i18next";
+import moment from 'moment';
 import uniqid from 'uniqid';
 
 import { ReportContext } from "./TableContext";
@@ -49,12 +50,14 @@ const FullDayReport = ({visible, onOk, onCancel, record}) => {
     }
 
     const onCancelHandle = async() => {
-        form.resetFields();
+        //form.resetFields();
         onCancel && onCancel();
     }
 
     const allowedReportCodes = reportContext.codes.filter( (reportCode) => {
-        return reportCode.goodFor === 2
+        // only daily codes
+        return reportCode.goodFor === 1 
+                || reportCode.goodFor === 2
     })
 
     return <Modal visible={visible}
@@ -66,10 +69,37 @@ const FullDayReport = ({visible, onOk, onCancel, record}) => {
                 style={{
                     marginTop: '12px'
                 }}>
-                {t('report_full_day')} { record? record.rdate: ''}
+                {t('report_full_day')} 
+                { 
+                    record ? 
+                        moment.isMoment(record.rdate) ? 
+                            record.rdate.format('DD/MM/YYYY') :
+                            record.rdate
+                        : null
+                }
             </Title>
             <Form {...layout} form={form}
                     size='small'>
+                <Form.Item label={t('report_code')}
+                    name="reportCode"
+                    rules={[
+                        {
+                            required: true,
+                        }
+                    ]}>
+                    <Select size="small" allowClear autoFocus defaultActiveFirstOption>
+                        {
+                            allowedReportCodes.map( item => 
+
+                                <Select.Option key={uniqid()} 
+                                    defaultValue={null}
+                                    value={item.Description}>
+                                        {item.Description}
+                                </Select.Option>
+                            )
+                        }
+                    </Select>
+                </Form.Item>
                 <Form.Item name='userNotes'
                         label={
                             <Space size={'small'}>
@@ -85,23 +115,6 @@ const FullDayReport = ({visible, onOk, onCancel, record}) => {
                                 whitespace: true }]
                         }>
                     <Input />
-                </Form.Item>
-                <Form.Item label={t('report_code')}
-                    name="reportCode"
-                    rules={[
-                        {
-                            required: true,
-                        }
-                    ]}>
-                    <Select size="small">
-                        {
-                                allowedReportCodes.map( item => 
-                                    <Select.Option key={uniqid()} 
-                                        value={item.Description}>
-                                            {item.Description}
-                                    </Select.Option>)
-                        }
-                    </Select>
                 </Form.Item>
             </Form>
         </Modal>

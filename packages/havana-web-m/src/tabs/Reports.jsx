@@ -91,7 +91,7 @@ const Reports = ({route, navigation}) => {
     }
 
     const iconClassName = {
-      color: isWorkingDay(item) ? 'green' : 'gray',
+      color: isWorkingDay(item) ? 'blue' : 'gray',
     };
 
     return (

@@ -17,6 +17,8 @@ const { Content } = Layout;
 import { DataContext } from './DataContext';
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
+const DATE_FORMAT = 'DD/MM/YYYY';
+
 const monthsFilter = [...Array(12).keys()].map( i => ({
                                                         text: i+1,
                                                         value: i + 1
@@ -62,7 +64,7 @@ const columns = [{
       align: 'right',
       key: "comment",
       render: (text, _) => 
-          <Tag color='volcano'
+          <Tag color='magenta'
                 style={{
                     marginRight: '0'
                 }}>
@@ -166,7 +168,7 @@ const ConfirmList = () => {
                 const pendingReports = resp[0].data.map( (item, index) => {
                     return {
                         ...item,
-                        whenSubmitted: moment(item.whenSubmitted).format('DD/MM/YYYY'),
+                        whenSubmitted: moment(item.whenSubmitted).format(DATE_FORMAT),
                         key: index
                     }
                 })
@@ -176,8 +178,8 @@ const ConfirmList = () => {
                 const approvedReports = resp[1].data.map( (item, index) => {
                     return {
                         ...item,
-                        whenSubmitted: moment(item.whenSubmitted).format('DD/MM/YYYY'),
-                        whenApproved: moment(item.whenApproved).format('DD/MM/YYYY'),
+                        whenSubmitted: moment(item.whenSubmitted).format(DATE_FORMAT),
+                        whenApproved: moment(item.whenApproved).format(DATE_FORMAT),
                         key: index
                     }
                 });
@@ -198,8 +200,8 @@ const ConfirmList = () => {
                 const _rejectedList = resp[2].data.map( (item, index) => {
                     return {
                         ...item,
-                        whenSubmitted: moment(item.whenSubmitted).format('DD/MM/YYYY'),
-                        whenRejected: moment(item.whenRejected).format('DD/MM/YYYY'),
+                        whenSubmitted: moment(item.whenSubmitted).format(DATE_FORMAT),
+                        whenRejected: moment(item.whenRejected).format(DATE_FORMAT),
                         key: index
                     }
                 });
@@ -280,7 +282,7 @@ const ConfirmList = () => {
                                     style={{ direction: 'rtl', heigth: '600px', cursor: 'pointer' }}
                                     columns={approvedTableColumns}
                                     size='middle'
-                                    bordered={true}
+                                    bordered={false}
                                     pagination={false}
                                     onRow = { (record, index) => ({
                                         onClick: (event) => { onApprovedRowClick(record, index, event) }

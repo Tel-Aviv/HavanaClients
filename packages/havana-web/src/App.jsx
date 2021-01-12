@@ -29,8 +29,8 @@ i18n
     lng: "he",
     debug: false,
     react: { 
-        useSuspense: false
-      }
+        useSuspense: true
+    }
   })
 
 const App = () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, Suspense } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import moment from 'moment';
@@ -26,11 +26,13 @@ import ReactToPrint from 'react-to-print';
 import { DataContext } from './DataContext';
 import TableReport from '@reports/TableReport';
 import DocsUploader from '@components/DocsUploader';
+const ExtraHoursModal = React.lazy( () => import('@reports/ExtraHoursModal'))
 
 import { DECREASE_NOTIFICATIONS_COUNT,
          INCREASE_NOTIFICATION_COUNT } from "./redux/actionTypes";
 
 const TIME_FORMAT = 'HH:mm';
+const DATE_FORMAT = 'DD/MM/YYYY';
 
 const ref = React.createRef();
 
@@ -54,7 +56,8 @@ const Confirm = (props) => {
     const [note, setNote] = useState('');
     const [approvalSending, setApprovalSending] = useState(false);
     const [manualUpdates, setManualUpdates] = useState();
-
+    const [extraHoursModalVisible, setExtraHoursModalVisible] = useState(false);
+  
     const history = useHistory();
     const componentRef = useRef();
     const context = useContext(DataContext)
@@ -235,85 +238,139 @@ const Confirm = (props) => {
 
     const alertOpacity = loadingData ? 0.2 : 1.0; 
 
+    const getExtraHoursDataSet = () => {
+        const data = tableData.map( item => (
+            {
+                key: uniqid(),
+                day: item.day,
+                dayOfWeek: item.dayOfWeek,
+                rdate: item.rdate,
+                extra_hours75: item.extra_hours75,
+                extra_hours100: item.extra_hours100,
+                extra_hours125: item.extra_hours125,
+                extra_hours150: item.extra_hours150,
+                extra_hours200: item.extra_hours200
+            }
+        ))
+
+        return data.filter( record => 
+            moment(record.rdate).isBefore(moment())
+            && ( (record.extra_hours75 && record.extra_hours75 !== '0:00' )
+                || (record.extra_hours100 && record.extra_hours100 !== '0:00' )
+                || (record.extra_hours125 && record.extra_hours125 !== '0:00' )
+                || (record.extra_hours150 && record.extra_hours150 !== '0:00' )
+                || (record.extra_hours200 && record.extra_hours200 !== '0:00' )
+            )
+        )
+
+    }
+
+    const onShowExtraHours = () => {
+        setExtraHoursModalVisible(!extraHoursModalVisible)
+    }
+
+    const lazyShowExtraHours = () => (
+        extraHoursModalVisible ?
+            <ExtraHoursModal
+                title={`${getMonthName(month)} ${year} `}
+                dataSource={getExtraHoursDataSet()}
+                visible={extraHoursModalVisible}
+                cancel={onShowExtraHours}/> :
+            null
+    )
+
     return (
         <Content>
             <Title level={1} className='hvn-title'>{title}</Title>
-                <Row  className='hvn-item-ltr' align={'middle'} type='flex'>
-                    <Col span={3}>
-                        <Space>
-                            <Button type='primary' loading={approvalSending}
-                                    onClick={ () => onContinue() }>
-                                        {t('continue')}
-                            </Button>                           
-                            <Button
-                                icon={<PrinterOutlined />}
-                                onClick={onPrint}>
-                                    {t('print')}
-                            </Button>
-                        </Space>
-                     </Col>
-                    <Col span={21} style={{
-                        direction: 'rtl'
-                    }}>
-                        <Alert closable={false} 
-                            style={{
-                                opacity: alertOpacity,
-                                width: '100%'
-                            }}
-                            message={formatAlertMessage()}
-                            showIcon
-                            type={ isReportRejected ? 'error' : 'info'}/>
+            <Row  className='hvn-item-ltr' align={'middle'} type='flex'>
+                <Col span={3}>
+                    <Space>
+                        <Button type='primary' loading={approvalSending}
+                                onClick={ () => onContinue() }>
+                                    {t('continue')}
+                        </Button>                           
+                        <Button
+                            icon={<PrinterOutlined />}
+                            onClick={onPrint}>
+                                {t('print')}
+                        </Button>
+                    </Space>
                     </Col>
-                </Row>
-                <Row gutter={[32, 0]}>
-                    <Col span={5} style={{
-                        paddingTop: '16px'
-                   }}>
-                        <Row gutter={[32, 32]}>
-                            <Col style={{
-                                paddingRight: '0px'
-                            }}>
-                                <Card title={ `סיכום חודשי: ${getMonthName(month)} ${year} ` } 
-                                    bordered={false}
-                                    style={{ width: 270}}
-                                    className='rtl' 
-                                    loading={loadingData}>
-                                        <Pie percent={getTotalHoursPercentage()} 
-                                            total={getTotalHoursPercentage() + '%'} 
-                                            title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
-                                            animate={false}
-                                            height={140} />
-                                </Card>                
-                            </Col>
-                        </Row>
-                        <Row gutter={[32, 32]}>
-                            <Col>
-                                <Card title={t('abs_docs')} 
-                                    bordered={true}
-                                    style={{ width: 270}}
-                                    className='rtl'
-                                    loading={loadingData}>
-                                    <DocsUploader year={year} month={month} 
-                                                employeeId={routeParams.userid}
-                                                isOperational={false}/>
-                                </Card>
-                            </Col>                    
-                        </Row>
-                    </Col>
-                    <Col span={19} style={{
-                        paddingLeft: '16px',
-                        paddingTop: '16px'
-                    }}>
-                            <div ref={ref}>
-                                <TableReport dataSource={tableData} 
-                                            loading={loadingData} 
-                                            manualUpdates={manualUpdates}
-                                            scroll={{y: '400px'}}
-                                            editable={false} />
+                <Col span={21} style={{
+                    direction: 'rtl'
+                }}>
+                    <Alert closable={false} 
+                        style={{
+                            opacity: alertOpacity,
+                            width: '100%'
+                        }}
+                        message={formatAlertMessage()}
+                        showIcon
+                        type={ isReportRejected ? 'error' : 'info'}/>
+                </Col>
+            </Row>
+            <Row gutter={[32, 0]}>
+                <Col span={5} style={{
+                    paddingTop: '16px'
+                }}>
+                    <Row gutter={[32, 32]}>
+                        <Col style={{
+                            paddingRight: '0px'
+                        }}>
+                            <Card title={ `${t('extra_hours')}: ${getMonthName(month)} ${year} ` } 
+                                bordered={false}
+                                style={{ width: 270}}
+                                className='rtl' 
+                                loading={loadingData}>
+                                <Pie percent={getTotalHoursPercentage()} 
+                                    total={getTotalHoursPercentage() + '%'} 
+                                    title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
+                                    animate={false}
+                                    height={140} />
+                                <Card.Grid  hoverable={false} style={{
+                                        width: '100%',
+                                        textAlign: 'center',
+                                        }}>
+                                    <Button type="primary" onClick={onShowExtraHours}>
+                                        {t('details')}
+                                    </Button>
+                                </Card.Grid>
+                            </Card>                
+                        </Col>
+                    </Row>
+                    <Row gutter={[32, 32]}>
+                        <Col>
+                            <Card title={t('abs_docs')} 
+                                bordered={true}
+                                style={{ width: 270}}
+                                className='rtl'
+                                loading={loadingData}>
+                                <DocsUploader year={year} month={month} 
+                                            employeeId={routeParams.userid}
+                                            isOperational={false}/>
+                            </Card>
+                        </Col>                    
+                    </Row>
+                </Col>
+                <Col span={19} style={{
+                    paddingLeft: '16px',
+                    paddingTop: '16px'
+                }}>
+                        <div ref={ref}>
+                            <TableReport dataSource={tableData} 
+                                        loading={loadingData} 
+                                        manualUpdates={manualUpdates}
+                                        scroll={{y: '400px'}}
+                                        editable={false} />
 
-                            </div>
-                    </Col>
-                </Row>
+                        </div>
+                </Col>
+            </Row>
+            <Suspense fallback={<div>Loading Extra Hours...</div>}>
+            {
+                lazyShowExtraHours()
+            }
+            </Suspense>
             <Modal width='54%'
                     visible={printModalVisible}
                     closable={true}
@@ -343,7 +400,7 @@ const Confirm = (props) => {
                         <Col span={6}>
                             { 
                                 whenApproved ?
-                                    <div className='footer-print'>{t('approved_when')} {whenApproved.format('DD/MM/YYYY')}</div> :
+                                    <div className='footer-print'>{t('approved_when')} {whenApproved.format(DATE_FORMAT)}</div> :
                                     null
                             }
                         </Col>                        

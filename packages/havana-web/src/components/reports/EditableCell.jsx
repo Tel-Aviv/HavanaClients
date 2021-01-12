@@ -26,7 +26,8 @@ const EditableCell = ({
     const getInput = (type) => {
 
         const allowedReportCodes = reportContext.codes.filter( (reportCode) => {
-            return reportCode.goodFor === 1
+            return reportCode.goodFor === 2
+                || reportCode.goodFor === 3
         })
 
         const controls = {

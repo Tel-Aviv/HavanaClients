@@ -2,8 +2,8 @@ import React, { useState, useEffect, useContext, useRef, Suspense } from 'react'
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
+import _ from 'lodash';
 import uniqid from 'uniqid';
-import Img from 'react-image';
 
 import { useTranslation } from "react-i18next";
 
@@ -14,7 +14,7 @@ import  { Layout, Popconfirm,
             Row, Col,
             DatePicker }
 from 'antd';
-import { UserOutlined,
+import { IssuesCloseOutlined,
     BarsOutlined,
     FundOutlined,
     PrinterOutlined,
@@ -24,28 +24,31 @@ from '@ant-design/icons'
 const { Title } = Typography;
 const { MonthPicker } = DatePicker;
 
-import { Tabs, Dropdown, Menu, message  } from 'antd';
+import { Tabs, message  } from 'antd';
 const { TabPane } = Tabs;
 
 import { Pie } from 'ant-design-pro/lib/Charts';
 import ReactToPrint from 'react-to-print';  
 
 import { DataContext } from './DataContext';
-import { UPDATE_ITEM, SET_DIRECT_MANAGER } from "./redux/actionTypes";
+import { UPDATE_ITEM } from "./redux/actionTypes";
 
 import TableReport from '@reports/TableReport';
+import NestedTableReport from "@reports/NestedTableReport";
+import CalendarReport from '@reports/CalendarReport';
 const YearReport = React.lazy( () => import('@reports/YearReport') )
 import DocsUploader from '@components/DocsUploader';
 const ValidationReport = React.lazy( () => import('@reports/ValidationsReport') )
+const ExtraHoursModal = React.lazy( () => import('@reports/ExtraHoursModal'))
 
 const TIME_FORMAT = 'HH:mm';
+const DATE_FORMAT = 'YYYY-MM-DD';
 
 const Home = () => {
 
     const [month, setMonth] = useState(moment().month()+1);
     const [year, setYear] = useState(moment().year());
     const [reportData, setReportData] = useState([])
-    const [managers, setManagers] = useState([])
     const [reportDataValid, setReportDataValid] = useState(false);
     const [isReportSubmitted, setReportSubmitted] = useState(false);
     const [isReportEditable, setIsReportEditable] = useState(true);
@@ -57,6 +60,7 @@ const Home = () => {
     const [reportDataLoaded, setReportDataLoaded] = useState(false);
     const [calendarDate, setCalendarDate] = useState(moment());
     const [printModalVisible, setPrintModalVisible] = useState(false);
+    const [extraHoursModalVisible, setExtraHoursModalVisible] = useState(false);
     const [signature, setSignature] = useState('');
     // Report Status Alert
     const [alert, setAlert] = useState({
@@ -68,34 +72,19 @@ const Home = () => {
 
     const [daysOff, setDaysOff] = useState([]);
     const [manualUpdates, setManualUpdates] = useState([]);
-    const [assignee, setAssignee] = useState({
-                                            userId:'direct'
-                                        });
+    // const [manualChanges, setManualChanges] = useState(new Set([]));
+    const [assignee, setAssignee] = useState();
     const [reportCodes, setReportCodes] = useState([]);
-    const [employeKind, setEmployeKind] = useState()
+    const [employeKind, setEmployeKind] = useState();
+    const [spareHours, setSpareHours] = useState({});
 
     const dataContext = useContext(DataContext);
     const componentRef = useRef();
 
     const dispatch = useDispatch();
     const { t } = useTranslation();
-
-    const action_setDirectManager = (manager) => ({
-        type: SET_DIRECT_MANAGER,
-        data: manager
-    })
     
     //#region Redux selectors and corresponding Effects
-    const _directManager = useSelector(
-        store => store.directManagerReducer.directManager
-    )
-    useEffect( () => {
-        if( _directManager ) {
-            setAssignee(_directManager);
-        }
-        
-    }, [_directManager])
-
     const _calendarDate = useSelector(
         store => store.reportDateReducer.reportDate
     );
@@ -144,13 +133,13 @@ const Home = () => {
             setReportData(newData);
 
             const addedManualUpdates = [{
-                    Day: _addedData.item.day,
-                    Inout: true,
-                    StripId: _addedData.item.stripId
+                    day: _addedData.item.day,
+                    inout: true,
+                    stripId: _addedData.item.stripId
                 }, {
-                    Day: _addedData.item.day,
-                    Inout: false,
-                    StripId: _addedData.item.stripId
+                    day: _addedData.item.day,
+                    inout: false,
+                    stripId: _addedData.item.stripId
                 }
             ]
             
@@ -184,10 +173,6 @@ const Home = () => {
             try {
 
                 const resp = await dataContext.API.get('/me')
-                if( !resp.data.managers )
-                    throw new Error(t('no_managers'));
-                    
-                setManagers(resp.data.managers);
 
                 const signature = resp.data.signature;
                 if( signature ) {
@@ -199,14 +184,8 @@ const Home = () => {
                     }
                 }
 
-                if( assignee.userId === 'direct' ) {
-                    const directManager = resp.data.direct_manager;
-                    if( directManager ) {
-                        setAssignee(directManager);
-                        dispatch(action_setDirectManager(directManager));
-                    }
-                }
 
+                setAssignee(resp.data.direct_manager);
                 setEmployeKind(resp.data.kind);
 
             } catch(err) {
@@ -253,11 +232,18 @@ const Home = () => {
 
                 // 2. process manual updates
                 data = respArr[1].data.items;
-                setManualUpdates(data)
+                setManualUpdates(data.map( item => {
+                    let {whenUpdated, ...x} = item;
+                    return x;
+                }));
 
                 // 3. process report data
                 let report = respArr[2].data;
                 defineAlert(report);
+                setSpareHours({
+                    actual: report.spareHours,
+                    granted: report.spaceHoursGranted
+                })
                 setIsReportRejected( report.isRejected );
                 const employerCode = report.employerCode || 0;
                 setUserCompanyCode( employerCode );
@@ -332,14 +318,14 @@ const Home = () => {
                     try {
 
                         // post the manual updates to the server 
-                        const manualUpdate = {
+                        const requestBody = {
                             Year: year,
                             Month: month,
                             UserID: dataContext.user.account_name,
                             items: manualUpdates
                         }
-                        await dataContext.API.post(`/me/reports/manual_updates`, 
-                                                    manualUpdate);
+                        await dataContext.API.post('/me/reports/manual_updates', 
+                                                    requestBody);
                     } catch(err) {
                         handleError(err);
                     }
@@ -447,7 +433,7 @@ const Home = () => {
                     });
                 }
             } else {
-                const whenApproved = moment(data.whenApproved).format('DD/MM/YYYY')
+                const whenApproved = moment(data.whenApproved).format(DATE_FORMAT)
                 setAlert({
                     type: 'info',
                     message: `דוח שעות לחודש ${month}/${year} אושר בתאריך ${whenApproved} ע"י ${data.assignedToName}`
@@ -467,10 +453,10 @@ const Home = () => {
         if( !res.isValid ) {
             setValidateModalOpen(true);
             const item = reportData[res.invalidItemIndex];
-            const _date = moment(item.rdate).format('DD/MM/YYYY');
+            const _date = moment(item.rdate).format(DATE_FORMAT);
             console.log(_date);
             const invalidItem = //{ ...item,
-                                //    rdate : moment(item.rdate).format('DD/MM/YYYY')                         
+                                //    rdate : moment(item.rdate).format(DATE_FORMAT)                         
                                 //}
                                 {
                                     "id":87864,
@@ -529,9 +515,12 @@ const Home = () => {
         const res = reportData.some( (item, index) => {
 
             const workingDay = isWorkingDay(item);
-            const hasTotal = isTotalled(item);
+            // const hasTotal = isTotalled(item);
 
-            const isItemInvalid = workingDay && !hasTotal && !item.systemNotes || item.systemNotes.startsWith('*');
+            const isItemInvalid = workingDay 
+                // && !hasTotal 
+                && !item.systemNotes 
+                || item.systemNotes.startsWith('*');
             if( isItemInvalid ) {
                 invalidItemIndex = index;
                 return true;
@@ -548,6 +537,10 @@ const Home = () => {
 
     const onShowPDF = () => {
         setPrintModalVisible(!printModalVisible);
+    }
+
+    const onShowExtraHours = () => {
+        setExtraHoursModalVisible(!extraHoursModalVisible)
     }
 
     const onSubmit = async () => {
@@ -579,23 +572,8 @@ const Home = () => {
     }  
 
     const handleMenuClick = (e) => {
-        setAssignee(managers[e.key].userId);
-        message.info(`הדוח יועבר לאישור ${managers[e.key].userName}`);
+        message.info(`הדוח יועבר לאישור ${assignee}`);
     }
-
-    const menu = 
-        <Menu onClick={handleMenuClick}>
-            {
-                managers ? 
-                managers.map((manager, index) => (
-                        <Menu.Item  key={index}>
-                            <UserOutlined />
-                            {manager.userName}
-                        </Menu.Item>
-                )) : 
-                null
-            }
-        </Menu>
 
     const onMonthChange = (date, dateString) => {
         if( date ) {
@@ -623,17 +601,29 @@ const Home = () => {
         return Math.floor( parseFloat(totals) / 160. * 100 );
     }
 
+    const getSpareHoursPercentage = () => {
+        if( !spareHours.granted 
+            || spareHours.granted === 0 
+            || !spareHours.actual 
+            || spareHours.actual === 0)
+            return '0';
+
+        return Math.floor(spareHours.actual/spareHours.granted * 100)
+
+    }
+
     const operations = <div>
                             <Tooltip placement='bottom' title={getSubmitTitle}>
                                 <Popconfirm title={t('send_to_approval')} 
                                     onConfirm={onSubmit}>
-                                    <Dropdown.Button type="primary" overlay={menu}
-                                                        disabled={ isReportSubmitted || !reportDataValid }
-                                        style={{
-                                            marginRight: '6px'
-                                        }}>
+                                    <Button type="primary"
+                                            disabled={ isReportSubmitted || !reportDataValid }
+                                            icon={<IssuesCloseOutlined />}
+                                            style={{
+                                                marginRight: '6px'
+                                            }}>
                                         {t('submit')}
-                                    </Dropdown.Button>
+                                    </Button>
                                 </Popconfirm>
                             </Tooltip>
                             <Tooltip placement='bottom' title={t('validate_report')}>
@@ -662,36 +652,36 @@ const Home = () => {
         if( !inouts )
             return;
 
-        let items = []
-        if( inouts[0] ) { // entry time was changed for this item
-            const foundIndex = manualUpdates.findIndex( arrayItem => {
-                return arrayItem.day === item.day
-                    && arrayItem.InOut === true
-            });
-            if( foundIndex === -1 ) {
-                items = [...items, {
-                    Day: parseInt(item.day),
-                    InOut: true,
-                    StripId: item.stripId
-                }]
-            }
-    
-        }
-        if( inouts[1] ) { // exit time was changed
-            const foundIndex = manualUpdates.findIndex( arrayItem => {
-                return arrayItem.day === item.day
-                    && arrayItem.InOut === false
-            });
-            if( foundIndex )
-                items = [...items, {
-                    Day: parseInt(item.day),
-                    InOut: false,
-                    StripId: item.stripId
-                }]                            
+        // This nor wants to be immutable
+        let _manualChanges = [...manualUpdates]; // new Set(manualUpdates)
+
+        if( inouts[0] ) {
+            _manualChanges.push({
+                day: parseInt(item.day),
+                stripId: item.stripId,
+                inout: true
+            })
         }
 
-        const _manualUpdates = [...manualUpdates, ...items];
-        setManualUpdates(_manualUpdates);
+        if( inouts[1] ) {
+            _manualChanges.push({
+                day: parseInt(item.day),
+                stripId: item.stripId,
+                inout: false
+            })
+        }
+
+        // Make this list unique.
+        // This is the same idea as new Set(), but Set uses only built-in JS reference comparison
+        // Thanks to compararer function (2-nd operand to _uniqWith)
+        // it work for object values too.
+        _manualChanges = _.uniqWith(_manualChanges, (arrVal, othVal) => {
+            return arrVal.day === othVal.day
+                && arrVal.stripId === othVal.stripId
+                && arrVal.inout === othVal.inout
+        })
+
+        setManualUpdates([..._manualChanges]);
     }
 
     const getMonthName = (monthNum) => {
@@ -708,6 +698,43 @@ const Home = () => {
 
     const handlePrintCancel = () => {
         setPrintModalVisible(false);
+    }
+
+    const lazyShowExtraHours = () => (
+        extraHoursModalVisible ?
+            <ExtraHoursModal
+                title={`${getMonthName(month)} ${year} `}
+                dataSource={getExtraHoursDataSet()}
+                visible={extraHoursModalVisible}
+                cancel={onShowExtraHours}/> :
+            null
+    )
+
+    const getExtraHoursDataSet = () => {
+        const data = reportData.map( item => (
+            {
+                key: uniqid(),
+                day: item.day,
+                dayOfWeek: item.dayOfWeek,
+                rdate: item.rdate,
+                extra_hours75: item.extra_hours75,
+                extra_hours100: item.extra_hours100,
+                extra_hours125: item.extra_hours125,
+                extra_hours150: item.extra_hours150,
+                extra_hours200: item.extra_hours200
+            }
+        ))
+
+        return data.filter( record => 
+            moment(record.rdate).isBefore(moment())
+            && ( (record.extra_hours75 && record.extra_hours75 !== '0:00' )
+                || (record.extra_hours100 && record.extra_hours100 !== '0:00' )
+                || (record.extra_hours125 && record.extra_hours125 !== '0:00' )
+                || (record.extra_hours150 && record.extra_hours150 !== '0:00' )
+                || (record.extra_hours200 && record.extra_hours200 !== '0:00' )
+            )
+        )
+
     }
 
     const alertOpacity = loadingData ? 0.2 : 1.0;   
@@ -751,16 +778,28 @@ const Home = () => {
                 <Col span={5}>
                     <Row gutter={[32, 32]}>
                         <Col>
-                            <Card title={ `סיכום חודשי: ${getMonthName(month)} ${year} ` } 
+                            <Card title={ `${t('extra_hours')}: ${getMonthName(month)} ${year} ` } 
                                 style={{ width: 270}}
                                 bordered={false}
                                 className='rtl' loading={loadingData}>
-                                        <Pie percent={getTotalHoursPercentage()} 
-                                            total={getTotalHoursPercentage() + '%'} 
-                                            title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
-                                            animate={false}
-                                            subTitle={ `${totals} שעות`}
-                                            height={140} />                               
+                                <Pie 
+                                    percent={ getSpareHoursPercentage()} 
+                                    total={ `% ${getSpareHoursPercentage()}` } 
+                                    title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
+                                    animate={false}
+                                    subTitle={ `${spareHours.actual ?? 0} שעות`}
+                                    height={140} />
+                                <Card.Grid hoverable={false} style={{
+                                        width: '100%',
+                                        textAlign: 'center',
+                                        }}>
+                                    <Button type="primary" 
+                                        disabled={!spareHours.actual 
+                                                    || spareHours.actual === 0}
+                                        onClick={onShowExtraHours}>
+                                        {t('details')}
+                                    </Button>
+                                </Card.Grid>                      
                             </Card>
                         </Col>
                     </Row>
@@ -789,12 +828,35 @@ const Home = () => {
                                         <span style={{
                                             marginRight: '6px'
                                         }}>
-                                            {t('plain')}
+                                            {t('calendar')}
                                         </span>
                                     </span>
                                 }
                                 key="1">
-                            <TableReport dataSource={reportData}
+                            <div style={{
+                                border: '1px solid rgb(240, 242, 245)',
+                                margin: '12px'
+                            }}>
+                                <CalendarReport 
+                                    dataSource={reportData}
+                                    employeKind={employeKind}
+                                    reportCodes={reportCodes}
+                                    daysOff={daysOff}
+                                    manualUpdates={manualUpdates}
+                                    onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
+                                />
+                            </div>
+                            {/* <NestedTableReport 
+                                dataSource={reportData}
+                                employeKind={employeKind}
+                                reportCodes={reportCodes}
+                                daysOff={daysOff}
+                                manualUpdates={manualUpdates}
+                                scroll={{y: '400px'}}
+                                onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
+                                editable={isReportEditable}
+                            />         */}
+                            {/* <TableReport dataSource={reportData}
                                         employeKind={employeKind}
                                         reportCodes={reportCodes}
                                         daysOff={daysOff}
@@ -803,7 +865,7 @@ const Home = () => {
                                         scroll={{y: '400px'}}
                                         onChange={( item, inouts ) => onReportDataChanged(item, inouts) } 
                                         editable={isReportEditable}>
-                            </TableReport>
+                            </TableReport> */}
                         </TabPane>
                         <TabPane tab={<span>
                                         <FundOutlined />
@@ -822,6 +884,11 @@ const Home = () => {
                     </Tabs>
                 </Col>
             </Row>
+            <Suspense fallback={<div>Loading Extra Hours...</div>}>
+            {
+                lazyShowExtraHours()
+            }
+            </Suspense>
             <Modal title={printReportTitle()}
                     width='64%'
                     visible={printModalVisible}
@@ -867,7 +934,7 @@ const Home = () => {
                             <div className='footer-print'>סה"כ { totals } שעות</div>
                         </Col>
                         <Col span={6}>
-                            <div className='footer-print'>{t('printed_when')} {moment().format('DD/MM/YYYY')}</div>
+                            <div className='footer-print'>{t('printed_when')} {moment().format(DATE_FORMAT)}</div>
                         </Col> 
                     </Row>
                 </div>

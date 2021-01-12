@@ -56,25 +56,56 @@ mock.onAny('/daysoff')
 
 mock.onAny('/me/report_codes')
     .reply(200, {
-    "items":[{
-            "Code":10,
-            "Description":"חופשה מנוחה",
-            "ShortDecription":"חופשה",
-            "goodFor":2
+    "codes":[
+        {
+          "Code": 1,
+          "Description": "עבודה רגילה",
+          "ShortDescription": "",
+          "goodFor": 3
         },
         {
-            "Code":20,
-            "Description":"מחלה",
-            "ShortDecription":"מחלה",
-            "goodFor":2
+          "Code": 10,
+          "Description": "חופשה מנוחה",
+          "ShortDescription": "חופשה",
+          "goodFor": 2
         },
         {
-            "Code":624,
-            "Description":"עבודה מהבית",
-            "ShortDecription":"ע.מהבית",
-            "goodFor":2
+          "Code": 20,
+          "Description": "מחלה",
+          "ShortDescription": "מחלה",
+          "goodFor": 2
+        },
+        {
+          "Code": 21,
+          "Description": "הצהרה אישית",
+          "ShortDescription": "הצהרה",
+          "goodFor": 2
+        },
+        {
+          "Code": 22,
+          "Description": "מחלת ילד",
+          "ShortDescription": "מחלת ילד",
+          "goodFor": 2
+        },
+        {
+          "Code": 23,
+          "Description": "מחלת בן זוג",
+          "ShortDescription": "מ.בן זוג",
+          "goodFor": 2
+        },
+        {
+          "Code": 28,
+          "Description": "מחלת הורים",
+          "ShortDescription": "מח.הורים",
+          "goodFor": 2
+        },
+        {
+          "Code": 624,
+          "Description": "עבודה מהבית",
+          "ShortDescription": "ע.מהבית",
+          "goodFor": 2
         }
-    ]        
+      ]       
     })
 
 mock.onAny('/me/reports/status')

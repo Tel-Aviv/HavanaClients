@@ -1,14 +1,13 @@
 import React, { useState, useEffect, Suspense } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { ADD_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
 import { Table, Popconfirm, Modal, Form, Icon,
-        Tag, Row, Col, Tooltip, Typography } from 'antd';
-const { Text, Title } = Typography;        
+        Tag, Row, Col, Tooltip } from 'antd';
 import { PlusCircleTwoTone, 
   MinusCircleTwoTone,
   TagOutlined } 
 from '@ant-design/icons';
-import moment, { max } from 'moment';
+import moment from 'moment';
 import { useTranslation } from "react-i18next";
 
 import { ReportContext } from "./TableContext";
@@ -20,6 +19,7 @@ const FullDayReport = React.lazy( () => import('./FullDayReport') );
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
 const format = 'HH:mm';
+const DATE_FORMAT = 'DD/MM/YYYY';
 
 const TableReport = (props) => {
 
@@ -63,7 +63,7 @@ const TableReport = (props) => {
                 ...record, 
                 requireChange : _isRowEditable, // isRowEditable(record),
                 valid : _isRowEditable ? false : true, // (record.requireChange)?  false : true,
-                rdate : moment(record.rdate).format('DD/MM/YYYY')
+                rdate : moment(record.rdate).format(DATE_FORMAT)
             }
           })
         )
@@ -106,7 +106,7 @@ const TableReport = (props) => {
       }
     
       const isTotalled = (item) => {
-        const tokens = item.total.split(':');
+        const tokens = item.acceptedHours.split(':');
         const hours = parseInt(tokens[0]);
         const minutes = parseInt(tokens[1]);
         return item.total != '0:00';
@@ -178,7 +178,7 @@ const TableReport = (props) => {
             let newItem = {
               ...item,
               ...row,
-              rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('DD/MM/YYYY')
+              rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT)
             }
             newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
             newItem.valid = true;
@@ -237,7 +237,7 @@ const TableReport = (props) => {
               ) : null
         },
           {
-            title: 'יום',
+            title: t('day'),
             width: '4%',
             dataIndex: 'day',
             align: 'right',
@@ -245,7 +245,7 @@ const TableReport = (props) => {
             editable: false,
           },
           {
-            title: 'יום בשבוע',
+            title: t('day_of_week'),
             width: '10%',
             dataIndex: 'dayOfWeek',
             align: 'center',
@@ -261,9 +261,9 @@ const TableReport = (props) => {
             render: (text, record) => {
               const isEditedManually = isRecordUpdatedManually(record, 'entry')
     
-              let tagColor = 'green';
+              let tagColor = 'blue';
               if( text === '0:00' ) {
-                tagColor = 'volcano'
+                tagColor = 'magenta'
               }
               return <Row>
                       <Tag color={tagColor}
@@ -291,9 +291,9 @@ const TableReport = (props) => {
     
               const isEditedManually = isRecordUpdatedManually(record, 'exit')
     
-              let tagColor = 'green';
+              let tagColor = 'blue';
               if( text === '0:00' ) {
-                tagColor = 'volcano'
+                tagColor = 'magenta'
               }
               return <>
                     <Tag color={tagColor}
@@ -311,27 +311,27 @@ const TableReport = (props) => {
                 </>                  
             }
           },
-          {
-            title: 'סיכום',
-            width: '6%',
-            dataIndex: 'total',
-            align: 'right',
-            editable: false,
-          },
-          {
-            title: 'נדרש',
-            width: '6%',
-            dataIndex: 'required',
-            align: 'right',
-            editable: false,
-          },
           // {
-          //   title: 'נחשב',
+          //   title: 'סיכום',
           //   width: '6%',
-          //   dataIndex: 'accepted',
+          //   dataIndex: 'total',
           //   align: 'right',
-          //   editable: false
+          //   editable: false,
           // },
+          {
+            title: t('required'),
+            width: '6%',
+            dataIndex: 'requiredHours',
+            align: 'right',
+            editable: false,
+          },
+          {
+            title: t('accepted'),
+            width: '6%',
+            dataIndex: 'acceptedHours',
+            align: 'right',
+            editable: false
+          },
           {
             title: t('report_code'),
             width: '14%',
@@ -340,7 +340,7 @@ const TableReport = (props) => {
             editable: true,
             render: (text, record) => {
               
-              if( !moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) )
+              if( !moment(record.rdate, DATE_FORMAT).isBefore(moment()) )
                 return null;
 
               return <Row>
@@ -365,11 +365,11 @@ const TableReport = (props) => {
             editable: false,
             render: (text, record) => {
 
-              if( !moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) )
+              if( !moment(record.rdate, DATE_FORMAT).isBefore(moment()) )
                 return null;
 
               return ( text !== '' ) ?
-                  <Tag color="blue"
+                  <Tag color="magenta"
                     style={{
                       marginRight: '0'
                     }}>
@@ -402,7 +402,7 @@ const TableReport = (props) => {
             width: '10%',
             render: (_, record) => {
 
-              return ( moment(record.rdate, 'DD/MM/YYYY').isBefore(moment()) // no edits for future
+              return ( moment(record.rdate, DATE_FORMAT).isBefore(moment()) // no edits for future
                         && record.requireChange)? 
                 (<EditIcons 
                     record={record}
@@ -443,8 +443,8 @@ const TableReport = (props) => {
         };
       });
 
-      if( props.employeKind === 1) { // Do not display 'required' columns for Contractors 
-        let index = columns.findIndex( item => item.dataIndex === 'required');
+      if( props.employeKind === 1) { // Do not display 'requiredHours' columns for Contractors 
+        let index = columns.findIndex( item => item.dataIndex === 'requiredHours');
         columns = [...columns.slice(0, index),
                   ...columns.slice(index+1)];
         // index = columns.findIndex( item => item.dataIndex === 'accepted');
@@ -488,11 +488,11 @@ const TableReport = (props) => {
         let found = false;  
         if( columnName === 'entry' ) {
                 found = manualUpdates.find( item => {
-                return item.Day == parseInt(record.day) && item.InOut === true
+                  return item.day == parseInt(record.day) && item.inout === true
                 })
         }  else if ( columnName === 'exit') {
                 found = manualUpdates.find( item => {
-                return item.Day == parseInt(record.day) && item.InOut === false
+                  return item.day == parseInt(record.day) && item.inout === false
                 })
         }
     
@@ -549,7 +549,7 @@ const TableReport = (props) => {
 
         let newItem = {
             ...recordToAdd,
-            rdate: moment(recordToAdd.rdate, 'DD/MM/YYYY').startOf('day').format('YYYY-MM-DD'),
+            rdate: moment(recordToAdd.rdate, DATE_FORMAT).startOf('day').format('YYYY-MM-DD'),
             key: addedPositions.key + 1,
             isAdded: true,
             userNotes: userNotes,
@@ -586,7 +586,7 @@ const TableReport = (props) => {
             ...item,
             inTime: newItem.inTime, 
             outTime: newItem.outTime, 
-            rdate: moment(item.rdate, 'DD/MM/YYYY').startOf('day').format('YYYY-MM-DD'),
+            rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format('YYYY-MM-DD'),
             reportCode: newItem.reportCode, 
             userNotes: newItem.userNotes,
             isFullDay: true

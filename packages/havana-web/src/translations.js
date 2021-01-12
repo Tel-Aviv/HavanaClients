@@ -24,9 +24,13 @@ const translations = {
             "for_month": "for month",
             "miising_in": "missing entry",
             "missing_out": "missing exit",
+            "day": "Day",
+            "day_of_week": "Day of Week",
             "in": "In",
             "out": "Out",
-            "systemNotes": "Sys Notes",
+            "accepted": "Accepted Hours",
+            "required": "Required Hours",
+            "systemNotes": "System Notes",
             "user_notes": "Notes",
             "notes_for_report": "Notes for Report",
             "missing_notes": "Please provide notes",
@@ -94,10 +98,14 @@ const translations = {
             "refresh": "Refresh",
             "cancel_edit": "Sure to discard changes?",
             "why_add_record": "Free text - the essence of the activity",
-            "report_full_day": "Report whole day",
+            "report_full_day": "Report whole day ",
             "job_description": "Job Description",
             "job_description_tooltip": "This text will be attached to a daily report",
-            "job_description_error": "What do you did on this day?"
+            "job_description_error": "What do you did on this day?",
+            "day_status_ok": "Record is valid",
+            "day_status_invalid": "Record is invalid",
+            "inout_details_caption": "Entrance/Exit details for ",
+            "extra_hours": "Extra Hours" 
         }
     },
     he: {
@@ -113,7 +121,7 @@ const translations = {
             "signature": "חתימה",
             "stamp": "חותמת",
             "setting_title": "הגדרות אישיות",
-            "details": "פרטים",
+            "details": "פירוט",
             "notifications": "דוחות לטיפולך",
             "plain": "טבלה",
             "calendar": "לוח חודשי",
@@ -125,8 +133,12 @@ const translations = {
             "for_month": " לחודש",
             "miising_in": "חסרה כניסה",
             "missing_out": "חסרה יציאה",
+            "day": "יום",
+            "day_of_week": "יום בשבוע",            
             "in": "כניסה",
             "out": "יציאה",
+            "accepted": "נחשב",
+            "required": "נדרש",
             "system_notes": "סימון",
             "user_notes": "הערות",
             "notes_for_report": "הערות לדוח",
@@ -195,10 +207,14 @@ const translations = {
             "refresh": "רענן",
             "cancel_edit": "האם ברצונך לבטל את השינויים ?",
             "why_add_record": "טקסט חופשי - מהות הפעילות",
-            "report_full_day": "דיווח יום מלא",
+            "report_full_day": " דיווח יום מלא ",
             "job_description": "פירוט העבודה",
             "job_description_tooltip": "הפירוט ייצורף לדוח יומי",
-            "job_description_error": "מה עשית ביום זה?"    
+            "job_description_error": "מה עשית ביום זה?",
+            "day_status_ok": "רישום תקין",
+            "day_status_invalid": "רישום צריך תיקון",
+            "inout_details_caption": " פירוט כניסות ויציאות לתאריך",
+            "extra_hours": "שעות נוספות" 
         }
     }
 }    
