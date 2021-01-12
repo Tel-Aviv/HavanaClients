@@ -606,9 +606,9 @@ const Home = () => {
             || spareHours.granted === 0 
             || !spareHours.actual 
             || spareHours.actual === 0)
-            return '0%';
+            return '0';
 
-        return  `% ${Math.floor(spareHours.actual/spareHours.granted * 100)}`
+        return Math.floor(spareHours.actual/spareHours.granted * 100)
 
     }
 
@@ -782,8 +782,9 @@ const Home = () => {
                                 style={{ width: 270}}
                                 bordered={false}
                                 className='rtl' loading={loadingData}>
-                                <Pie percent={ getSpareHoursPercentage()} 
-                                    // total={ getSpareHoursPercentage() } 
+                                <Pie 
+                                    percent={ getSpareHoursPercentage()} 
+                                    total={ `% ${getSpareHoursPercentage()}` } 
                                     title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
                                     animate={false}
                                     subTitle={ `${spareHours.actual ?? 0} שעות`}
