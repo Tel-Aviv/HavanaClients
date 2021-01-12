@@ -242,7 +242,7 @@ const Home = () => {
                 defineAlert(report);
                 setSpareHours({
                     actual: report.spareHours,
-                    granted: report.spaceHoursGranted
+                    granted: report.spaceHoursLimit
                 })
                 setIsReportRejected( report.isRejected );
                 const employerCode = report.employerCode || 0;
@@ -595,10 +595,6 @@ const Home = () => {
         return current && 
                 ( current > moment().endOf('day') )
                 || (current < moment().add(-12, 'month'))
-    }
-
-    const getTotalHoursPercentage = () => {
-        return Math.floor( parseFloat(totals) / 160. * 100 );
     }
 
     const getSpareHoursPercentage = () => {

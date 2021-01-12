@@ -57,7 +57,8 @@ const Confirm = (props) => {
     const [approvalSending, setApprovalSending] = useState(false);
     const [manualUpdates, setManualUpdates] = useState();
     const [extraHoursModalVisible, setExtraHoursModalVisible] = useState(false);
-  
+    const [spareHours, setSpareHours] = useState({});
+
     const history = useHistory();
     const componentRef = useRef();
     const context = useContext(DataContext)
@@ -94,6 +95,10 @@ const Confirm = (props) => {
                 setReportRejected(resp.data.isRejected);
                 setReportResubmitted(resp.data.reSubmitted);
                 setReportNote(resp.data.note);
+                setSpareHours({
+                    actual: resp.data.spareHours,
+                    granted: resp.data.spaceHoursLimit
+                })
                 setTitle(`אישור דוח נוכחות של ${resp.data.ownerName} ל ${resp.data.month}/${resp.data.year}`);
 
                 resp = await context.API.get(`/me/employees/manual_updates/${routeParams.userid}?year=${resp.data.year}&month=${resp.data.month}`, {
@@ -211,10 +216,16 @@ const Confirm = (props) => {
         setNote(evt.target.value)
     }
 
-    const getTotalHoursPercentage = () => {
-        return Math.floor( parseFloat(totals) / 160. * 100 );
-    }
+    const getSpareHoursPercentage = () => {
+        if( !spareHours.granted 
+            || spareHours.granted === 0 
+            || !spareHours.actual 
+            || spareHours.actual === 0)
+            return '0';
 
+        return Math.floor(spareHours.actual/spareHours.granted * 100)
+
+    }
     const onPrint = () => {
         setPrintModalVisible(!printModalVisible);
     }
@@ -322,8 +333,8 @@ const Confirm = (props) => {
                                 style={{ width: 270}}
                                 className='rtl' 
                                 loading={loadingData}>
-                                <Pie percent={getTotalHoursPercentage()} 
-                                    total={getTotalHoursPercentage() + '%'} 
+                                <Pie percent={ getSpareHoursPercentage() } 
+                                    total={`% ${getSpareHoursPercentage()}` } 
                                     title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
                                     animate={false}
                                     height={140} />
