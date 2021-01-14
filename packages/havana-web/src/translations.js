@@ -105,7 +105,9 @@ const translations = {
             "day_status_ok": "Record is valid",
             "day_status_invalid": "Record is invalid",
             "inout_details_caption": "Entrance/Exit details for ",
-            "extra_hours": "Extra Hours" 
+            "extra_hours": "Extra Hours",
+            "next": "Next",
+            "previous": "Previous"
         }
     },
     he: {
@@ -214,7 +216,9 @@ const translations = {
             "day_status_ok": "רישום תקין",
             "day_status_invalid": "רישום צריך תיקון",
             "inout_details_caption": " פירוט כניסות ויציאות לתאריך",
-            "extra_hours": "שעות נוספות" 
+            "extra_hours": "שעות נוספות",
+            "next": "הבא",
+            "previous": "קודם"
         }
     }
 }    

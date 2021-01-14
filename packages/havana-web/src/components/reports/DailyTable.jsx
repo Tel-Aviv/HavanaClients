@@ -16,10 +16,8 @@ import EditIcons from './EditIcons';
 import EditableCell from './EditableCell';
 import AddRecordModal from './AddRecordModal';
 const FullDayReport = React.lazy( () => import('./FullDayReport') );
-//import FullDayReport from './FullDayReport';
 
-const TIME_FORMAT = 'HH:mm';
-const DATE_FORMAT = 'DD/MM/YYYY';
+import { TIME_FORMAT, DATE_FORMAT } from '../../globals'
 
 const DailyTable = (props) => {
 

@@ -1,6 +1,5 @@
 import React from 'react';
-import  { Layout, Popconfirm,
-    Tooltip, Modal, Button,
+import  { Modal, Button,
     Typography, Table, Tag,
     Alert, Card,
     Row, Col,
@@ -10,6 +9,7 @@ const { Title } = Typography;
 import uniqid from 'uniqid';
 import { useTranslation } from "react-i18next";
 
+import { TIME_FORMAT } from '../../globals'
 
 const ValidationReport = ({visible, onClosed, invalidItems}) => {
 
@@ -38,12 +38,18 @@ const ValidationReport = ({visible, onClosed, invalidItems}) => {
                 if( text === '0:00' ) {
                     tagColor = 'magenta'
                 }
-                return <Tag color={tagColor}
-                        style={{
+                return text.format(TIME_FORMAT) === '00:00' ?
+                    <div>-</div> :
+                    <>
+                        <Tag color={tagColor}
+                            style={{
                             marginRight: '0'
                         }}>
-                        {text}
+                            {
+                                text.format(TIME_FORMAT)
+                            }
                         </Tag>
+                    </> 
             }          
         }, {
             title: 'יציאה',
@@ -55,12 +61,18 @@ const ValidationReport = ({visible, onClosed, invalidItems}) => {
                 if( text === '0:00' ) {
                 tagColor = 'magenta'
                 }
-                return <Tag color={tagColor}
-                        style={{
+                return text.format(TIME_FORMAT) === '00:00' ?
+                    <div>-</div> :
+                    <>
+                        <Tag color={tagColor}
+                            style={{
                             marginRight: '0'
                         }}>
-                        {text}
+                            {
+                                text.format(TIME_FORMAT)
+                            }
                         </Tag>
+                    </> 
             }
         }, {
             title: 'סיכום',
@@ -109,7 +121,7 @@ const ValidationReport = ({visible, onClosed, invalidItems}) => {
                     </Title>
                 </div>
                 <Row>
-                    <Col>
+                    <Col span={24}>
                         <Table style={{
                                     direction: 'rtl'
                                 }}

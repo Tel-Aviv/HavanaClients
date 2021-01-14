@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Row, Col, Tag,
-    Modal, Tooltip } from 'antd';
+import { Calendar, Row, Col, Tag, Modal } from 'antd';
 import moment from 'moment';
 import { useTranslation } from "react-i18next";
 
 const DailyTable = React.lazy( () => import('./DailyTable') );
 
-const format = 'HH:mm';
-const DATE_FORMAT = 'DD/MM/YYYY';
+import { TIME_FORMAT, DATE_FORMAT } from '../../globals'   
 
 const CalendarReport = (props) => {
 
@@ -137,7 +135,7 @@ const CalendarReport = (props) => {
               ...record,
               rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT)
             }
-            newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
+            newItem.total = moment.utc(moment(newItem.exit, TIME_FORMAT).diff(moment(newItem.entry, TIME_FORMAT))).format(TIME_FORMAT)
             newItem.valid = true;
             
             newData.splice(index, 1, newItem);

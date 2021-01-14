@@ -17,7 +17,7 @@ const { Content } = Layout;
 import { DataContext } from './DataContext';
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
-const DATE_FORMAT = 'DD/MM/YYYY';
+import { DATE_FORMAT } from 'globals'   
 
 const monthsFilter = [...Array(12).keys()].map( i => ({
                                                         text: i+1,

@@ -19,9 +19,8 @@ import { IssuesCloseOutlined,
     FundOutlined,
     PrinterOutlined,
     CheckCircleOutlined } 
-from '@ant-design/icons'
-;const { Content } = Layout;
-const { Title } = Typography;
+from '@ant-design/icons';
+const { Content } = Layout;
 const { MonthPicker } = DatePicker;
 
 import { Tabs, message  } from 'antd';
@@ -34,15 +33,14 @@ import { DataContext } from './DataContext';
 import { UPDATE_ITEM } from "./redux/actionTypes";
 
 import TableReport from '@reports/TableReport';
-import NestedTableReport from "@reports/NestedTableReport";
+//import NestedTableReport from "@reports/NestedTableReport";
 import CalendarReport from '@reports/CalendarReport';
 const YearReport = React.lazy( () => import('@reports/YearReport') )
 import DocsUploader from '@components/DocsUploader';
 const ValidationReport = React.lazy( () => import('@reports/ValidationsReport') )
 const ExtraHoursModal = React.lazy( () => import('@reports/ExtraHoursModal'))
 
-const TIME_FORMAT = 'HH:mm';
-const DATE_FORMAT = 'YYYY-MM-DD';
+import { TIME_FORMAT, DATE_FORMAT } from './globals'
 
 const Home = () => {
 
@@ -72,11 +70,11 @@ const Home = () => {
 
     const [daysOff, setDaysOff] = useState([]);
     const [manualUpdates, setManualUpdates] = useState([]);
-    // const [manualChanges, setManualChanges] = useState(new Set([]));
     const [assignee, setAssignee] = useState();
     const [reportCodes, setReportCodes] = useState([]);
     const [employeKind, setEmployeKind] = useState();
     const [spareHours, setSpareHours] = useState({});
+    const [criticalSystemNotes, setCriticalSystemNotes] = useState([]);
 
     const dataContext = useContext(DataContext);
     const componentRef = useRef();
@@ -221,7 +219,8 @@ const Home = () => {
                             month: month
                         }
                     }),
-                    dataContext.API.get(`/me/reports/${year}/${month}`)
+                    dataContext.API.get(`/me/reports/${year}/${month}`),
+                    dataContext.API.get(`system_notes`)
                 ]);
 
                 // 1. Process work off days
@@ -283,6 +282,12 @@ const Home = () => {
                 setTotals(`${Math.floor(report.totalHours)}:${Math.round(report.totalHours % 1 * 60)}`);
 
                 setIsReportEditable(report.isEditable);
+
+                // 4. Process system notes
+                data = respArr[3].data.notes;
+                setCriticalSystemNotes( data.filter( item => 
+                    item.severityCode === 1
+                ))
 
             } catch(err) {
                 handleError(err);
@@ -449,31 +454,11 @@ const Home = () => {
     }
     
     const validateReport = () => {
+
         const res = isReportDataValid();
         if( !res.isValid ) {
+            setInvalidReportItems(res.items);
             setValidateModalOpen(true);
-            const item = reportData[res.invalidItemIndex];
-            const _date = moment(item.rdate).format(DATE_FORMAT);
-            console.log(_date);
-            const invalidItem = //{ ...item,
-                                //    rdate : moment(item.rdate).format(DATE_FORMAT)                         
-                                //}
-                                {
-                                    "id":87864,
-                                    "rdate":"2020-07-01T00:00:00",
-                                    "day":"1",
-                                    "isWorkingDay":false,
-                                    "dayOfWeek":"ד",
-                                    "entry":"10:54",
-                                    "exit":"18:22",
-                                    "required": "8:18",
-                                    "accepted": "8:18",
-                                    "systemNotes":"",
-                                    "total":"7:28",
-                                    "isAdded":false,
-                                    "reportCode":""
-                                };                                
-            setInvalidReportItems([invalidItem]);
         }
         else {
             setValidateModalOpen(false); 
@@ -482,7 +467,6 @@ const Home = () => {
             setReportDataValid( true );
             message.info(t('report_validated'));
         }
-
     }
 
     const isWorkingDay = (item) => {
@@ -500,39 +484,21 @@ const Home = () => {
             return !(item.dayOfWeek === 'ש' || item.dayOfWeek === 'ו');
     }
 
-    const isTotalled = (item) => {
-        const tokens = item.total.split(':');
-        const hours = parseInt(tokens[0]);
-        const minutes = parseInt(tokens[1]);
-    
-        //return item.entry !== '0:00' && item.exit !== '0:00'
-        return item.total != '0:00';
-    }
-
     const isReportDataValid = () => {
 
-        let invalidItemIndex = -1;
-        const res = reportData.some( (item, index) => {
+        const pastData = reportData.filter( item =>
+             moment(item.rdate).isBefore(moment())
+        )
 
-            const workingDay = isWorkingDay(item);
-            // const hasTotal = isTotalled(item);
-
-            const isItemInvalid = workingDay 
-                // && !hasTotal 
-                && !item.systemNotes 
-                || item.systemNotes.startsWith('*');
-            if( isItemInvalid ) {
-                invalidItemIndex = index;
-                return true;
-            }
-
-            return isItemInvalid;
-        })
+        const invalidItems = _.intersectionWith(pastData, criticalSystemNotes, ( (a, b) =>
+            a.systemNotes === b.name
+        ));
 
         return {
-            isValid: !res,
-            invalidItemIndex: invalidItemIndex
-        } 
+            isValid: invalidItems.length === 0,
+            items: invalidItems
+        }
+
     }
 
     const onShowPDF = () => {
@@ -570,10 +536,6 @@ const Home = () => {
         }
       
     }  
-
-    const handleMenuClick = (e) => {
-        message.info(`הדוח יועבר לאישור ${assignee}`);
-    }
 
     const onMonthChange = (date, dateString) => {
         if( date ) {
@@ -696,6 +658,15 @@ const Home = () => {
         setPrintModalVisible(false);
     }
 
+    const lazyShowValidationReport = () => (
+        validateModalOpen ?
+            <ValidationReport visible={validateModalOpen}
+                onClosed={setValidateModalOpen}
+                invalidItems={invalidReportItems}
+            /> :
+            null
+    )
+
     const lazyShowExtraHours = () => (
         extraHoursModalVisible ?
             <ExtraHoursModal
@@ -738,10 +709,9 @@ const Home = () => {
     return (
         <Content>
             <Suspense fallback={<div>Loading Validation Report...</div>}>
-                <ValidationReport visible={validateModalOpen}
-                    onClosed={setValidateModalOpen}
-                    invalidItems={invalidReportItems}
-                />
+            {
+                lazyShowValidationReport()
+            }
             </Suspense>
             <Row className='hvn-item-ltr' align={'middle'} type='flex'>
                 <Col span={10} >

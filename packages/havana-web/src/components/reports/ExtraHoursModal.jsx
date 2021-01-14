@@ -13,7 +13,6 @@ const ExtraHoursModal = ({title, visible, dataSource, cancel}) => {
         setTableData(dataSource);
     },[dataSource])
 
-
     const renderTime = (text) => {
         if( text === '0:00' )
             return <div>{ text }</div>

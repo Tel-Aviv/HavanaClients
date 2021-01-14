@@ -26,13 +26,13 @@ import ReactToPrint from 'react-to-print';
 import { DataContext } from './DataContext';
 import TableReport from '@reports/TableReport';
 import DocsUploader from '@components/DocsUploader';
-const ExtraHoursModal = React.lazy( () => import('@reports/ExtraHoursModal'))
+const ExtraHoursModal = React.lazy( () => import('@reports/ExtraHoursModal') )
+const ApprovalModal = React.lazy( ()=> import('@reports/ApprovalModal') )
 
 import { DECREASE_NOTIFICATIONS_COUNT,
          INCREASE_NOTIFICATION_COUNT } from "./redux/actionTypes";
 
-const TIME_FORMAT = 'HH:mm';
-const DATE_FORMAT = 'DD/MM/YYYY';
+import { TIME_FORMAT, DATE_FORMAT } from 'globals'         
 
 const ref = React.createRef();
 
@@ -58,6 +58,7 @@ const Confirm = (props) => {
     const [manualUpdates, setManualUpdates] = useState();
     const [extraHoursModalVisible, setExtraHoursModalVisible] = useState(false);
     const [spareHours, setSpareHours] = useState({});
+    const [approvalModalVisible, setApprovalModalVisible] = useState(false);
 
     const history = useHistory();
     const componentRef = useRef();
@@ -290,6 +291,28 @@ const Confirm = (props) => {
             null
     )
 
+    const onShowAppovalModal = () => {
+        setApprovalModalVisible(!approvalModalVisible)
+    }
+
+    const lazyShowApprovalModal = () => (
+        approvalModalVisible ?
+            <ApprovalModal visible={true}
+                onOk={onApproved}
+                onCancel={onApproveCanceled}
+                extraHours={spareHours}
+            /> :
+            null
+    )
+
+    const onApproved = (param1) => {
+        setApprovalModalVisible(false)
+    }
+
+    const onApproveCanceled = () => {
+        setApprovalModalVisible(false)
+    }
+
     return (
         <Content>
             <Title level={1} className='hvn-title'>{title}</Title>
@@ -297,7 +320,7 @@ const Confirm = (props) => {
                 <Col span={3}>
                     <Space>
                         <Button type='primary' loading={approvalSending}
-                                onClick={ () => onContinue() }>
+                                onClick={ () => onShowAppovalModal() }>
                                     {t('continue')}
                         </Button>                           
                         <Button
@@ -418,6 +441,11 @@ const Confirm = (props) => {
                     </Row>
                 </div>                                        
             </Modal>
+            <Suspense>
+                {
+                    lazyShowApprovalModal()
+                }
+            </Suspense>
             <Modal closable={false} 
                     className='rtl'
                     visible={notesModalVisible}
@@ -442,7 +470,7 @@ const Confirm = (props) => {
                                         }} onClick={onForward}>
                                     {t('move_to')}
                                 </Button>
-                            </Tooltip>        ,
+                            </Tooltip>,
                             <Tooltip key='approve' title={t('approve_tooltip')}>
                                 <Button type="primary" 
                                     style={{
