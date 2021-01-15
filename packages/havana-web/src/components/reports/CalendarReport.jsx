@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Row, Col, Tag, Modal } from 'antd';
+import { Calendar, Row, Col, Tag, Modal, Typography } from 'antd';
+const { Text } = Typography;  
 import moment from 'moment';
 import { useTranslation } from "react-i18next";
 
@@ -94,7 +95,11 @@ const CalendarReport = (props) => {
                                         width: '100%',
                                         textAlign: 'start'
                                     }}>
-                                    {originalItem.systemNotes}
+                                    {
+                                        originalItem.isUpdated ?
+                                        <Text delete>{ originalItem.systemNotes }</Text> :
+                                        <Text>{ originalItem.systemNotes }</Text>
+                                    }
                                 </Tag> : null
                             }
                         </li>
