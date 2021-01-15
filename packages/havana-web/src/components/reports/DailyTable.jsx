@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { ADD_ITEM, UPDATE_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
 import { Table, Popconfirm, Modal, Form, Icon,
     Tag, Row, Col, Tooltip, Typography } from 'antd';
+const { Text } = Typography;    
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 import { PlusCircleTwoTone, 
     MinusCircleTwoTone,
@@ -418,7 +419,7 @@ const DailyTable = (props) => {
           return <Row>
             <Col>
               <div style={{whiteSpace: 'nowrap'}}>
-                {text}
+                  { text }
               </div>
             </Col>
             <Col>
@@ -441,13 +442,17 @@ const DailyTable = (props) => {
             return null;
 
           return ( text !== '' ) ?
-              <Tag color="magenta"
-                style={{
-                  marginRight: '0'
+                <Tag color="magenta"
+                    style={{
+                    marginRight: '0'
                 }}>
-                {text}
-              </Tag>
-              : null
+                    {
+                        record.isUpdated ?
+                            <Text delete>{text}</Text> : 
+                            <Text>{text}</Text>
+                    }
+                </Tag>
+                : null
         }
       },           {
         title: t('user_notes'),

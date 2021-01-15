@@ -486,17 +486,18 @@ const Home = () => {
 
     const isReportDataValid = () => {
 
-        const pastData = reportData.filter( item =>
+        const invalidItems = _.intersectionWith(reportData, criticalSystemNotes, ( (a, b) =>
+            a.systemNotes === b.name
+            && !a.isUpdated
+        ));
+
+        const invalidData = invalidItems.filter( item =>
              moment(item.rdate).isBefore(moment())
         )
 
-        const invalidItems = _.intersectionWith(pastData, criticalSystemNotes, ( (a, b) =>
-            a.systemNotes === b.name
-        ));
-
         return {
-            isValid: invalidItems.length === 0,
-            items: invalidItems
+            isValid: invalidData.length === 0,
+            items: invalidData
         }
 
     }

@@ -270,7 +270,7 @@ const SupportPage = () => {
             <Layout.Footer>
                 <Row>
                     <Col offset={10}>
-                        <Button type='primary' onClick={sendOut}>Send to Support Pesonnel</Button>
+                        <Button type='primary' onClick={sendOut}>Send to Support Personnel</Button>
                     </Col>
                 </Row>
             </Layout.Footer>
