@@ -107,7 +107,8 @@ const translations = {
             "inout_details_caption": "Entrance/Exit details for ",
             "extra_hours": "Extra Hours",
             "next": "Next",
-            "previous": "Previous"
+            "previous": "Previous",
+            "valid_not_completed" : "The report is valid but not completed till the end of the month"
         }
     },
     he: {
@@ -218,7 +219,8 @@ const translations = {
             "inout_details_caption": " פירוט כניסות ויציאות לתאריך",
             "extra_hours": "שעות נוספות",
             "next": "הבא",
-            "previous": "קודם"
+            "previous": "קודם",
+            "valid_not_completed": "הדו\"ח תקין אך לא הושלם עד סוף החודש"
         }
     }
 }    

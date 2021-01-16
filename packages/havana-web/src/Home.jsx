@@ -461,11 +461,17 @@ const Home = () => {
             setValidateModalOpen(true);
         }
         else {
-            setValidateModalOpen(false); 
-            setInvalidReportItems(null);
 
-            setReportDataValid( true );
-            message.info(t('report_validated'));
+            if( res.items.length === 0 ) {
+                message.warning(t('valid_not_completed'))
+            } else {
+                setValidateModalOpen(false); 
+                setInvalidReportItems(null);
+    
+                setReportDataValid( true );
+                message.info(t('report_validated'));
+            }
+
         }
     }
 
