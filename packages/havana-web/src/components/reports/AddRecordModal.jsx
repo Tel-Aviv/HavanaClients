@@ -25,6 +25,7 @@ const tailLayout = {
 };
 
 import { ReportContext } from "./TableContext";
+import { DATE_FORMAT } from '../../globals';
 
 const AddRecordModal = ({visible, record, onCancel, onAddRecord}) => {
 
@@ -64,7 +65,7 @@ const AddRecordModal = ({visible, record, onCancel, onAddRecord}) => {
                 { 
                     record ?  
                         moment.isMoment(record.rdate) ? 
-                            record.rdate.format('DD/MM/YYYY') :
+                            record.rdate.format(DATE_FORMAT) :
                             record.rdate
                     : null
                 }

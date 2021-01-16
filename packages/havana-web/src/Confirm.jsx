@@ -8,9 +8,9 @@ import { useTranslation } from "react-i18next";
 
 import { Button, Typography, 
         Row, Col, Card, Tooltip, 
-        Collapse, Alert, Space } from 'antd';
-const { Panel } = Collapse;
-import { Input, Modal } from 'antd';
+        Alert, Space,
+        Input, Modal 
+} from 'antd';
 
 const { Title } = Typography;    
 
@@ -32,7 +32,7 @@ const ApprovalModal = React.lazy( ()=> import('@reports/ApprovalModal') )
 import { DECREASE_NOTIFICATIONS_COUNT,
          INCREASE_NOTIFICATION_COUNT } from "./redux/actionTypes";
 
-import { TIME_FORMAT, DATE_FORMAT } from 'globals'         
+import { TIME_FORMAT, DATE_FORMAT } from './globals'         
 
 const ref = React.createRef();
 
@@ -433,7 +433,7 @@ const Confirm = (props) => {
                         </Col>
                         <Col span={6}>
                             { 
-                                whenApproved ?
+                                whenApproved && whenApproved.isValid() ?
                                     <div className='footer-print'>{t('approved_when')} {whenApproved.format(DATE_FORMAT)}</div> :
                                     null
                             }

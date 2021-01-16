@@ -17,14 +17,14 @@ const { Content } = Layout;
 import { DataContext } from './DataContext';
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
-import { DATE_FORMAT } from 'globals'   
+import { DATE_FORMAT } from './globals'   
 
 const monthsFilter = [...Array(12).keys()].map( i => ({
                                                         text: i+1,
                                                         value: i + 1
                                                     })
                                               )
-const yearsFilter = [2019, 2020, 2021, 2022, 2023, 2024].map( i => ({
+const yearsFilter = [2020, 2021, 2022, 2023, 2024].map( i => ({
                                                             text: i,
                                                             value: i
                                                         })
@@ -57,7 +57,10 @@ const columns = [{
       title: "תאריך שליחה",
       dataIndex: "whenSubmitted",
       align: 'right',
-      key: "submitted"
+      key: "submitted",
+      render: (text, record) => {
+          return moment(text).format(DATE_FORMAT)
+      }
    },{
       title: "סימון",
       dataIndex: "systemNotes",
@@ -165,21 +168,22 @@ const ConfirmList = () => {
                     context.API.get('/me/pendings/rejected')
                 ])
 
-                const pendingReports = resp[0].data.map( (item, index) => {
-                    return {
+                const pendingReports = resp[0].data.map( (item, index) => (
+
+                    {
                         ...item,
-                        whenSubmitted: moment(item.whenSubmitted).format(DATE_FORMAT),
+                        whenSubmitted: moment(item.whenSubmitted),
                         key: index
                     }
-                })
+                ))
                 setPendingCount(pendingReports.length);
                 setPendingList(pendingReports);
 
                 const approvedReports = resp[1].data.map( (item, index) => {
                     return {
                         ...item,
-                        whenSubmitted: moment(item.whenSubmitted).format(DATE_FORMAT),
-                        whenApproved: moment(item.whenApproved).format(DATE_FORMAT),
+                        whenSubmitted: moment(item.whenSubmitted),
+                        whenApproved: moment(item.whenApproved),
                         key: index
                     }
                 });
@@ -200,8 +204,8 @@ const ConfirmList = () => {
                 const _rejectedList = resp[2].data.map( (item, index) => {
                     return {
                         ...item,
-                        whenSubmitted: moment(item.whenSubmitted).format(DATE_FORMAT),
-                        whenRejected: moment(item.whenRejected).format(DATE_FORMAT),
+                        whenSubmitted: moment(item.whenSubmitted),
+                        whenRejected: moment(item.whenRejected),
                         key: index
                     }
                 });

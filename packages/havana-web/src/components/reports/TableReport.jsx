@@ -547,7 +547,7 @@ const TableReport = (props) => {
 
         let newItem = {
             ...recordToAdd,
-            rdate: moment(recordToAdd.rdate, DATE_FORMAT).startOf('day').format('YYYY-MM-DD'),
+            rdate: moment(recordToAdd.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT),
             key: addedPositions.key + 1,
             isAdded: true,
             userNotes: userNotes,
@@ -584,7 +584,7 @@ const TableReport = (props) => {
             ...item,
             inTime: newItem.inTime, 
             outTime: newItem.outTime, 
-            rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format('YYYY-MM-DD'),
+            rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT),
             reportCode: newItem.reportCode, 
             userNotes: newItem.userNotes,
             isFullDay: true

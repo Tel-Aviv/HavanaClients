@@ -164,7 +164,7 @@ const CalendarReport = (props) => {
             ...item,
             inTime: newItem.inTime, 
             outTime: newItem.outTime, 
-            rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format('YYYY-MM-DD'),
+            rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT),
             reportCode: newItem.reportCode, 
             userNotes: newItem.userNotes,
             isFullDay: true
