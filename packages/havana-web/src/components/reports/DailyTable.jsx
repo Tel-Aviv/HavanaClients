@@ -185,16 +185,20 @@ const DailyTable = (props) => {
             let replacedItem = {
                 ...item,
                 ...newValues,
+                isFullDay: true,
+                isUpdated: true,
                 valid: true
             }
 
             newData.splice(index, 1, replacedItem);
             setTableData(newData);
+
+            props.onSave && props.onSave(replacedItem)
         }
 
         setFullDayReportVisible(false);
-        setRecordToAdd(null);        
-
+        setRecordToAdd(null);
+   
     }
 
     const addRecord = ({inTime, outTime, reportCode, userNotes, isFullDay}) => {
@@ -407,7 +411,6 @@ const DailyTable = (props) => {
         }
     }, {
         title: t('report_code'),
-        width: '14%',
         dataIndex: 'reportCode',
         align: 'right',
         editable: true,
@@ -531,12 +534,14 @@ const DailyTable = (props) => {
        }
      }>
         
-        <AddRecordModal 
-            visible={addModalVisible}
-            record = {recordToAdd}
-            onCancel={onCancelAdd}
-            onAddRecord={addRecord}
-        />
+        <Suspense fallback={<div>Loading AddRecord Report...</div>}>
+            <AddRecordModal 
+                visible={addModalVisible}
+                record = {recordToAdd}
+                onCancel={onCancelAdd}
+                onAddRecord={addRecord}
+            />
+        </Suspense>
 
         <Suspense fallback={<div>Loading FullDayReport...</div>}>
             <FullDayReport visible={fullDayReportVisible}

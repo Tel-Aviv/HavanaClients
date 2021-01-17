@@ -462,7 +462,7 @@ const Home = () => {
         }
         else {
 
-            if( res.items.length === 0 ) {
+            if( res.items ) {
                 message.warning(t('valid_not_completed'))
             } else {
                 setValidateModalOpen(false); 
@@ -497,14 +497,25 @@ const Home = () => {
             && !a.isUpdated
         ));
 
+        if( invalidItems.length === 0 )
+            return {
+                isValid: true,
+                items: null
+            }
+
         const invalidData = invalidItems.filter( item =>
              moment(item.rdate).isBefore(moment())
         )
-
-        return {
-            isValid: invalidData.length === 0,
-            items: invalidData
-        }
+        if( invalidData.length !== 0 )
+            return {
+                isValid: false,
+                items: invalidData
+            }
+        else
+            return {
+                isValid: true,
+                items: invalidData
+            }
 
     }
 
