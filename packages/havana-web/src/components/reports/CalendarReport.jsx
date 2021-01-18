@@ -63,53 +63,55 @@ const CalendarReport = (props) => {
         if( !originalItem )  
             return null;
 
-        return <div className='ant-picker-cell-inner ant-picker-calendar-date'>
+        return (
+        <div className='ant-picker-cell-inner ant-picker-calendar-date'>
             <div className='ant-picker-calendar-date-value'>
                 <span className='calendar-date'>
                     {date.date()}
                 </span>
             </div>
             <div className='ant-picker-calendar-date-content'>
-        <Row>
-            <Col>
-            {
-                ( !isInPast(originalItem) ) ?
-                    <ul className='calendar-events'>
-                        <li style={{
-                            margin: '3px'
-                        }}>
-                            { t('required') + ': ' + originalItem.requiredHours }
-                        </li>
-                        <li style={{
-                            margin: '3px'
-                        }}>
-                            { t('accepted') + ': ' + originalItem.acceptedHours }
-                        </li>
-                        <li style={{
-                            float: 'right'
-                        }}>
-                            { originalItem.systemNotes ? 
-                                <Tag color='magenta'
-                                    style={{
-                                        marginRight: '0',
-                                        width: '100%',
-                                        textAlign: 'start'
-                                    }}>
-                                    {
-                                        originalItem.isUpdated ?
-                                        <Text delete>{ originalItem.systemNotes }</Text> :
-                                        <Text>{ originalItem.systemNotes }</Text>
+                <Row>
+                    <Col>
+                    {
+                        ( !isInPast(originalItem) ) ?
+                            <ul className='calendar-events'>
+                                <li style={{
+                                    margin: '3px'
+                                }}>
+                                    { t('required') + ': ' + originalItem.requiredHours }
+                                </li>
+                                <li style={{
+                                    margin: '3px'
+                                }}>
+                                    { t('accepted') + ': ' + originalItem.acceptedHours }
+                                </li>
+                                <li style={{
+                                    float: 'right'
+                                }}>
+                                    { originalItem.systemNotes ? 
+                                        <Tag color='magenta'
+                                            style={{
+                                                marginRight: '0',
+                                                width: '100%',
+                                                textAlign: 'start'
+                                            }}>
+                                            {
+                                                originalItem.isUpdated ?
+                                                <Text delete>{ originalItem.systemNotes }</Text> :
+                                                <Text>{ originalItem.systemNotes }</Text>
+                                            }
+                                        </Tag> : null
                                     }
-                                </Tag> : null
-                            }
-                        </li>
-                    </ul>
-                : null
-            }
-            </Col>
-        </Row>
-        </div>
-        </div>   
+                                </li>
+                            </ul>
+                        : null
+                    }
+                    </Col>
+                </Row>
+            </div>
+        </div> 
+        )  
     }
 
     const getSecondLevelData = (day) => {
@@ -138,7 +140,7 @@ const CalendarReport = (props) => {
             let newItem = {
               ...item,
               ...record,
-              rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT)
+              rdate: moment(item.rdate, DATE_FORMAT).startOf('day')
             }
             newItem.total = moment.utc(moment(newItem.exit, TIME_FORMAT).diff(moment(newItem.entry, TIME_FORMAT))).format(TIME_FORMAT)
             newItem.valid = true;
@@ -164,7 +166,7 @@ const CalendarReport = (props) => {
             ...item,
             inTime: newItem.inTime, 
             outTime: newItem.outTime, 
-            rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT),
+            rdate: moment(item.rdate, DATE_FORMAT).startOf('day'),
             reportCode: newItem.reportCode, 
             userNotes: newItem.userNotes,
             isFullDay: true
