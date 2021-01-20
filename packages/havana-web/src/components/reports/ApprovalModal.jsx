@@ -6,7 +6,7 @@ const { Step } = Steps;
 import { useTranslation } from "react-i18next";
 
 import ExtraHoursDiff from './approval/ExtraHoursDiff';
-import FinalApprove from './approval/FinalApprove';
+import FinalApproval  from './approval/FinalApproval';
 
 const ApprovalModal = ({visible, onCancel, onOk, extraHours}) => {
 
@@ -19,7 +19,7 @@ const ApprovalModal = ({visible, onCancel, onOk, extraHours}) => {
         content: <ExtraHoursDiff extraHours={extraHours} />
     }, {
         title: t('approve'),
-        content: <FinalApprove />
+        content: <FinalApproval />
     }]
 
     const next = () => {

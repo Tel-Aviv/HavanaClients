@@ -108,7 +108,12 @@ const translations = {
             "extra_hours": "Extra Hours",
             "next": "Next",
             "previous": "Previous",
-            "valid_not_completed" : "The report is valid but not completed till the end of the month"
+            "valid_not_completed" : "The report is valid but not completed till the end of the month",
+            "granted": "Hours limit",
+            "actual": "",
+            "to_vacation": "Exchange to special vacation",
+            "to_pay": "Exchange to payment",
+            "divide_extra_hours": "Hours division"
         }
     },
     he: {
@@ -220,7 +225,12 @@ const translations = {
             "extra_hours": "שעות נוספות",
             "next": "הבא",
             "previous": "קודם",
-            "valid_not_completed": "הדו\"ח תקין אך לא הושלם עד סוף החודש"
+            "valid_not_completed": "הדו\"ח תקין אך לא הושלם עד סוף החודש",
+            "granted": "מכסה שעות",
+            "actual": "דווחו בפועל",
+            "to_vacation": "המרה לחופשה מיוחדת",
+            "to_pay": "המרה לתשלום",
+            "divide_extra_hours": "חלוקת השעות"
         }
     }
 }    

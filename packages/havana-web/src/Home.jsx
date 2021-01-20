@@ -48,7 +48,6 @@ const Home = () => {
     const [year, setYear] = useState(moment().year());
     const [reportData, setReportData] = useState([])
     const [reportDataValid, setReportDataValid] = useState(false);
-    const [isReportSubmitted, setReportSubmitted] = useState(false);
     const [isReportEditable, setIsReportEditable] = useState(true);
     const [isReportRejected, setIsReportRejected] = useState(false);
     const [totals, setTotals] = useState(0);
@@ -304,8 +303,8 @@ const Home = () => {
         const applyEffect = async () => {
 
             if( reportData.length > 0 ) { // skip for the first time
-                const _totals = recalculateTotals();
-                setTotals(_totals);
+                // const _totals = recalculateTotals();
+                // setTotals(_totals);
 
                 await onSave();
             }
@@ -384,18 +383,18 @@ const Home = () => {
         })
     }
 
-    const recalculateTotals = () => {
+    // const recalculateTotals = () => {
 
-        const lTotal = reportData.reduce( ( accu, item ) => {
+    //     const lTotal = reportData.reduce( ( accu, item ) => {
             
-            const dayDuration = moment.duration(item.total);
-            return accu.add(dayDuration);
+    //         const dayDuration = moment.duration(item.total);
+    //         return accu.add(dayDuration);
 
-        }, moment.duration('00:00'))
+    //     }, moment.duration('00:00'))
       
-        return `${Math.floor(lTotal.asHours())}:${lTotal.minutes().toString().padStart(2, '0')}`;
+    //     return `${Math.floor(lTotal.asHours())}:${lTotal.minutes().toString().padStart(2, '0')}`;
         
-    }
+    // }
 
     const action_updateItem = (item) => ({
         type: UPDATE_ITEM,
@@ -414,14 +413,14 @@ const Home = () => {
     const defineAlert = (data) => {
         if( data ) {
 
-            if( !data.submitted ) {
+            if( data.isEditable ) {
                 setAlert({
                     type: 'info',
                     message: `דוח שעות לחודש ${month}/${year} טרם נשלח לאישור`
                 });
-            } else if( !data.approved ) {
+            } else if( !data.isApproved ) {
 
-                if ( data.rejected ) {
+                if ( data.isRejected ) {
                     setAlert({
                         type: 'error',
                         message: t('rejected_note') + data.note
@@ -429,11 +428,8 @@ const Home = () => {
                 } else {
 
                     let _alertMessage = `דוח שעות לחודש ${month}/${year} טרם אושר`
-                    if( data.assignedToName ) {
-                        _alertMessage += ` ע"י ${data.assignedToName}`;
-                    }
                     setAlert({
-                        type: 'info',
+                        type: 'warning',
                         message : _alertMessage
                     });
                 }
@@ -536,7 +532,6 @@ const Home = () => {
             await dataContext.API.post(`/me/reports?month=${month}&year=${year}&assignee=${assignee.userAccountName}`,
                                         reportData);
             
-            setReportSubmitted(true);
             setIsReportEditable(false)
 
             message.info(_message)
@@ -593,7 +588,7 @@ const Home = () => {
                                 <Popconfirm title={t('send_to_approval')} 
                                     onConfirm={onSubmit}>
                                     <Button type="primary"
-                                            disabled={ isReportSubmitted || !reportDataValid }
+                                            disabled={ isReportEditable || !reportDataValid }
                                             icon={<IssuesCloseOutlined />}
                                             style={{
                                                 marginRight: '6px'

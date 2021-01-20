@@ -238,6 +238,15 @@ margin: 12px;
   color: rgb(24, 144, 255)
 }
 
+.extraHours-tile {
+  /* height: 120px; */
+  /* line-height: 120px; */
+  background: #0092ff;
+  font-size: 14px;
+  border-radius: 4px;
+  color: rgb(255, 255, 255)
+}
+
 /* Steps wizard */
 .steps-content {
   margin-top: 16px;
@@ -246,7 +255,7 @@ margin: 12px;
   background-color: #fafafa;
   min-height: 200px;
   text-align: center;
-  padding-top: 80px;
+  padding-top: 8px;
 }
 
 .steps-action {

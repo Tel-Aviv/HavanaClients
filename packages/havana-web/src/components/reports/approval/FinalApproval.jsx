@@ -4,7 +4,7 @@ import { Col, Row, Button, Tooltip,
 
 import { useTranslation } from "react-i18next";
 
-const FinalApprove = () => {
+const FinalApproval = () => {
 
     const { t } = useTranslation();
 
@@ -46,4 +46,4 @@ const FinalApprove = () => {
     </Col>
 }
 
-export default FinalApprove;
+export default FinalApproval;

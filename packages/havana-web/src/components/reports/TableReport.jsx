@@ -366,7 +366,7 @@ const TableReport = (props) => {
               if( !moment(record.rdate, DATE_FORMAT).isBefore(moment()) )
                 return null;
 
-              return ( text !== '' ) ?
+              return ( text ? 
                   <Tag color="magenta"
                     style={{
                       marginRight: '0'
@@ -376,6 +376,7 @@ const TableReport = (props) => {
                       </Tooltip>
                   </Tag>
                   : null
+              )
             }
           },
           {
