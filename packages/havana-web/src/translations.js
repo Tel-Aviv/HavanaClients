@@ -113,7 +113,10 @@ const translations = {
             "actual": "",
             "to_vacation": "Exchange to special vacation",
             "to_pay": "Exchange to payment",
-            "divide_extra_hours": "Hours division"
+            "divide_extra_hours": "Hours division",
+            "done": "Done",
+            "select_hr_contact": "The approved report will be handled by",
+            "notes_for_hr_officer" : "Notes for HR Officer"
         }
     },
     he: {
@@ -230,7 +233,10 @@ const translations = {
             "actual": "דווחו בפועל",
             "to_vacation": "המרה לחופשה מיוחדת",
             "to_pay": "מכסה לתשלום",
-            "divide_extra_hours": "חלוקת השעות לתגמול"
+            "divide_extra_hours": "חלוקת השעות לתגמול",
+            "done": "סיום",
+            "select_hr_contact": "הדוח המאושר יעבור לטיפול על ידי",
+            "notes_for_hr_officer": "הערות לפקיד כא"
         }
     }
 }    

@@ -27,7 +27,7 @@ import { DataContext } from './DataContext';
 import TableReport from '@reports/TableReport';
 import DocsUploader from '@components/DocsUploader';
 const ExtraHoursModal = React.lazy( () => import('@reports/ExtraHoursModal') )
-const ApprovalModal = React.lazy( ()=> import('@reports/ApprovalModal') )
+const ApprovalModal = React.lazy( ()=> import('@reports/approval/ApprovalModal') )
 
 import { DECREASE_NOTIFICATIONS_COUNT,
          INCREASE_NOTIFICATION_COUNT } from "./redux/actionTypes";
@@ -59,6 +59,7 @@ const Confirm = (props) => {
     const [extraHoursModalVisible, setExtraHoursModalVisible] = useState(false);
     const [spareHours, setSpareHours] = useState({});
     const [approvalModalVisible, setApprovalModalVisible] = useState(false);
+    const [hrOfficers, serHROfficers] = useState();
 
     const history = useHistory();
     const componentRef = useRef();
@@ -79,7 +80,7 @@ const Confirm = (props) => {
                     withCredentials: true
                 }); 
 
-                const data = resp.data.items.map( (item, index ) => {
+                let data = resp.data.items.map( (item, index ) => {
                     const _item = {...item, 
                         entry: moment(item.entry, TIME_FORMAT),
                         exit: moment(item.exit, TIME_FORMAT),
@@ -106,6 +107,18 @@ const Confirm = (props) => {
                     withCredentials: true
                 })
                 setManualUpdates(resp.data.items)
+
+                resp = await context.API.get('/me/hr_officers', {
+                    withCredentials: true
+                });
+                data = resp.data.map( item => (
+                    {
+                        email: item.email,
+                        name: item.userName,
+                        accountName: item.userAccountName
+                    }
+                ))
+                serHROfficers(data);
 
             } catch(err) {
                 console.error(err);
@@ -297,6 +310,8 @@ const Confirm = (props) => {
     const lazyShowApprovalModal = () => (
         approvalModalVisible ?
             <ApprovalModal visible={true}
+                hrOfficers={hrOfficers}
+                reportId={savedReportId}
                 onOk={onApproved}
                 onCancel={onApproveCanceled}
                 extraHours={spareHours}
@@ -316,20 +331,30 @@ const Confirm = (props) => {
         <Content>
             <Title level={1} className='hvn-title'>{title}</Title>
             <Row  className='hvn-item-ltr' align={'middle'} type='flex'>
-                <Col span={3}>
+                <Col span={4}>
                     <Space>
-                        <Button type='primary' loading={approvalSending}
+                        <Button type='primary' loading={approvalSending} disabled={loadingData}
                                 onClick={ () => onShowAppovalModal() }>
-                                    {t('continue')}
-                        </Button>                           
-                        <Button
+                                    {'...' + t('approve')}
+                        </Button>
+                        <Tooltip key='reject' title={t('reject_tooltip')}>
+                            <Button type='danger' loading={loadingData} disabled={loadingData}>
+                                {t('reject')}
+                            </Button>
+                        </Tooltip>
+                        <Tooltip key='forward' title={t('forward_tooltip')}>
+                            <Button loading={loadingData} disabled={loadingData}>
+                                {t('move_to')}
+                            </Button>
+                        </Tooltip>                        
+                        <Button  loading={loadingData} disabled={loadingData}
                             icon={<PrinterOutlined />}
                             onClick={onPrint}>
                                 {t('print')}
                         </Button>
                     </Space>
                     </Col>
-                <Col span={21} style={{
+                <Col span={20} style={{
                     direction: 'rtl'
                 }}>
                     <Alert closable={false} 
@@ -389,14 +414,14 @@ const Confirm = (props) => {
                     paddingLeft: '16px',
                     paddingTop: '16px'
                 }}>
-                        <div ref={ref}>
-                            <TableReport dataSource={tableData} 
-                                        loading={loadingData} 
-                                        manualUpdates={manualUpdates}
-                                        scroll={{y: '400px'}}
-                                        editable={false} />
+                    <div ref={ref}>
+                        <TableReport dataSource={tableData} 
+                                    loading={loadingData} 
+                                    manualUpdates={manualUpdates}
+                                    scroll={{y: '400px'}}
+                                    editable={false} />
 
-                        </div>
+                    </div>
                 </Col>
             </Row>
             <Suspense fallback={<div>Loading Extra Hours...</div>}>

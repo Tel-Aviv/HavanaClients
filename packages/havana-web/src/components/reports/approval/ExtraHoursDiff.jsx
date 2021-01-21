@@ -1,24 +1,10 @@
 import React, { useState } from 'react';
 import { Row, Col, Divider, InputNumber } from 'antd';
 import { useTranslation } from "react-i18next";
-import moment from 'moment';
 
-import { TIME_FORMAT } from '../../../globals'
-
-const ExtraHoursDiff = ({extraHours}) => {
-
-    const [vacationHours, setVacationHours] = useState();
-    const [paymentHours, setPaymentHours] = useState();
+const ExtraHoursDiff = ({extraHours, vacationHoursChanged, paymentHoursChanged}) => {
 
     const { t } = useTranslation();
-
-    const onVacationHoursChanged = (value) => {
-        setVacationHours(value)
-    }
-
-    const onPaymentHoursChanged = (value) => {
-        setPaymentHours(value);
-    }
 
     return <>
     <Row gutter={[16, 16]}>
@@ -36,17 +22,19 @@ const ExtraHoursDiff = ({extraHours}) => {
             }}>{extraHours.actual}</div>
         </Col>
     </Row>
-    <Divider>{t('divide_extra_hours')}</Divider>
+    <Divider orientation="left">{t('divide_extra_hours')}</Divider>
     <Row gutter={[16, 16]}>
         <Col span={8}>{t('to_vacation')}</Col>
         <Col>
-            <InputNumber min={0} size="small" defaultValue={0}/>
+            <InputNumber min={0} size="small" defaultValue={0}
+                onChange={vacationHoursChanged}/>
         </Col>
     </Row>
     <Row gutter={[16, 16]}>
         <Col span={8}>{t('to_pay')}</Col>
         <Col>
-            <InputNumber min={0} size="small" defaultValue={extraHours.granted}/>
+            <InputNumber min={0} size="small" defaultValue={extraHours.granted}
+                onChange={paymentHoursChanged}/>
         </Col>
     </Row>
         
