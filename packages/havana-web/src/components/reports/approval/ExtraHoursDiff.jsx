@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Row, Col, Divider, TimePicker } from 'antd';
+import { Row, Col, Divider, InputNumber } from 'antd';
 import { useTranslation } from "react-i18next";
 import moment from 'moment';
 
@@ -40,17 +40,13 @@ const ExtraHoursDiff = ({extraHours}) => {
     <Row gutter={[16, 16]}>
         <Col span={8}>{t('to_vacation')}</Col>
         <Col>
-            <TimePicker defaultValue={moment('00:00', TIME_FORMAT)} format={TIME_FORMAT}
-                        showNow={false} minuteStep={15} allowClear={true}
-                        onSelect={onVacationHoursChanged}/>
+            <InputNumber min={0} size="small" defaultValue={0}/>
         </Col>
     </Row>
     <Row gutter={[16, 16]}>
         <Col span={8}>{t('to_pay')}</Col>
         <Col>
-            <TimePicker defaultValue={moment('00:00', TIME_FORMAT)} format={TIME_FORMAT}
-                        showNow={false} minuteStep={15} allowClear={true}
-                        onSelect={onPaymentHoursChanged}/>
+            <InputNumber min={0} size="small" defaultValue={extraHours.granted}/>
         </Col>
     </Row>
         

@@ -207,7 +207,6 @@ const Confirm = (props) => {
             console.error(err.message)
         }
     }
-
     
     const onNotesModalClosed = () => {
         setNotesModalVisible(false)

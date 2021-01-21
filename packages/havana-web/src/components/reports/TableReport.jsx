@@ -263,20 +263,24 @@ const TableReport = (props) => {
               if( text === '0:00' ) {
                 tagColor = 'magenta'
               }
-              return <Row>
-                      <Tag color={tagColor}
-                        style={{
-                          marginRight: '0'
-                      }}>
-                        { 
-                            moment.isMoment(text) ?
-                              text.format(TIME_FORMAT) : text
-                        }
-                      </Tag>
+              
+              return <>
+              {
+                text.format(TIME_FORMAT) === '00:00' ?
+                  <div>-</div> :
+                  <>
+                  <Tag color={tagColor}
+                      style={{
+                      marginRight: '0'
+                  }}>
                       {
-                        manuallyEditedTag(isEditedManually)
+                          text.format(TIME_FORMAT)
                       }
-                     </Row> 
+                  </Tag>
+                  { manuallyEditedTag(isEditedManually) }
+              </>
+              }
+              </>
             }          
           },
           {
@@ -293,20 +297,24 @@ const TableReport = (props) => {
               if( text === '0:00' ) {
                 tagColor = 'magenta'
               }
+
               return <>
-                    <Tag color={tagColor}
-                      style={{
-                        marginRight: '0'
-                    }}>
-                      {
-                        moment.isMoment(text) ?
-                        text.format(TIME_FORMAT) : text
-                      }
-                    </Tag>
-                    {
-                      manuallyEditedTag(isEditedManually)
-                    }
-                </>                  
+              {
+                  text.format(TIME_FORMAT) === '00:00' ?
+                  <div>-</div> :
+                  <>
+                      <Tag color={tagColor}
+                          style={{
+                              marginRight: '0'
+                          }}>
+                          {
+                              text.format(TIME_FORMAT)
+                          }
+                      </Tag>
+                      { manuallyEditedTag(isEditedManually) }
+                  </>
+              }
+              </>               
             }
           },
           // {

@@ -226,11 +226,11 @@ const translations = {
             "next": "הבא",
             "previous": "קודם",
             "valid_not_completed": "הדו\"ח תקין אך לא הושלם עד סוף החודש",
-            "granted": "מכסה שעות",
+            "granted": "מכסה שעות לתשלום",
             "actual": "דווחו בפועל",
             "to_vacation": "המרה לחופשה מיוחדת",
-            "to_pay": "המרה לתשלום",
-            "divide_extra_hours": "חלוקת השעות"
+            "to_pay": "מכסה לתשלום",
+            "divide_extra_hours": "חלוקת השעות לתגמול"
         }
     }
 }    

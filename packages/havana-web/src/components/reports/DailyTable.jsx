@@ -45,16 +45,16 @@ const DailyTable = (props) => {
         addItem: item
       });  
     
-      const action_ItemDeleted = (item, index) => ({
+    const action_ItemDeleted = (item, index) => ({
         type: DELETE_ITEM,
         deleteIndex: index,
         deletedItem: item
-      })
+    })
 
-      const action_ItemUpdated = (item, index) => ({
+    const action_ItemUpdated = (item, index) => ({
         type: UPDATE_ITEM,
         item
-      })
+    })
 
     useEffect( () => {
 
@@ -408,6 +408,23 @@ const DailyTable = (props) => {
                     </>
                 }
             </>
+            // return <>
+            //     {
+            //         text.format(TIME_FORMAT) === '00:00' ?
+            //         <div>-</div> :
+            //         <>
+            //             <Tag color={tagColor}
+            //                 style={{
+            //                     marginRight: '0'
+            //                 }}>
+            //                 {
+            //                     text.format(TIME_FORMAT)
+            //                 }
+            //             </Tag>
+            //             { manuallyEditedTag(isEditedManually) }
+            //         </>
+            //     }
+            // </>
         }
     }, {
         title: t('report_code'),
