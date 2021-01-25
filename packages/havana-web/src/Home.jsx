@@ -71,7 +71,7 @@ const Home = () => {
     const [manualUpdates, setManualUpdates] = useState([]);
     const [assignee, setAssignee] = useState();
     const [reportCodes, setReportCodes] = useState([]);
-    const [employeKind, setEmployeKind] = useState();
+    const [employeeKind, setEmployeeKind] = useState();
     const [spareHours, setSpareHours] = useState({});
     const [criticalSystemNotes, setCriticalSystemNotes] = useState([]);
 
@@ -183,7 +183,7 @@ const Home = () => {
 
 
                 setAssignee(resp.data.direct_manager);
-                setEmployeKind(resp.data.kind);
+                setEmployeeKind(resp.data.kind);
 
             } catch(err) {
                 handleError(err);
@@ -816,9 +816,10 @@ const Home = () => {
                                 border: '1px solid rgb(240, 242, 245)',
                                 margin: '12px'
                             }}>
-                                <CalendarReport 
+                                <CalendarReport
+                                    month={month}
                                     dataSource={reportData}
-                                    employeKind={employeKind}
+                                    employeeKind={employeeKind}
                                     reportCodes={reportCodes}
                                     daysOff={daysOff}
                                     manualUpdates={manualUpdates}
@@ -827,7 +828,7 @@ const Home = () => {
                             </div>
                             {/* <NestedTableReport 
                                 dataSource={reportData}
-                                employeKind={employeKind}
+                                employeeKind={employeeKind}
                                 reportCodes={reportCodes}
                                 daysOff={daysOff}
                                 manualUpdates={manualUpdates}
@@ -836,7 +837,7 @@ const Home = () => {
                                 editable={isReportEditable}
                             />         */}
                             {/* <TableReport dataSource={reportData}
-                                        employeKind={employeKind}
+                                        employeeKind={employeeKind}
                                         reportCodes={reportCodes}
                                         daysOff={daysOff}
                                         manualUpdates={manualUpdates}
@@ -889,7 +890,7 @@ const Home = () => {
                     <div className='pdf-title'>{dataContext.user.name} (ת.ז. {dataContext.user.userID})</div>
                     <div className='pdf-title'>{t('summary')} {month}/{year}</div>
                     <TableReport dataSource={reportData}
-                                employeKind={employeKind}
+                                employeeKind={employeeKind}
                                 reportCodes={reportCodes}
                                 daysOff={daysOff}
                                 loading={loadingData} 

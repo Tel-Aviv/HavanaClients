@@ -53,14 +53,13 @@ const ApprovalModal = ({hrOfficers, reportId, visible, onCancel, onOk, extraHour
         }
 
         try {
-            // await context.API.patch(`/me/pendings/saved/${reportId}?note=${reportNotes}`, {
-            //     html: ref.current.outerHTML
-            // }, {
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     withCredentials: true
-            // })
+
+            await context.API.put(`/me/reports/approved/${reportId}`, approvalParams, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true              
+            })
 
             // pass the rest of work to parent
             onOk();

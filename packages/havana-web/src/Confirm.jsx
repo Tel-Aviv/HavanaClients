@@ -184,7 +184,7 @@ const Confirm = (props) => {
 
             dispatch( action_decreaseNotificationCount() );
 
-            await context.API.patch(`/me/pendings/saved/${savedReportId}?note=${note}`, {
+            await context.API.post(`/me/pendings/saved/${savedReportId}`, {
                     html: ref.current.outerHTML
                 }, 
                 {
@@ -312,7 +312,7 @@ const Confirm = (props) => {
             <ApprovalModal visible={true}
                 hrOfficers={hrOfficers}
                 reportId={savedReportId}
-                onOk={onApproved}
+                onOk={onApprove}
                 onCancel={onApproveCanceled}
                 extraHours={spareHours}
             /> :

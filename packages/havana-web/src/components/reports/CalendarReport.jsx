@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Row, Col, Tag, Modal, Typography } from 'antd';
-const { Text } = Typography;  
+import { Calendar, Row, Col, Tag, Modal, Badge, Typography } from 'antd';
+const { Text } = Typography;
+import { CloseCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import uniqid from 'uniqid';
 import { useTranslation } from "react-i18next";
 
-const DailyTable = React.lazy( () => import('./DailyTable') );
+// const DailyTable = React.lazy( () => import('./DailyTable') );
+import DailyTable from './DailyTable';
 
 import { TIME_FORMAT, DATE_FORMAT } from '../../globals'   
 
@@ -18,10 +21,17 @@ const CalendarReport = (props) => {
 
     const { t } = useTranslation();
 
+    const dateKey = (day, month) => {
+        return day.toString().padStart(2, '0') +
+                month.toString().padStart(2, '0')
+    }
+
     useEffect( () => {
 
         if( !props.dataSource || props.dataSource.length === 0 )
             return;
+
+        setSelectedDate(new moment( props.dataSource[0].rdate));
 
         const _originalData = props.dataSource.map( record =>  {
 
@@ -31,12 +41,30 @@ const CalendarReport = (props) => {
             }
           })
 
-        setFirstLevelData(
-            _originalData.filter( 
-                item => item.stripId === 1)
-        );
+        // setFirstLevelData(
+        //     _originalData.filter( 
+        //         item => item.stripId === 1)
+        // );
 
         setOriginalData(_originalData);
+
+        const _firstLevelData = new Map();
+
+        _originalData.map( item => {
+
+            const key = dateKey(item.day, props.month);
+
+            if( _firstLevelData.has(key) ) {
+                _firstLevelData.get(key).systemNotes.push(item.systemNotes)
+            }
+            else
+                _firstLevelData.set(key, {...item,
+                                            systemNotes: item.systemNotes === '' ? []
+                                                         : [item.systemNotes] // convert it to array
+                                        })
+        })
+
+        setFirstLevelData(_firstLevelData);
 
     }, [props.dataSource])
 
@@ -49,7 +77,7 @@ const CalendarReport = (props) => {
         const day = value.date();
         setSecondLevelData(getSecondLevelData(day));
         setDailyReportVisible(true);
-        setSelectedDate(value.format(DATE_FORMAT))
+        setSelectedDate(value)
     }
 
     const onDailyReportClosed = () => {
@@ -58,8 +86,9 @@ const CalendarReport = (props) => {
     }
 
     const dateFullCellRender = (date) => {
-        const originalItem = firstLevelData.find( item => item.rdate.isSame(date, 'day') )
-
+        // Get from the Map by the key
+        const key = dateKey(date.date(), date.month()+1);
+        const originalItem = firstLevelData.get(key); 
         if( !originalItem )  
             return null;
 
@@ -79,30 +108,51 @@ const CalendarReport = (props) => {
                                 <li style={{
                                     margin: '3px'
                                 }}>
-                                    { t('required') + ': ' + originalItem.requiredHours }
+                                    { 
+                                        props.employeeKind === 1 ?
+                                        t('in') + ': ' + originalItem.entry.format(TIME_FORMAT)
+                                         : t('required') + ': ' + originalItem.requiredHours
+                                    }
                                 </li>
                                 <li style={{
                                     margin: '3px'
                                 }}>
-                                    { t('accepted') + ': ' + originalItem.acceptedHours }
+                                    { 
+                                        props.employeeKind === 1 ?
+                                        t('out') + ': ' + originalItem.exit.format(TIME_FORMAT) :
+                                        t('accepted') + ': ' + originalItem.acceptedHours 
+                                    }
                                 </li>
                                 <li style={{
                                     float: 'right'
                                 }}>
-                                    { originalItem.systemNotes ? 
-                                        <Tag color='magenta'
-                                            style={{
-                                                marginRight: '0',
-                                                width: '100%',
-                                                textAlign: 'start'
-                                            }}>
-                                            {
-                                                originalItem.isUpdated ?
-                                                <Text delete>{ originalItem.systemNotes }</Text> :
-                                                <Text>{ originalItem.systemNotes }</Text>
-                                            }
-                                        </Tag> : null
+
+                                    { 
+                                    originalItem.systemNotes.length !== 0 ? 
+                                      
+                                        originalItem.systemNotes.map( item => {
+
+                                            return item !== '' ?
+                                                    <Tag key={uniqid()}
+                                                        icon={<CloseCircleOutlined />}
+                                                        color='error'
+                                                        style={{
+                                                            marginRight: '0',
+                                                            marginBottom: '4px',
+                                                            width: '100%',
+                                                            textAlign: 'start'
+                                                        }}>
+                                                        {
+                                                            originalItem.isUpdated ?
+                                                            <Text delete>{ item.replace('*', ' ') }</Text> :
+                                                            <Text strong>{ item.replace('*', ' ') }</Text>
+                                                        }                                                
+                                                    </Tag>
+                                                    : null
+                                        })
+                                        : null
                                     }
+
                                 </li>
                             </ul>
                         : null
@@ -183,7 +233,7 @@ const CalendarReport = (props) => {
 
     return (
         <>
-            <Modal title={selectedDate}
+            <Modal title={ selectedDate? selectedDate.format(DATE_FORMAT) : null }
                 visible={dailyReportVisible}
                 destroyOnClose='true'
                 footer={null}
@@ -211,7 +261,7 @@ const CalendarReport = (props) => {
                     mode='month'
                     onSelect={onSelect}
                     dateFullCellRender={dateFullCellRender}
-                    value={new moment(originalData[0].rdate)}
+                    value={selectedDate}
                     headerRender={ () => null }
                 /> : null
             }

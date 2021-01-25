@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useDispatch } from 'react-redux';
 import { ADD_ITEM, UPDATE_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
-import { Table, Popconfirm, Modal, Form, Icon,
+import { Table, Popconfirm, Form, Icon,
     Tag, Row, Col, Tooltip, Typography } from 'antd';
 const { Text } = Typography;    
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';

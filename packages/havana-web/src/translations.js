@@ -116,7 +116,8 @@ const translations = {
             "divide_extra_hours": "Hours division",
             "done": "Done",
             "select_hr_contact": "The approved report will be handled by",
-            "notes_for_hr_officer" : "Notes for HR Officer"
+            "notes_for_hr_officer" : "Notes for HR Officer",
+            "remember_hr_officer": "Remember selection"
         }
     },
     he: {
@@ -236,7 +237,8 @@ const translations = {
             "divide_extra_hours": "חלוקת השעות לתגמול",
             "done": "סיום",
             "select_hr_contact": "הדוח המאושר יעבור לטיפול על ידי",
-            "notes_for_hr_officer": "הערות לפקיד כא"
+            "notes_for_hr_officer": "הערות לפקיד כא",
+            "remember_hr_officer": "זכור את הבחירה"
         }
     }
 }    
