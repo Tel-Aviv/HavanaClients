@@ -14,6 +14,7 @@ import moment from 'moment';
 import uniqid from 'uniqid';
 
 import { ReportContext } from "./TableContext";
+import { DATE_FORMAT } from '../../globals';
 
 const layout = {
     labelCol: {
@@ -73,7 +74,7 @@ const FullDayReport = ({visible, onOk, onCancel, record}) => {
                 { 
                     record ? 
                         moment.isMoment(record.rdate) ? 
-                            record.rdate.format('DD/MM/YYYY') :
+                            record.rdate.format(DATE_FORMAT) :
                             record.rdate
                         : null
                 }

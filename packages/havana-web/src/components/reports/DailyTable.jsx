@@ -1,8 +1,9 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useDispatch } from 'react-redux';
 import { ADD_ITEM, UPDATE_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
-import { Table, Popconfirm, Modal, Form, Icon,
+import { Table, Popconfirm, Form, Icon,
     Tag, Row, Col, Tooltip, Typography } from 'antd';
+const { Text } = Typography;    
 import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 import { PlusCircleTwoTone, 
     MinusCircleTwoTone,
@@ -16,10 +17,8 @@ import EditIcons from './EditIcons';
 import EditableCell from './EditableCell';
 import AddRecordModal from './AddRecordModal';
 const FullDayReport = React.lazy( () => import('./FullDayReport') );
-//import FullDayReport from './FullDayReport';
 
-const TIME_FORMAT = 'HH:mm';
-const DATE_FORMAT = 'DD/MM/YYYY';
+import { TIME_FORMAT, DATE_FORMAT } from '../../globals'
 
 const DailyTable = (props) => {
 
@@ -46,16 +45,16 @@ const DailyTable = (props) => {
         addItem: item
       });  
     
-      const action_ItemDeleted = (item, index) => ({
+    const action_ItemDeleted = (item, index) => ({
         type: DELETE_ITEM,
         deleteIndex: index,
         deletedItem: item
-      })
+    })
 
-      const action_ItemUpdated = (item, index) => ({
+    const action_ItemUpdated = (item, index) => ({
         type: UPDATE_ITEM,
         item
-      })
+    })
 
     useEffect( () => {
 
@@ -186,16 +185,20 @@ const DailyTable = (props) => {
             let replacedItem = {
                 ...item,
                 ...newValues,
+                isFullDay: true,
+                isUpdated: true,
                 valid: true
             }
 
             newData.splice(index, 1, replacedItem);
             setTableData(newData);
+
+            props.onSave && props.onSave(replacedItem)
         }
 
         setFullDayReportVisible(false);
-        setRecordToAdd(null);        
-
+        setRecordToAdd(null);
+   
     }
 
     const addRecord = ({inTime, outTime, reportCode, userNotes, isFullDay}) => {
@@ -405,10 +408,26 @@ const DailyTable = (props) => {
                     </>
                 }
             </>
+            // return <>
+            //     {
+            //         text.format(TIME_FORMAT) === '00:00' ?
+            //         <div>-</div> :
+            //         <>
+            //             <Tag color={tagColor}
+            //                 style={{
+            //                     marginRight: '0'
+            //                 }}>
+            //                 {
+            //                     text.format(TIME_FORMAT)
+            //                 }
+            //             </Tag>
+            //             { manuallyEditedTag(isEditedManually) }
+            //         </>
+            //     }
+            // </>
         }
     }, {
         title: t('report_code'),
-        width: '14%',
         dataIndex: 'reportCode',
         align: 'right',
         editable: true,
@@ -420,7 +439,7 @@ const DailyTable = (props) => {
           return <Row>
             <Col>
               <div style={{whiteSpace: 'nowrap'}}>
-                {text}
+                  { text }
               </div>
             </Col>
             <Col>
@@ -443,13 +462,17 @@ const DailyTable = (props) => {
             return null;
 
           return ( text !== '' ) ?
-              <Tag color="magenta"
-                style={{
-                  marginRight: '0'
+                <Tag color="magenta"
+                    style={{
+                    marginRight: '0'
                 }}>
-                {text}
-              </Tag>
-              : null
+                    {
+                        record.isUpdated ?
+                            <Text delete>{text}</Text> : 
+                            <Text>{text}</Text>
+                    }
+                </Tag>
+                : null
         }
       },           {
         title: t('user_notes'),
@@ -528,12 +551,14 @@ const DailyTable = (props) => {
        }
      }>
         
-        <AddRecordModal 
-            visible={addModalVisible}
-            record = {recordToAdd}
-            onCancel={onCancelAdd}
-            onAddRecord={addRecord}
-        />
+        <Suspense fallback={<div>Loading AddRecord Report...</div>}>
+            <AddRecordModal 
+                visible={addModalVisible}
+                record = {recordToAdd}
+                onCancel={onCancelAdd}
+                onAddRecord={addRecord}
+            />
+        </Suspense>
 
         <Suspense fallback={<div>Loading FullDayReport...</div>}>
             <FullDayReport visible={fullDayReportVisible}

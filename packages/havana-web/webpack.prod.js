@@ -30,7 +30,7 @@ module.exports = {
          })],
     },    
     entry: {
-        bundle: path.resolve(__dirname, './src/index.js'),
+        bundle: ["@babel/polyfill", path.resolve(__dirname, './src/index.js')]
     },
     module: {
         rules: [
@@ -87,7 +87,7 @@ module.exports = {
     },
     output: {
         path: __dirname + '/dist',
-        publicPath: '/',
+        publicPath: process.env.public_path,
         chunkFilename: '[name].bundle.js'
         // filename: 'bundle.js'
     },

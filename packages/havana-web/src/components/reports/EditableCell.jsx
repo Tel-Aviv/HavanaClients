@@ -4,7 +4,7 @@ const { Option } = Select;
 import uniqid from 'uniqid';
 
 import { ReportContext } from "./TableContext";
-const format = 'HH:mm';
+import { TIME_FORMAT } from '../../globals'
 
 const EditableCell = ({
     rowEditing,
@@ -34,7 +34,7 @@ const EditableCell = ({
             time: () => {
                 return  <TimePicker
                             className='ltr'
-                            format={format}
+                            format={TIME_FORMAT}
                             allowClear={false}
                             showNow={false} />
             },

@@ -1,12 +1,13 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useDispatch } from 'react-redux';
 import { ADD_ITEM, DELETE_ITEM } from '../../redux/actionTypes';
-import { Table, Popconfirm, Modal, Form, Icon,
+import { Table, Popconfirm, Form,
         Tag, Row, Col, Tooltip } from 'antd';
 import { PlusCircleTwoTone, 
   MinusCircleTwoTone,
   TagOutlined } 
 from '@ant-design/icons';
+import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 import moment from 'moment';
 import { useTranslation } from "react-i18next";
 
@@ -15,11 +16,8 @@ import EditableCell from './EditableCell';
 import EditIcons from './EditIcons';
 import AddRecordModal from './AddRecordModal';
 const FullDayReport = React.lazy( () => import('./FullDayReport') );
-//import FullDayReport from './FullDayReport';
-import Ellipsis from 'ant-design-pro/lib/Ellipsis';
 
-const format = 'HH:mm';
-const DATE_FORMAT = 'DD/MM/YYYY';
+import { TIME_FORMAT, DATE_FORMAT } from '../../globals'
 
 const TableReport = (props) => {
 
@@ -180,7 +178,7 @@ const TableReport = (props) => {
               ...row,
               rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT)
             }
-            newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
+            newItem.total = moment.utc(moment(newItem.exit, TIME_FORMAT).diff(moment(newItem.entry, format))).format(TIME_FORMAT)
             newItem.valid = true;
             
             newData.splice(index, 1, newItem);
@@ -265,20 +263,24 @@ const TableReport = (props) => {
               if( text === '0:00' ) {
                 tagColor = 'magenta'
               }
-              return <Row>
-                      <Tag color={tagColor}
-                        style={{
-                          marginRight: '0'
-                      }}>
-                        { 
-                            moment.isMoment(text) ?
-                              text.format(format) : text
-                        }
-                      </Tag>
+              
+              return <>
+              {
+                text.format(TIME_FORMAT) === '00:00' ?
+                  <div>-</div> :
+                  <>
+                  <Tag color={tagColor}
+                      style={{
+                      marginRight: '0'
+                  }}>
                       {
-                        manuallyEditedTag(isEditedManually)
+                          text.format(TIME_FORMAT)
                       }
-                     </Row> 
+                  </Tag>
+                  { manuallyEditedTag(isEditedManually) }
+              </>
+              }
+              </>
             }          
           },
           {
@@ -295,20 +297,24 @@ const TableReport = (props) => {
               if( text === '0:00' ) {
                 tagColor = 'magenta'
               }
+
               return <>
-                    <Tag color={tagColor}
-                      style={{
-                        marginRight: '0'
-                    }}>
-                      {
-                        moment.isMoment(text) ?
-                        text.format(format) : text
-                      }
-                    </Tag>
-                    {
-                      manuallyEditedTag(isEditedManually)
-                    }
-                </>                  
+              {
+                  text.format(TIME_FORMAT) === '00:00' ?
+                  <div>-</div> :
+                  <>
+                      <Tag color={tagColor}
+                          style={{
+                              marginRight: '0'
+                          }}>
+                          {
+                              text.format(TIME_FORMAT)
+                          }
+                      </Tag>
+                      { manuallyEditedTag(isEditedManually) }
+                  </>
+              }
+              </>               
             }
           },
           // {
@@ -368,7 +374,7 @@ const TableReport = (props) => {
               if( !moment(record.rdate, DATE_FORMAT).isBefore(moment()) )
                 return null;
 
-              return ( text !== '' ) ?
+              return ( text ? 
                   <Tag color="magenta"
                     style={{
                       marginRight: '0'
@@ -378,6 +384,7 @@ const TableReport = (props) => {
                       </Tooltip>
                   </Tag>
                   : null
+              )
             }
           },
           {
@@ -549,7 +556,7 @@ const TableReport = (props) => {
 
         let newItem = {
             ...recordToAdd,
-            rdate: moment(recordToAdd.rdate, DATE_FORMAT).startOf('day').format('YYYY-MM-DD'),
+            rdate: moment(recordToAdd.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT),
             key: addedPositions.key + 1,
             isAdded: true,
             userNotes: userNotes,
@@ -586,7 +593,7 @@ const TableReport = (props) => {
             ...item,
             inTime: newItem.inTime, 
             outTime: newItem.outTime, 
-            rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format('YYYY-MM-DD'),
+            rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT),
             reportCode: newItem.reportCode, 
             userNotes: newItem.userNotes,
             isFullDay: true

@@ -7,8 +7,8 @@
   "scripts": {
     "test": "jest --collectCoverage",
     "build": "webpack --mode=development --watch",
-    "start": "webpack serve --port 8089 --mode=development",
-    "prod": "webpack -p --config webpack.prod.js"
+    "start": "webpack serve --port 8089 --mode=production",
+    "prod": "webpack --mode=production --config webpack.prod.js"
   },
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
@@ -45,6 +45,7 @@
     "jest": "^26.4.2",
     "react-test-renderer": "^16.13.1",
     "style-loader": "^1.2.1",
+    "terser-webpack-plugin": "4.2.3",
     "webpack": "^4.44.2",
     "webpack-dev-server": "^3.11.0"
   }

@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Row, Col, Tag,
-    Modal, Tooltip } from 'antd';
+import { Calendar, Row, Col, Tag, Modal, Badge, Typography } from 'antd';
+const { Text } = Typography;
+import { CloseCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import uniqid from 'uniqid';
 import { useTranslation } from "react-i18next";
 
-const DailyTable = React.lazy( () => import('./DailyTable') );
+// const DailyTable = React.lazy( () => import('./DailyTable') );
+import DailyTable from './DailyTable';
 
-const format = 'HH:mm';
-const DATE_FORMAT = 'DD/MM/YYYY';
+import { TIME_FORMAT, DATE_FORMAT } from '../../globals'   
 
 const CalendarReport = (props) => {
 
@@ -19,10 +21,17 @@ const CalendarReport = (props) => {
 
     const { t } = useTranslation();
 
+    const dateKey = (day, month) => {
+        return day.toString().padStart(2, '0') +
+                month.toString().padStart(2, '0')
+    }
+
     useEffect( () => {
 
         if( !props.dataSource || props.dataSource.length === 0 )
             return;
+
+        setSelectedDate(new moment( props.dataSource[0].rdate));
 
         const _originalData = props.dataSource.map( record =>  {
 
@@ -32,12 +41,30 @@ const CalendarReport = (props) => {
             }
           })
 
-        setFirstLevelData(
-            _originalData.filter( 
-                item => item.stripId === 1)
-        );
+        // setFirstLevelData(
+        //     _originalData.filter( 
+        //         item => item.stripId === 1)
+        // );
 
         setOriginalData(_originalData);
+
+        const _firstLevelData = new Map();
+
+        _originalData.map( item => {
+
+            const key = dateKey(item.day, props.month);
+
+            if( _firstLevelData.has(key) ) {
+                _firstLevelData.get(key).systemNotes.push(item.systemNotes)
+            }
+            else
+                _firstLevelData.set(key, {...item,
+                                            systemNotes: item.systemNotes === '' ? []
+                                                         : [item.systemNotes] // convert it to array
+                                        })
+        })
+
+        setFirstLevelData(_firstLevelData);
 
     }, [props.dataSource])
 
@@ -50,7 +77,7 @@ const CalendarReport = (props) => {
         const day = value.date();
         setSecondLevelData(getSecondLevelData(day));
         setDailyReportVisible(true);
-        setSelectedDate(value.format(DATE_FORMAT))
+        setSelectedDate(value)
     }
 
     const onDailyReportClosed = () => {
@@ -59,54 +86,82 @@ const CalendarReport = (props) => {
     }
 
     const dateFullCellRender = (date) => {
-        const originalItem = firstLevelData.find( item => item.rdate.isSame(date, 'day') )
-
+        // Get from the Map by the key
+        const key = dateKey(date.date(), date.month()+1);
+        const originalItem = firstLevelData.get(key); 
         if( !originalItem )  
             return null;
 
-        return <div className='ant-picker-cell-inner ant-picker-calendar-date'>
+        return (
+        <div className='ant-picker-cell-inner ant-picker-calendar-date'>
             <div className='ant-picker-calendar-date-value'>
                 <span className='calendar-date'>
                     {date.date()}
                 </span>
             </div>
             <div className='ant-picker-calendar-date-content'>
-        <Row>
-            <Col>
-            {
-                ( !isInPast(originalItem) ) ?
-                    <ul className='calendar-events'>
-                        <li style={{
-                            margin: '3px'
-                        }}>
-                            { t('required') + ': ' + originalItem.requiredHours }
-                        </li>
-                        <li style={{
-                            margin: '3px'
-                        }}>
-                            { t('accepted') + ': ' + originalItem.acceptedHours }
-                        </li>
-                        <li style={{
-                            float: 'right'
-                        }}>
-                            { originalItem.systemNotes ? 
-                                <Tag color='magenta'
-                                    style={{
-                                        marginRight: '0',
-                                        width: '100%',
-                                        textAlign: 'start'
-                                    }}>
-                                    {originalItem.systemNotes}
-                                </Tag> : null
-                            }
-                        </li>
-                    </ul>
-                : null
-            }
-            </Col>
-        </Row>
-        </div>
-        </div>   
+                <Row>
+                    <Col>
+                    {
+                        ( !isInPast(originalItem) ) ?
+                            <ul className='calendar-events'>
+                                <li style={{
+                                    margin: '3px'
+                                }}>
+                                    { 
+                                        props.employeeKind === 1 ?
+                                        t('in') + ': ' + originalItem.entry.format(TIME_FORMAT)
+                                         : t('required') + ': ' + originalItem.requiredHours
+                                    }
+                                </li>
+                                <li style={{
+                                    margin: '3px'
+                                }}>
+                                    { 
+                                        props.employeeKind === 1 ?
+                                        t('out') + ': ' + originalItem.exit.format(TIME_FORMAT) :
+                                        t('accepted') + ': ' + originalItem.acceptedHours 
+                                    }
+                                </li>
+                                <li style={{
+                                    float: 'right'
+                                }}>
+
+                                    { 
+                                    originalItem.systemNotes.length !== 0 ? 
+                                      
+                                        originalItem.systemNotes.map( item => {
+
+                                            return item !== '' ?
+                                                    <Tag key={uniqid()}
+                                                        icon={<CloseCircleOutlined />}
+                                                        color='error'
+                                                        style={{
+                                                            marginRight: '0',
+                                                            marginBottom: '4px',
+                                                            width: '100%',
+                                                            textAlign: 'start'
+                                                        }}>
+                                                        {
+                                                            originalItem.isUpdated ?
+                                                            <Text delete>{ item.replace('*', ' ') }</Text> :
+                                                            <Text strong>{ item.replace('*', ' ') }</Text>
+                                                        }                                                
+                                                    </Tag>
+                                                    : null
+                                        })
+                                        : null
+                                    }
+
+                                </li>
+                            </ul>
+                        : null
+                    }
+                    </Col>
+                </Row>
+            </div>
+        </div> 
+        )  
     }
 
     const getSecondLevelData = (day) => {
@@ -135,9 +190,9 @@ const CalendarReport = (props) => {
             let newItem = {
               ...item,
               ...record,
-              rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format(DATE_FORMAT)
+              rdate: moment(item.rdate, DATE_FORMAT).startOf('day')
             }
-            newItem.total = moment.utc(moment(newItem.exit, format).diff(moment(newItem.entry, format))).format(format)
+            newItem.total = moment.utc(moment(newItem.exit, TIME_FORMAT).diff(moment(newItem.entry, TIME_FORMAT))).format(TIME_FORMAT)
             newItem.valid = true;
             
             newData.splice(index, 1, newItem);
@@ -161,7 +216,7 @@ const CalendarReport = (props) => {
             ...item,
             inTime: newItem.inTime, 
             outTime: newItem.outTime, 
-            rdate: moment(item.rdate, DATE_FORMAT).startOf('day').format('YYYY-MM-DD'),
+            rdate: moment(item.rdate, DATE_FORMAT).startOf('day'),
             reportCode: newItem.reportCode, 
             userNotes: newItem.userNotes,
             isFullDay: true
@@ -178,7 +233,7 @@ const CalendarReport = (props) => {
 
     return (
         <>
-            <Modal title={selectedDate}
+            <Modal title={ selectedDate? selectedDate.format(DATE_FORMAT) : null }
                 visible={dailyReportVisible}
                 destroyOnClose='true'
                 footer={null}
@@ -206,7 +261,7 @@ const CalendarReport = (props) => {
                     mode='month'
                     onSelect={onSelect}
                     dateFullCellRender={dateFullCellRender}
-                    value={new moment(originalData[0].rdate)}
+                    value={selectedDate}
                     headerRender={ () => null }
                 /> : null
             }

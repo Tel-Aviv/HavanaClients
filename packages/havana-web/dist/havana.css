@@ -220,7 +220,7 @@ margin: 12px;
 /* calendar styles */
 .calendar-events {
   list-style: none;
-  font-size: 12px;
+  font-size: 14px;
   /* font-weight: bold; */
   margin: 0;
   padding: 0;
@@ -236,6 +236,30 @@ margin: 12px;
 
 .calendar-date {
   color: rgb(24, 144, 255)
+}
+
+.extraHours-tile {
+  /* height: 120px; */
+  /* line-height: 120px; */
+  background: #0092ff;
+  font-size: 14px;
+  border-radius: 4px;
+  color: rgb(255, 255, 255)
+}
+
+/* Steps wizard */
+.steps-content {
+  margin-top: 16px;
+  border: 1px dashed #e9e9e9;
+  border-radius: 2px;
+  background-color: #fafafa;
+  min-height: 200px;
+  text-align: center;
+  padding-top: 8px;
+}
+
+.steps-action {
+  margin-top: 24px;
 }
 
 /* table adaptation for print */

@@ -19,9 +19,8 @@ import { IssuesCloseOutlined,
     FundOutlined,
     PrinterOutlined,
     CheckCircleOutlined } 
-from '@ant-design/icons'
-;const { Content } = Layout;
-const { Title } = Typography;
+from '@ant-design/icons';
+const { Content } = Layout;
 const { MonthPicker } = DatePicker;
 
 import { Tabs, message  } from 'antd';
@@ -34,15 +33,14 @@ import { DataContext } from './DataContext';
 import { UPDATE_ITEM } from "./redux/actionTypes";
 
 import TableReport from '@reports/TableReport';
-import NestedTableReport from "@reports/NestedTableReport";
+//import NestedTableReport from "@reports/NestedTableReport";
 import CalendarReport from '@reports/CalendarReport';
 const YearReport = React.lazy( () => import('@reports/YearReport') )
 import DocsUploader from '@components/DocsUploader';
 const ValidationReport = React.lazy( () => import('@reports/ValidationsReport') )
 const ExtraHoursModal = React.lazy( () => import('@reports/ExtraHoursModal'))
 
-const TIME_FORMAT = 'HH:mm';
-const DATE_FORMAT = 'YYYY-MM-DD';
+import { TIME_FORMAT, DATE_FORMAT } from './globals'
 
 const Home = () => {
 
@@ -50,7 +48,6 @@ const Home = () => {
     const [year, setYear] = useState(moment().year());
     const [reportData, setReportData] = useState([])
     const [reportDataValid, setReportDataValid] = useState(false);
-    const [isReportSubmitted, setReportSubmitted] = useState(false);
     const [isReportEditable, setIsReportEditable] = useState(true);
     const [isReportRejected, setIsReportRejected] = useState(false);
     const [totals, setTotals] = useState(0);
@@ -72,11 +69,11 @@ const Home = () => {
 
     const [daysOff, setDaysOff] = useState([]);
     const [manualUpdates, setManualUpdates] = useState([]);
-    // const [manualChanges, setManualChanges] = useState(new Set([]));
     const [assignee, setAssignee] = useState();
     const [reportCodes, setReportCodes] = useState([]);
-    const [employeKind, setEmployeKind] = useState();
+    const [employeeKind, setEmployeeKind] = useState();
     const [spareHours, setSpareHours] = useState({});
+    const [criticalSystemNotes, setCriticalSystemNotes] = useState([]);
 
     const dataContext = useContext(DataContext);
     const componentRef = useRef();
@@ -186,7 +183,7 @@ const Home = () => {
 
 
                 setAssignee(resp.data.direct_manager);
-                setEmployeKind(resp.data.kind);
+                setEmployeeKind(resp.data.kind);
 
             } catch(err) {
                 handleError(err);
@@ -221,7 +218,8 @@ const Home = () => {
                             month: month
                         }
                     }),
-                    dataContext.API.get(`/me/reports/${year}/${month}`)
+                    dataContext.API.get(`/me/reports/${year}/${month}`),
+                    dataContext.API.get(`system_notes`)
                 ]);
 
                 // 1. Process work off days
@@ -242,7 +240,7 @@ const Home = () => {
                 defineAlert(report);
                 setSpareHours({
                     actual: report.spareHours,
-                    granted: report.spaceHoursGranted
+                    granted: report.spaceHoursLimit
                 })
                 setIsReportRejected( report.isRejected );
                 const employerCode = report.employerCode || 0;
@@ -284,6 +282,12 @@ const Home = () => {
 
                 setIsReportEditable(report.isEditable);
 
+                // 4. Process system notes
+                data = respArr[3].data.notes;
+                setCriticalSystemNotes( data.filter( item => 
+                    item.severityCode === 1
+                ))
+
             } catch(err) {
                 handleError(err);
             } finally {
@@ -299,8 +303,8 @@ const Home = () => {
         const applyEffect = async () => {
 
             if( reportData.length > 0 ) { // skip for the first time
-                const _totals = recalculateTotals();
-                setTotals(_totals);
+                // const _totals = recalculateTotals();
+                // setTotals(_totals);
 
                 await onSave();
             }
@@ -379,18 +383,18 @@ const Home = () => {
         })
     }
 
-    const recalculateTotals = () => {
+    // const recalculateTotals = () => {
 
-        const lTotal = reportData.reduce( ( accu, item ) => {
+    //     const lTotal = reportData.reduce( ( accu, item ) => {
             
-            const dayDuration = moment.duration(item.total);
-            return accu.add(dayDuration);
+    //         const dayDuration = moment.duration(item.total);
+    //         return accu.add(dayDuration);
 
-        }, moment.duration('00:00'))
+    //     }, moment.duration('00:00'))
       
-        return `${Math.floor(lTotal.asHours())}:${lTotal.minutes().toString().padStart(2, '0')}`;
+    //     return `${Math.floor(lTotal.asHours())}:${lTotal.minutes().toString().padStart(2, '0')}`;
         
-    }
+    // }
 
     const action_updateItem = (item) => ({
         type: UPDATE_ITEM,
@@ -409,14 +413,14 @@ const Home = () => {
     const defineAlert = (data) => {
         if( data ) {
 
-            if( !data.submitted ) {
+            if( data.isEditable ) {
                 setAlert({
                     type: 'info',
                     message: `דוח שעות לחודש ${month}/${year} טרם נשלח לאישור`
                 });
-            } else if( !data.approved ) {
+            } else if( !data.isApproved ) {
 
-                if ( data.rejected ) {
+                if ( data.isRejected ) {
                     setAlert({
                         type: 'error',
                         message: t('rejected_note') + data.note
@@ -424,11 +428,8 @@ const Home = () => {
                 } else {
 
                     let _alertMessage = `דוח שעות לחודש ${month}/${year} טרם אושר`
-                    if( data.assignedToName ) {
-                        _alertMessage += ` ע"י ${data.assignedToName}`;
-                    }
                     setAlert({
-                        type: 'info',
+                        type: 'warning',
                         message : _alertMessage
                     });
                 }
@@ -449,40 +450,25 @@ const Home = () => {
     }
     
     const validateReport = () => {
+
         const res = isReportDataValid();
         if( !res.isValid ) {
+            setInvalidReportItems(res.items);
             setValidateModalOpen(true);
-            const item = reportData[res.invalidItemIndex];
-            const _date = moment(item.rdate).format(DATE_FORMAT);
-            console.log(_date);
-            const invalidItem = //{ ...item,
-                                //    rdate : moment(item.rdate).format(DATE_FORMAT)                         
-                                //}
-                                {
-                                    "id":87864,
-                                    "rdate":"2020-07-01T00:00:00",
-                                    "day":"1",
-                                    "isWorkingDay":false,
-                                    "dayOfWeek":"ד",
-                                    "entry":"10:54",
-                                    "exit":"18:22",
-                                    "required": "8:18",
-                                    "accepted": "8:18",
-                                    "systemNotes":"",
-                                    "total":"7:28",
-                                    "isAdded":false,
-                                    "reportCode":""
-                                };                                
-            setInvalidReportItems([invalidItem]);
         }
         else {
-            setValidateModalOpen(false); 
-            setInvalidReportItems(null);
 
-            setReportDataValid( true );
-            message.info(t('report_validated'));
+            if( res.items ) {
+                message.warning(t('valid_not_completed'))
+            } else {
+                setValidateModalOpen(false); 
+                setInvalidReportItems(null);
+    
+                setReportDataValid( true );
+                message.info(t('report_validated'));
+            }
+
         }
-
     }
 
     const isWorkingDay = (item) => {
@@ -500,39 +486,33 @@ const Home = () => {
             return !(item.dayOfWeek === 'ש' || item.dayOfWeek === 'ו');
     }
 
-    const isTotalled = (item) => {
-        const tokens = item.total.split(':');
-        const hours = parseInt(tokens[0]);
-        const minutes = parseInt(tokens[1]);
-    
-        //return item.entry !== '0:00' && item.exit !== '0:00'
-        return item.total != '0:00';
-    }
-
     const isReportDataValid = () => {
 
-        let invalidItemIndex = -1;
-        const res = reportData.some( (item, index) => {
+        const invalidItems = _.intersectionWith(reportData, criticalSystemNotes, ( (a, b) =>
+            a.systemNotes === b.name
+            && !a.isUpdated
+        ));
 
-            const workingDay = isWorkingDay(item);
-            // const hasTotal = isTotalled(item);
-
-            const isItemInvalid = workingDay 
-                // && !hasTotal 
-                && !item.systemNotes 
-                || item.systemNotes.startsWith('*');
-            if( isItemInvalid ) {
-                invalidItemIndex = index;
-                return true;
+        if( invalidItems.length === 0 )
+            return {
+                isValid: true,
+                items: null
             }
 
-            return isItemInvalid;
-        })
+        const invalidData = invalidItems.filter( item =>
+             moment(item.rdate).isBefore(moment())
+        )
+        if( invalidData.length !== 0 )
+            return {
+                isValid: false,
+                items: invalidData
+            }
+        else
+            return {
+                isValid: true,
+                items: invalidData
+            }
 
-        return {
-            isValid: !res,
-            invalidItemIndex: invalidItemIndex
-        } 
     }
 
     const onShowPDF = () => {
@@ -552,7 +532,6 @@ const Home = () => {
             await dataContext.API.post(`/me/reports?month=${month}&year=${year}&assignee=${assignee.userAccountName}`,
                                         reportData);
             
-            setReportSubmitted(true);
             setIsReportEditable(false)
 
             message.info(_message)
@@ -570,10 +549,6 @@ const Home = () => {
         }
       
     }  
-
-    const handleMenuClick = (e) => {
-        message.info(`הדוח יועבר לאישור ${assignee}`);
-    }
 
     const onMonthChange = (date, dateString) => {
         if( date ) {
@@ -597,10 +572,6 @@ const Home = () => {
                 || (current < moment().add(-12, 'month'))
     }
 
-    const getTotalHoursPercentage = () => {
-        return Math.floor( parseFloat(totals) / 160. * 100 );
-    }
-
     const getSpareHoursPercentage = () => {
         if( !spareHours.granted 
             || spareHours.granted === 0 
@@ -617,7 +588,7 @@ const Home = () => {
                                 <Popconfirm title={t('send_to_approval')} 
                                     onConfirm={onSubmit}>
                                     <Button type="primary"
-                                            disabled={ isReportSubmitted || !reportDataValid }
+                                            disabled={ isReportEditable || !reportDataValid }
                                             icon={<IssuesCloseOutlined />}
                                             style={{
                                                 marginRight: '6px'
@@ -700,6 +671,15 @@ const Home = () => {
         setPrintModalVisible(false);
     }
 
+    const lazyShowValidationReport = () => (
+        validateModalOpen ?
+            <ValidationReport visible={validateModalOpen}
+                onClosed={setValidateModalOpen}
+                invalidItems={invalidReportItems}
+            /> :
+            null
+    )
+
     const lazyShowExtraHours = () => (
         extraHoursModalVisible ?
             <ExtraHoursModal
@@ -742,10 +722,9 @@ const Home = () => {
     return (
         <Content>
             <Suspense fallback={<div>Loading Validation Report...</div>}>
-                <ValidationReport visible={validateModalOpen}
-                    onClosed={setValidateModalOpen}
-                    invalidItems={invalidReportItems}
-                />
+            {
+                lazyShowValidationReport()
+            }
             </Suspense>
             <Row className='hvn-item-ltr' align={'middle'} type='flex'>
                 <Col span={10} >
@@ -837,9 +816,10 @@ const Home = () => {
                                 border: '1px solid rgb(240, 242, 245)',
                                 margin: '12px'
                             }}>
-                                <CalendarReport 
+                                <CalendarReport
+                                    month={month}
                                     dataSource={reportData}
-                                    employeKind={employeKind}
+                                    employeeKind={employeeKind}
                                     reportCodes={reportCodes}
                                     daysOff={daysOff}
                                     manualUpdates={manualUpdates}
@@ -848,7 +828,7 @@ const Home = () => {
                             </div>
                             {/* <NestedTableReport 
                                 dataSource={reportData}
-                                employeKind={employeKind}
+                                employeeKind={employeeKind}
                                 reportCodes={reportCodes}
                                 daysOff={daysOff}
                                 manualUpdates={manualUpdates}
@@ -857,7 +837,7 @@ const Home = () => {
                                 editable={isReportEditable}
                             />         */}
                             {/* <TableReport dataSource={reportData}
-                                        employeKind={employeKind}
+                                        employeeKind={employeeKind}
                                         reportCodes={reportCodes}
                                         daysOff={daysOff}
                                         manualUpdates={manualUpdates}
@@ -910,7 +890,7 @@ const Home = () => {
                     <div className='pdf-title'>{dataContext.user.name} (ת.ז. {dataContext.user.userID})</div>
                     <div className='pdf-title'>{t('summary')} {month}/{year}</div>
                     <TableReport dataSource={reportData}
-                                employeKind={employeKind}
+                                employeeKind={employeeKind}
                                 reportCodes={reportCodes}
                                 daysOff={daysOff}
                                 loading={loadingData} 

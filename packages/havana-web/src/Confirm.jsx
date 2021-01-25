@@ -8,9 +8,9 @@ import { useTranslation } from "react-i18next";
 
 import { Button, Typography, 
         Row, Col, Card, Tooltip, 
-        Collapse, Alert, Space } from 'antd';
-const { Panel } = Collapse;
-import { Input, Modal } from 'antd';
+        Alert, Space,
+        Input, Modal 
+} from 'antd';
 
 const { Title } = Typography;    
 
@@ -26,13 +26,13 @@ import ReactToPrint from 'react-to-print';
 import { DataContext } from './DataContext';
 import TableReport from '@reports/TableReport';
 import DocsUploader from '@components/DocsUploader';
-const ExtraHoursModal = React.lazy( () => import('@reports/ExtraHoursModal'))
+const ExtraHoursModal = React.lazy( () => import('@reports/ExtraHoursModal') )
+const ApprovalModal = React.lazy( ()=> import('@reports/approval/ApprovalModal') )
 
 import { DECREASE_NOTIFICATIONS_COUNT,
          INCREASE_NOTIFICATION_COUNT } from "./redux/actionTypes";
 
-const TIME_FORMAT = 'HH:mm';
-const DATE_FORMAT = 'DD/MM/YYYY';
+import { TIME_FORMAT, DATE_FORMAT } from './globals'         
 
 const ref = React.createRef();
 
@@ -57,7 +57,10 @@ const Confirm = (props) => {
     const [approvalSending, setApprovalSending] = useState(false);
     const [manualUpdates, setManualUpdates] = useState();
     const [extraHoursModalVisible, setExtraHoursModalVisible] = useState(false);
-  
+    const [spareHours, setSpareHours] = useState({});
+    const [approvalModalVisible, setApprovalModalVisible] = useState(false);
+    const [hrOfficers, serHROfficers] = useState();
+
     const history = useHistory();
     const componentRef = useRef();
     const context = useContext(DataContext)
@@ -77,7 +80,7 @@ const Confirm = (props) => {
                     withCredentials: true
                 }); 
 
-                const data = resp.data.items.map( (item, index ) => {
+                let data = resp.data.items.map( (item, index ) => {
                     const _item = {...item, 
                         entry: moment(item.entry, TIME_FORMAT),
                         exit: moment(item.exit, TIME_FORMAT),
@@ -94,12 +97,28 @@ const Confirm = (props) => {
                 setReportRejected(resp.data.isRejected);
                 setReportResubmitted(resp.data.reSubmitted);
                 setReportNote(resp.data.note);
+                setSpareHours({
+                    actual: resp.data.spareHours,
+                    granted: resp.data.spaceHoursLimit
+                })
                 setTitle(`אישור דוח נוכחות של ${resp.data.ownerName} ל ${resp.data.month}/${resp.data.year}`);
 
                 resp = await context.API.get(`/me/employees/manual_updates/${routeParams.userid}?year=${resp.data.year}&month=${resp.data.month}`, {
                     withCredentials: true
                 })
                 setManualUpdates(resp.data.items)
+
+                resp = await context.API.get('/me/hr_officers', {
+                    withCredentials: true
+                });
+                data = resp.data.map( item => (
+                    {
+                        email: item.email,
+                        name: item.userName,
+                        accountName: item.userAccountName
+                    }
+                ))
+                serHROfficers(data);
 
             } catch(err) {
                 console.error(err);
@@ -165,7 +184,7 @@ const Confirm = (props) => {
 
             dispatch( action_decreaseNotificationCount() );
 
-            await context.API.patch(`/me/pendings/saved/${savedReportId}?note=${note}`, {
+            await context.API.post(`/me/pendings/saved/${savedReportId}`, {
                     html: ref.current.outerHTML
                 }, 
                 {
@@ -201,7 +220,6 @@ const Confirm = (props) => {
             console.error(err.message)
         }
     }
-
     
     const onNotesModalClosed = () => {
         setNotesModalVisible(false)
@@ -211,10 +229,16 @@ const Confirm = (props) => {
         setNote(evt.target.value)
     }
 
-    const getTotalHoursPercentage = () => {
-        return Math.floor( parseFloat(totals) / 160. * 100 );
-    }
+    const getSpareHoursPercentage = () => {
+        if( !spareHours.granted 
+            || spareHours.granted === 0 
+            || !spareHours.actual 
+            || spareHours.actual === 0)
+            return '0';
 
+        return Math.floor(spareHours.actual/spareHours.granted * 100)
+
+    }
     const onPrint = () => {
         setPrintModalVisible(!printModalVisible);
     }
@@ -279,24 +303,58 @@ const Confirm = (props) => {
             null
     )
 
+    const onShowAppovalModal = () => {
+        setApprovalModalVisible(!approvalModalVisible)
+    }
+
+    const lazyShowApprovalModal = () => (
+        approvalModalVisible ?
+            <ApprovalModal visible={true}
+                hrOfficers={hrOfficers}
+                reportId={savedReportId}
+                onOk={onApprove}
+                onCancel={onApproveCanceled}
+                extraHours={spareHours}
+            /> :
+            null
+    )
+
+    const onApproved = (param1) => {
+        setApprovalModalVisible(false)
+    }
+
+    const onApproveCanceled = () => {
+        setApprovalModalVisible(false)
+    }
+
     return (
         <Content>
             <Title level={1} className='hvn-title'>{title}</Title>
             <Row  className='hvn-item-ltr' align={'middle'} type='flex'>
-                <Col span={3}>
+                <Col span={4}>
                     <Space>
-                        <Button type='primary' loading={approvalSending}
-                                onClick={ () => onContinue() }>
-                                    {t('continue')}
-                        </Button>                           
-                        <Button
+                        <Button type='primary' loading={approvalSending} disabled={loadingData}
+                                onClick={ () => onShowAppovalModal() }>
+                                    {'...' + t('approve')}
+                        </Button>
+                        <Tooltip key='reject' title={t('reject_tooltip')}>
+                            <Button type='danger' loading={loadingData} disabled={loadingData}>
+                                {t('reject')}
+                            </Button>
+                        </Tooltip>
+                        <Tooltip key='forward' title={t('forward_tooltip')}>
+                            <Button loading={loadingData} disabled={loadingData}>
+                                {t('move_to')}
+                            </Button>
+                        </Tooltip>                        
+                        <Button  loading={loadingData} disabled={loadingData}
                             icon={<PrinterOutlined />}
                             onClick={onPrint}>
                                 {t('print')}
                         </Button>
                     </Space>
                     </Col>
-                <Col span={21} style={{
+                <Col span={20} style={{
                     direction: 'rtl'
                 }}>
                     <Alert closable={false} 
@@ -322,8 +380,8 @@ const Confirm = (props) => {
                                 style={{ width: 270}}
                                 className='rtl' 
                                 loading={loadingData}>
-                                <Pie percent={getTotalHoursPercentage()} 
-                                    total={getTotalHoursPercentage() + '%'} 
+                                <Pie percent={ getSpareHoursPercentage() } 
+                                    total={`% ${getSpareHoursPercentage()}` } 
                                     title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
                                     animate={false}
                                     height={140} />
@@ -356,14 +414,14 @@ const Confirm = (props) => {
                     paddingLeft: '16px',
                     paddingTop: '16px'
                 }}>
-                        <div ref={ref}>
-                            <TableReport dataSource={tableData} 
-                                        loading={loadingData} 
-                                        manualUpdates={manualUpdates}
-                                        scroll={{y: '400px'}}
-                                        editable={false} />
+                    <div ref={ref}>
+                        <TableReport dataSource={tableData} 
+                                    loading={loadingData} 
+                                    manualUpdates={manualUpdates}
+                                    scroll={{y: '400px'}}
+                                    editable={false} />
 
-                        </div>
+                    </div>
                 </Col>
             </Row>
             <Suspense fallback={<div>Loading Extra Hours...</div>}>
@@ -399,7 +457,7 @@ const Confirm = (props) => {
                         </Col>
                         <Col span={6}>
                             { 
-                                whenApproved ?
+                                whenApproved && whenApproved.isValid() ?
                                     <div className='footer-print'>{t('approved_when')} {whenApproved.format(DATE_FORMAT)}</div> :
                                     null
                             }
@@ -407,6 +465,11 @@ const Confirm = (props) => {
                     </Row>
                 </div>                                        
             </Modal>
+            <Suspense>
+                {
+                    lazyShowApprovalModal()
+                }
+            </Suspense>
             <Modal closable={false} 
                     className='rtl'
                     visible={notesModalVisible}
@@ -431,7 +494,7 @@ const Confirm = (props) => {
                                         }} onClick={onForward}>
                                     {t('move_to')}
                                 </Button>
-                            </Tooltip>        ,
+                            </Tooltip>,
                             <Tooltip key='approve' title={t('approve_tooltip')}>
                                 <Button type="primary" 
                                     style={{

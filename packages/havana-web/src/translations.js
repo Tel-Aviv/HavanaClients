@@ -105,7 +105,19 @@ const translations = {
             "day_status_ok": "Record is valid",
             "day_status_invalid": "Record is invalid",
             "inout_details_caption": "Entrance/Exit details for ",
-            "extra_hours": "Extra Hours" 
+            "extra_hours": "Extra Hours",
+            "next": "Next",
+            "previous": "Previous",
+            "valid_not_completed" : "The report is valid but not completed till the end of the month",
+            "granted": "Hours limit",
+            "actual": "",
+            "to_vacation": "Exchange to special vacation",
+            "to_pay": "Exchange to payment",
+            "divide_extra_hours": "Hours division",
+            "done": "Done",
+            "select_hr_contact": "The approved report will be handled by",
+            "notes_for_hr_officer" : "Notes for HR Officer",
+            "remember_hr_officer": "Remember selection"
         }
     },
     he: {
@@ -214,7 +226,19 @@ const translations = {
             "day_status_ok": "רישום תקין",
             "day_status_invalid": "רישום צריך תיקון",
             "inout_details_caption": " פירוט כניסות ויציאות לתאריך",
-            "extra_hours": "שעות נוספות" 
+            "extra_hours": "שעות נוספות",
+            "next": "הבא",
+            "previous": "קודם",
+            "valid_not_completed": "הדו\"ח תקין אך לא הושלם עד סוף החודש",
+            "granted": "מכסה שעות לתשלום",
+            "actual": "דווחו בפועל",
+            "to_vacation": "המרה לחופשה מיוחדת",
+            "to_pay": "מכסה לתשלום",
+            "divide_extra_hours": "חלוקת השעות לתגמול",
+            "done": "סיום",
+            "select_hr_contact": "הדוח המאושר יעבור לטיפול על ידי",
+            "notes_for_hr_officer": "הערות לפקיד כא",
+            "remember_hr_officer": "זכור את הבחירה"
         }
     }
 }    
