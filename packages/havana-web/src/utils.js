@@ -168,6 +168,24 @@ if( process.env.mock ) {
     mock.onPost('/me/report/save')
     .reply(200);
 
+    mock.onGet('system_notes')
+    .reply(200, { 
+        "notes": [{
+                name: "איחור",
+                severityCode: 0
+            }, {
+                name: '*העדרות',
+                severityCode: 1
+            }, {
+                name: '*חסרה יציאה',
+                severityCode: 1
+            }, {
+                name: '*חסרה כניסה',
+                severityCode: 1
+            }
+        ]
+    })
+
     mock.onGet(/\/me\/reports\/\d+\/\d+/)
         .reply(200, {
             "ownerName":"אולג קליימן - טכנולוג אינטגרצייה",
@@ -360,7 +378,10 @@ if( process.env.mock ) {
                     "requiredHours": "8:24",
                     "acceptedHours": "8:24",
                     "systemNotes": "",
-                    "userNotes":"","total":"8:00","isAdded":false,"reportCode":"ע.מהבית"},
+                    "userNotes":"",
+                    "total":"8:00",
+                    "isAdded":false,
+                    "reportCode":"ע.מהבית"},
                 {"id":87880,
                     "rdate":"2020-07-17T00:00:00",
                     "day":"17",
@@ -369,8 +390,11 @@ if( process.env.mock ) {
                     "exit":"0:00",
                     "requiredHours": "8:24",
                     "acceptedHours": "8:24",
-                    "systemNotes": "*היעדרות",
-                    "userNotes":"","total":"0:00","isAdded":false,"reportCode":""},
+                    "systemNotes": "*העדרות",
+                    "userNotes":"",
+                    "total":"0:00",
+                    "isAdded":false,
+                    "reportCode":""},
                 {"id":87881,"rdate":"2020-07-18T00:00:00",
                     "day":"18",
                     "stripId": 1,
