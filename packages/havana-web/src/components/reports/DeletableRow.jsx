@@ -4,8 +4,8 @@ import { ReportContext } from "./TableContext";
 const DeletableRow = (props) => {
 
     const context = useContext(ReportContext);
-    const record = context.dailyTableData.find( item =>
-        item => item.key === props["data-row-key"]
+    const record = context.tableData.find( item =>
+       item.key === props["data-row-key"]
     )
 
     const trClassName = record && record.isDeleted ? 'strikeout' : '';

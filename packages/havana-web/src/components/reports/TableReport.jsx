@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 
 import { ReportContext } from "./TableContext";
 import EditableCell from './EditableCell';
+import DeletableRow from './DeletableRow';
 import EditIcons from './EditIcons';
 import AddRecordModal from './AddRecordModal';
 const FullDayReport = React.lazy( () => import('./FullDayReport') );
@@ -201,6 +202,7 @@ const TableReport = (props) => {
       const components = {
         body: {
           cell: EditableCell,
+          row: DeletableRow
         },
       };
      
@@ -642,7 +644,8 @@ const TableReport = (props) => {
 
       return (<>
         <ReportContext.Provider value={ {
-                                         codes: reportCodes
+                                         codes: reportCodes,
+                                         tableData: data
                                         }
                                       }>
           <AddRecordModal 

@@ -556,7 +556,7 @@ const DailyTable = (props) => {
 
     return <ReportContext.Provider value={ {
         codes: reportCodes,
-        dailyTableData: tableData
+        tableData: tableData
        }
      }>
         
