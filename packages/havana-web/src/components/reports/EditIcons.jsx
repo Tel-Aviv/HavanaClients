@@ -37,7 +37,8 @@ export default ({record, editing, disable, edit, editFullDay, save, cancel}) => 
                 !record.isFullDay ? 
                 <Tooltip title={t('edit_record')}>
                   <ClockCircleTwoTone
-                      onClick={() => edit(record)} />
+                      onClick={() => edit(record)} 
+                      style={iconStyle} />
                 </Tooltip> : null
               }
               <Tooltip title={t('report_full_day')}>

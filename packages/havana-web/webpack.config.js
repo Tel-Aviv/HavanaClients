@@ -29,7 +29,7 @@ module.exports = {
             })
     ],
     entry: {
-        bundle: ["@babel/polyfill", path.resolve(__dirname, './src/index.js')]
+        bundle: ["@babel/polyfill", path.resolve(__dirname, './src/index.jsx')]
     },
     module: {
         rules: [

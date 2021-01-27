@@ -7,6 +7,7 @@
   "scripts": {
     "test": "jest --collectCoverage",
     "build": "webpack --mode=development --watch",
+    "esbuild": "node esbuild.config.js",
     "start": "webpack serve --port 8089 --mode=production",
     "prod": "webpack --mode=production --config webpack.prod.js"
   },
@@ -41,6 +42,7 @@
     "css-loader": "^4.3.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.5",
+    "esbuild": "^0.8.36",
     "filemanager-webpack-plugin": "^2.0.5",
     "jest": "^26.4.2",
     "react-test-renderer": "^16.13.1",

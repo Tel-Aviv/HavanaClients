@@ -262,6 +262,16 @@ margin: 12px;
   margin-top: 24px;
 }
 
+ /* Pattern image for background is from http://www.patternify.com/ */
+ .strikeout {
+  background-color: transparent;
+  background-image: url(
+      data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAGklEQVQYV2NkYGD4z4AGGHEJoitkAKkkThAAte8CBP1ctQIAAAAASUVORK5CYII=  
+  );
+  background-repeat: repeat-x;
+  background-position: 0% 60%;
+}
+
 /* table adaptation for print */
 @media print {
   div.pdf-container {
@@ -283,6 +293,10 @@ margin: 12px;
   }
   span.ant-tag {
     font-size: 10px !important;
+  }
+  .ant-tag {
+    color: rgba(0, 0, 0, 0.85);
+    background-color: transparent;
   }
   td {
     padding: 2px 2px !important;

@@ -19,6 +19,7 @@
     "scripts": {
         "web:test": "yarn workspace havana-web test",
         "web:build": "yarn workspace havana-web build",
+        "web:esbuild": "yarn workspace havana-web esbuild",
         "web:prod": "yarn workspace havana-web prod",
         "web:start": "yarn workspace havana-web start",
         "web-m:build": "yarn workspace havana-web-m build",
