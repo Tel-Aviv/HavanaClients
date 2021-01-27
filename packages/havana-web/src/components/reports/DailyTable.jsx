@@ -180,21 +180,15 @@ const DailyTable = (props) => {
 
     const removeRecord = (record) => {
 
-        const index = tableData.findIndex( 
+        const deletedItem = tableData.find(
             item => item.key === record.key
-        );
+        )
 
-        if( index !== -1 ) {
-
-            const deletedItem = tableData[index];
+        if( deletedItem ) {
             deletedItem.isDeleted = true;
-
-            // dispatch(
-            //     action_ItemDeleted(deletedItem, index)
-            // )
-
             props.onRemove && props.onRemove(deletedItem.key, deletedItem);
         }
+
     }
 
     const replaceRecord = (newValues, recordKey) => {
