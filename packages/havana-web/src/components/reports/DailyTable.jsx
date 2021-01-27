@@ -505,6 +505,7 @@ const DailyTable = (props) => {
         render: (_, record) => {
 
           return ( moment(record.rdate, DATE_FORMAT).isBefore(moment()) // no edits for future
+                    && !record.isDeleted // no edits for deleted items
                     && record.requireChange)? 
             (<EditIcons 
                 record={record}
