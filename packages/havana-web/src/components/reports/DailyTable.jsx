@@ -100,7 +100,9 @@ const DailyTable = (props) => {
 
         return isEditedManually ?
                 <Tooltip title={t('manual_tag')}>
-                  <Tag color='magenta'>
+                  <Tag color='magenta' style={{
+                      backgroundColor: 'transparent'
+                  }}>
                         <TagOutlined />
                   </Tag> 
                 </Tooltip>: null
