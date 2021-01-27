@@ -96,23 +96,6 @@ const DailyTable = (props) => {
         setAddModalVisible(true);
     }
 
-    const handleRemoveRecord = (record) => {
-
-        const index = tableData.findIndex( 
-           item => item.key === record.key
-        );
-
-        if( index !== -1 ) {
-
-            const deletedItem = tableData[index];
-            deletedItem.isDeleted = true;
-
-            dispatch(
-                action_ItemDeleted(deletedItem, index)
-            )
-       }
-    }
-
     const manuallyEditedTag = ( isEditedManually ) => {
 
         return isEditedManually ?
@@ -192,6 +175,25 @@ const DailyTable = (props) => {
     const onCancelFullDayReport = () =>
         setFullDayReportVisible(false);        
  
+
+    const removeRecord = (record) => {
+
+        const index = tableData.findIndex( 
+            item => item.key === record.key
+        );
+
+        if( index !== -1 ) {
+
+            const deletedItem = tableData[index];
+            deletedItem.isDeleted = true;
+
+            // dispatch(
+            //     action_ItemDeleted(deletedItem, index)
+            // )
+
+            props.onRemove && props.onRemove(deletedItem.key, deletedItem);
+        }
+    }
 
     const replaceRecord = (newValues, recordKey) => {
  
@@ -354,7 +356,7 @@ const DailyTable = (props) => {
                     <Tooltip title={t('delete_record')}>
                         <Popconfirm
                             title={t('sure')}
-                            onConfirm={() => handleRemoveRecord(record)}>
+                            onConfirm={() => removeRecord(record)}>
                                 <MinusCircleTwoTone />  
                         </Popconfirm>                        
                     </Tooltip>
