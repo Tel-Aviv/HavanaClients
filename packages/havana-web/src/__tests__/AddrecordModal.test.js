@@ -22,6 +22,7 @@ i18n
 const year = 2020;
 const month = 7; 
 let reportCodes = [];
+let reportData = [];
 
 describe('Enables adding new entry to the report', () => {
 
@@ -45,7 +46,7 @@ describe('Enables adding new entry to the report', () => {
 
         const ID = resp[0].data.ID;
 
-        const report = resp[1].data;
+        const reportData = resp[1].data;
         const employerCode = report.employerCode || 0;
 
         resp = await API.get(`/me/report_codes`, {
@@ -57,6 +58,8 @@ describe('Enables adding new entry to the report', () => {
             },
             withCredentials: true
         })
+
+        reportCodes = resp.data;
     })
 
     afterAll(() => {
@@ -67,7 +70,8 @@ describe('Enables adding new entry to the report', () => {
     test('Fit Layout', () => {
         const component = renderer.create(
             <ReportContext.Provider value={ {
-                                                codes: reportCodes
+                                                codes: reportCodes,
+                                                tableData: reportData.items
                                             }
                                            }>
                 <AddRecordModal />

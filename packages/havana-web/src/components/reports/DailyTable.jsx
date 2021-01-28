@@ -15,6 +15,7 @@ import moment from 'moment';
 
 import EditIcons from './EditIcons';
 import EditableCell from './EditableCell';
+import DeletableRow from './DeletableRow';
 import AddRecordModal from './AddRecordModal';
 const FullDayReport = React.lazy( () => import('./FullDayReport') );
 
@@ -90,7 +91,7 @@ const DailyTable = (props) => {
         return record.key === editingKey
     }
 
-    const handleAddRow = (record) => {
+    const handleAddRecord = (record) => {
         setRecordToAdd(record);
         setAddModalVisible(true);
     }
@@ -99,7 +100,9 @@ const DailyTable = (props) => {
 
         return isEditedManually ?
                 <Tooltip title={t('manual_tag')}>
-                  <Tag color='magenta'>
+                  <Tag color='magenta' style={{
+                      backgroundColor: 'transparent'
+                  }}>
                         <TagOutlined />
                   </Tag> 
                 </Tooltip>: null
@@ -174,6 +177,19 @@ const DailyTable = (props) => {
     const onCancelFullDayReport = () =>
         setFullDayReportVisible(false);        
  
+
+    const removeRecord = (record) => {
+
+        const deletedItem = tableData.find(
+            item => item.key === record.key
+        )
+
+        if( deletedItem ) {
+            deletedItem.isDeleted = true;
+            props.onRemove && props.onRemove(deletedItem.key, deletedItem);
+        }
+
+    }
 
     const replaceRecord = (newValues, recordKey) => {
  
@@ -311,6 +327,7 @@ const DailyTable = (props) => {
     const components = {
         body: {
           cell: EditableCell,
+          row: DeletableRow
         },
     };
 
@@ -321,29 +338,29 @@ const DailyTable = (props) => {
         width: '6%',
         editable: false,
         render: (_, record) => 
-          props.editable ? (
+            props.editable ? (
             <Row>
-              <Col span={12}>
+                <Col span={12}>
                 <Tooltip title={t('add_record')}>
-                  <PlusCircleTwoTone
-                        onClick={() => handleAddRow(record)}/>
+                    <PlusCircleTwoTone
+                        onClick={() => handleAddRecord(record)}/>
                 </Tooltip>      
-              </Col>
-              <Col span={12}>
-              {
-                  record.isAdded ? 
-                    <Popconfirm
-                      title={t('sure')}
-                      onConfirm={() => handleRemoveRecord(record)}>
-                        <MinusCircleTwoTone />  
-                    </Popconfirm>    
-                  : null
-              }
-              </Col>
+                </Col>
+                <Col span={12}>
+                {
+                    record.isDeleted ? null :
+                    <Tooltip title={t('delete_record')}>
+                        <Popconfirm
+                            title={t('sure')}
+                            onConfirm={() => removeRecord(record)}>
+                                <MinusCircleTwoTone />  
+                        </Popconfirm>                        
+                    </Tooltip>
+                }
+                </Col>
             </Row> 
             ) : null
-      },
-        {
+      }, {
         title: t('in'),
         width: '15%',
         dataIndex: 'entry',
@@ -364,7 +381,8 @@ const DailyTable = (props) => {
                                 <>
                                     <Tag color={tagColor}
                                         style={{
-                                        marginRight: '0'
+                                            marginRight: '0',
+                                            backgroundColor: 'transparent'
                                     }}>
                                         {
                                             text.format(TIME_FORMAT)
@@ -398,7 +416,8 @@ const DailyTable = (props) => {
                     <>
                         <Tag color={tagColor}
                             style={{
-                                marginRight: '0'
+                                marginRight: '0',
+                                backgroundColor: 'transparent'
                             }}>
                             {
                                 text.format(TIME_FORMAT)
@@ -408,23 +427,7 @@ const DailyTable = (props) => {
                     </>
                 }
             </>
-            // return <>
-            //     {
-            //         text.format(TIME_FORMAT) === '00:00' ?
-            //         <div>-</div> :
-            //         <>
-            //             <Tag color={tagColor}
-            //                 style={{
-            //                     marginRight: '0'
-            //                 }}>
-            //                 {
-            //                     text.format(TIME_FORMAT)
-            //                 }
-            //             </Tag>
-            //             { manuallyEditedTag(isEditedManually) }
-            //         </>
-            //     }
-            // </>
+
         }
     }, {
         title: t('report_code'),
@@ -464,7 +467,8 @@ const DailyTable = (props) => {
           return ( text !== '' ) ?
                 <Tag color="magenta"
                     style={{
-                    marginRight: '0'
+                        marginRight: '0',
+                        backgroundColor: 'transparent'
                 }}>
                     {
                         record.isUpdated ?
@@ -495,6 +499,7 @@ const DailyTable = (props) => {
         render: (_, record) => {
 
           return ( moment(record.rdate, DATE_FORMAT).isBefore(moment()) // no edits for future
+                    && !record.isDeleted // no edits for deleted items
                     && record.requireChange)? 
             (<EditIcons 
                 record={record}
@@ -547,7 +552,8 @@ const DailyTable = (props) => {
     }     
 
     return <ReportContext.Provider value={ {
-        codes: reportCodes
+        codes: reportCodes,
+        tableData: tableData
        }
      }>
         

@@ -118,6 +118,138 @@ if( process.env.mock ) {
         ]        
         })
 
+    mock.onGet('/system_notes')
+        .reply(200,
+            {
+                "notes": [
+                  {
+                    "name": "איחור",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "*העדרות",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "לא פעיל",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "*חסר הסכם",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "*יום חריג",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "*לא מאושר",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "*חסרה יציאה",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "*חסרה כניסה",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "*עבודת לילה",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "*אין קוד יום",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "כניסת שבת.*ע",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "*עבודה בפגרה",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "*יציאה מאוחרת",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "*כניסה מוקדמת",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "עבודה מעל 12 ש",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "תקציבי.*חסר ס",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "*.זמן קטן ממינ",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "*.חופף תקופ שג",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "*.חפף רצועה שג",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": ".נוספ.*חריגה ש",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": ".שג .אוטו .*יצ",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": ".שג.אוטו .*כנס",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "*אין מספר הסכם",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "*דווח לא מאושר",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "הצהרה.*גמר מכס",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "יום בהס.*אין ק",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "*כנ.מקד/פ.מחצי",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "*מרווח קטן משע",
+                    "severityCode": 1
+                  },
+                  {
+                    "name": "פחות מחצי יום",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "*רצועות נוספות",
+                    "severityCode": 0
+                  },
+                  {
+                    "name": "*שגיאת פיצולים",
+                    "severityCode": 1
+                  }
+                ]
+              })
+
+
     mock.onGet('/me/reports/manual_updates')
         .reply(200,
         {
