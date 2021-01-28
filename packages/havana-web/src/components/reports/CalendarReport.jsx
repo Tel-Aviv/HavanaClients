@@ -211,26 +211,10 @@ const CalendarReport = (props) => {
         const index = newData.findIndex(item => key === item.key);
         if (index > -1) {
 
-        //   const item = newData[index];
-        //   let replacedItem = {
-        //     ...item,
-        //     inTime: newItem.inTime, 
-        //     outTime: newItem.outTime, 
-        //     rdate: moment(item.rdate, DATE_FORMAT).startOf('day'),
-        //     reportCode: newItem.reportCode, 
-        //     userNotes: newItem.userNotes,
-        //     isUpdated: newItem.isUpdated,
-        //     isDeleted: newItem.isDeleted,
-        //     isFullDay: true
-        //   }
-
-          //replacedItem.valid = true;
           //newItem.valid = true;
-          newData.splice(index, 1, newItem); //;replacedItem);
+          newData.splice(index, 1, newItem);
           setOriginalData(newData);
-          //setRecordToAdd(null);
 
-          // props.onChange && props.onChange(replacedItem, null);
           props.onChange && props.onChange(newItem, null);
         }
       }
