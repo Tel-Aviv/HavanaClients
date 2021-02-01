@@ -40,7 +40,7 @@ import DocsUploader from '@components/DocsUploader';
 const ValidationReport = React.lazy( () => import('@reports/ValidationsReport') )
 const ExtraHoursModal = React.lazy( () => import('@reports/ExtraHoursModal'))
 
-import { TIME_FORMAT, DATE_FORMAT } from './globals'
+import { TIME_FORMAT, DATE_FORMAT, TOTAL_MONTHLY_HOURS } from './globals'
 
 const Home = () => {
 
@@ -278,7 +278,7 @@ const Home = () => {
                 setReportData(data);
                 setReportDataLoaded(true);
 
-                setTotals(`${Math.floor(report.totalHours)}:${Math.round(report.totalHours % 1 * 60)}`);
+                // setTotals(`${Math.floor(report.totalHours)}:${Math.round(report.totalHours % 1 * 60)}`);
 
                 setIsReportEditable(report.isEditable);
 
@@ -303,8 +303,8 @@ const Home = () => {
         const applyEffect = async () => {
 
             if( reportData.length > 0 ) { // skip for the first time
-                // const _totals = recalculateTotals();
-                // setTotals(_totals);
+                const _totals = recalculateTotals();
+                setTotals(_totals);
 
                 await onSave();
             }
@@ -383,18 +383,23 @@ const Home = () => {
         })
     }
 
-    // const recalculateTotals = () => {
+    const recalculateTotals = () => {
 
-    //     const lTotal = reportData.reduce( ( accu, item ) => {
-            
-    //         const dayDuration = moment.duration(item.total);
-    //         return accu.add(dayDuration);
+        const lTotal = reportData.reduce( ( accu, item ) => {
 
-    //     }, moment.duration('00:00'))
+            const dayDuration = moment.duration(item.exit - item.entry);
+            return accu.add(dayDuration);
+
+        }, moment.duration('00:00'))
       
-    //     return `${Math.floor(lTotal.asHours())}:${lTotal.minutes().toString().padStart(2, '0')}`;
+        return `${Math.floor(lTotal.asHours())}:${lTotal.minutes().toString().padStart(2, '0')}`;
         
-    // }
+    }
+
+    const getTotalsPercentage = () => {
+        const _totalHours = moment.duration(totals);
+        return Math.floor( _totalHours.asHours() / TOTAL_MONTHLY_HOURS * 100)
+    }
 
     const action_updateItem = (item) => ({
         type: UPDATE_ITEM,
@@ -763,29 +768,46 @@ const Home = () => {
                 <Col span={5}>
                     <Row gutter={[32, 32]}>
                         <Col>
-                            <Card title={ `${t('extra_hours')}: ${getMonthName(month)} ${year} ` } 
-                                style={{ width: 270}}
-                                bordered={false}
-                                className='rtl' loading={loadingData}>
-                                <Pie 
-                                    percent={ getSpareHoursPercentage()} 
-                                    total={ `% ${getSpareHoursPercentage()}` } 
-                                    title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
-                                    animate={false}
-                                    subTitle={ `${spareHours.actual ?? 0} שעות`}
-                                    height={140} />
-                                <Card.Grid hoverable={false} style={{
-                                        width: '100%',
-                                        textAlign: 'center',
-                                        }}>
-                                    <Button type="primary" 
-                                        disabled={!spareHours.actual 
-                                                    || spareHours.actual === 0}
-                                        onClick={onShowExtraHours}>
-                                        {t('details')}
-                                    </Button>
-                                </Card.Grid>                      
-                            </Card>
+                        {
+                            employeeKind === 2 ? // Employee
+                                <Card title={ `${t('extra_hours')}: ${getMonthName(month)} ${year} ` } 
+                                    style={{ width: 270}}
+                                    bordered={false}
+                                    className='rtl' loading={loadingData}>
+                                            <Pie 
+                                                percent={ getSpareHoursPercentage() } 
+                                                total={ `% ${getSpareHoursPercentage()}` } 
+                                                title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
+                                                animate={false}
+                                                subTitle={ `${spareHours.actual ?? 0} שעות`}
+                                                height={140} />
+                                        <Card.Grid hoverable={false} style={{
+                                                width: '100%',
+                                                textAlign: 'center',
+                                                }}>
+                                            <Button type="primary"
+                                                disabled={!spareHours.actual 
+                                                            || spareHours.actual === 0}
+                                                onClick={onShowExtraHours}>
+                                                {t('details')}
+                                            </Button>
+                                        </Card.Grid>                      
+                                    </Card>
+                            : 
+                                <Card title={ `${t('extra_hours')}: ${getMonthName(month)} ${year} ` } 
+                                        style={{ width: 270}}
+                                        bordered={false}
+                                        className='rtl' loading={loadingData}>
+                                    <Pie
+                                        percent={ getTotalsPercentage() }
+                                        total={ `% ${getTotalsPercentage()} ` }
+                                        title={ `סיכום חודשי: ${getMonthName(month)} ${year} `}
+                                        subTitle={ ` ${totals} שעות`}
+                                        animate={false}
+                                        height={140} />
+                                </Card>
+
+                        }
                         </Col>
                     </Row>
                     <Row gutter={[32, 32]}>

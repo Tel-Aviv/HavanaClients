@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Row, Col, Tag, Modal, Badge, Typography } from 'antd';
+import { Calendar, Row, Col, Tag, Modal, Typography } from 'antd';
 const { Text } = Typography;
-import { CloseCircleOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import uniqid from 'uniqid';
 import { useTranslation } from "react-i18next";
@@ -134,7 +134,7 @@ const CalendarReport = (props) => {
 
                                             return item !== '' ?
                                                     <Tag key={uniqid()}
-                                                        icon={<CloseCircleOutlined />}
+                                                        icon={<ExclamationCircleOutlined />}
                                                         color='error'
                                                         style={{
                                                             marginRight: '0',
