@@ -272,7 +272,7 @@ const Home = () => {
                                 entry: moment(item.entry, TIME_FORMAT),
                                 exit: moment(item.exit, TIME_FORMAT),
                                 key: index,
-                                reportCode: isWorkingDay(item) ? _reportCode : ''
+                                reportCode: isWorkingDay(item) || isEmptyDay(item) ? '' : _reportCode
                             };
                 })
                 setReportData(data);
@@ -471,6 +471,12 @@ const Home = () => {
         }
     }
 
+    const isEmptyDay = (item) => {
+        const regex = new RegExp('^0*0*:0+0+')
+        return regex.test(item.entry) 
+                && regex.test(item.exit);
+    }
+
     const isWorkingDay = (item) => {
 
         const itemDate = moment(item.rdate);
@@ -481,9 +487,9 @@ const Home = () => {
              && dayOff.getFullYear() == itemDate.year()
         ))
         if( index ) 
-            return false;
+            return true;
         else
-            return !(item.dayOfWeek === 'ש' || item.dayOfWeek === 'ו');
+            return item.dayOfWeek === 'ש' || item.dayOfWeek === 'ו';
     }
 
     const isReportDataValid = () => {
