@@ -259,20 +259,19 @@ const Home = () => {
 
                 // Now process the report items
                 data = report.items.map( (item, index ) => {
-        
-                    // Map short description of the report code to the 'normal' description.
-                    // At this moment, reportCodes is not yet updated to state, so we use resp.data.items instead of additional useEffect()
-                    const reportCode = resp.data.codes.find( (el) => 
-                        el.ShortDescription === item.reportCode
-                    );
-                    const _reportCode = reportCode? reportCode.Description : item.reportCode;
 
                     return {
                                 ...item,
                                 entry: moment(item.entry, TIME_FORMAT),
                                 exit: moment(item.exit, TIME_FORMAT),
                                 key: index,
-                                reportCode: isWorkingDay(item) || isEmptyDay(item) ? '' : _reportCode
+                                reportCode: !isEmptyDay(item) ?
+                                    // Map short description of the report code to the 'normal' description.
+                                    // At this moment, reportCodes is not yet updated to state, so we use resp.data.items instead of additional useEffect()
+                                    resp.data.codes.find( (el) => 
+                                        el.ShortDescription === item.reportCode
+                                    ).Description :
+                                    item.reportCode
                             };
                 })
                 setReportData(data);
