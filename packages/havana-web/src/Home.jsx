@@ -595,17 +595,15 @@ const Home = () => {
 
     const operations = <div>
                             <Tooltip placement='bottom' title={getSubmitTitle}>
-                                <Popconfirm title={t('send_to_approval')} 
-                                    onConfirm={onSubmit}>
                                     <Button type="primary"
-                                            disabled={ isReportEditable || !reportDataValid }
+                                            onClick={onSubmit}
+                                            disabled={ !isReportEditable || !reportDataValid }
                                             icon={<IssuesCloseOutlined />}
                                             style={{
                                                 marginRight: '6px'
                                             }}>
                                         {t('submit')}
                                     </Button>
-                                </Popconfirm>
                             </Tooltip>
                             <Tooltip placement='bottom' title={t('validate_report')}>
                                 <Button onClick={validateReport} 
