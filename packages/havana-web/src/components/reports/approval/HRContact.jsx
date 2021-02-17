@@ -17,11 +17,13 @@ const HRContact = ({contacts, contactChanged, hrNotesChanged}) => {
     return (
         <>
             <Divider orientation="left">{t('select_hr_contact')}</Divider>
-            <Select size="small" style={{ 
+            <Select size="small" 
+                    style={{ 
                         width: 220,
                         float: 'right'
                     }}
-                        onChange={contactChanged}>
+                    defaultValue={contacts[0].name}
+                    onChange={contactChanged}>
                 {
                     contacts.map( item => (
                         <Option key={uniqid()}

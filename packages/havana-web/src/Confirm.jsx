@@ -331,7 +331,7 @@ const Confirm = (props) => {
         <Content>
             <Title level={1} className='hvn-title'>{title}</Title>
             <Row  className='hvn-item-ltr' align={'middle'} type='flex'>
-                <Col span={4}>
+                <Col span={5}>
                     <Space>
                         <Button type='primary' loading={approvalSending} disabled={loadingData}
                                 onClick={ () => onShowAppovalModal() }>
@@ -354,13 +354,13 @@ const Confirm = (props) => {
                         </Button>
                     </Space>
                     </Col>
-                <Col span={20} style={{
+                <Col span={19} style={{
                     direction: 'rtl'
                 }}>
                     <Alert closable={false} 
                         style={{
                             opacity: alertOpacity,
-                            width: '100%'
+                            width: '98%'
                         }}
                         message={formatAlertMessage()}
                         showIcon
